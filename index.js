@@ -25,6 +25,7 @@ app.use('/api/auth', require('./routes/auth'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {
+    //console.log(process.env.DB_CNN);
     console.log(`Api REST USUARIOS corriendo en el puerto ${process.env.PORT}`);
 });
 

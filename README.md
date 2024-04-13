@@ -55,3 +55,6 @@ SECRET_JWT_SEED=************************
 
 docker-compose up --build
 
+# Test en local 2.0 (en contrucción)
+
+docker-compose -f dev.docker-compose.yml up --build
