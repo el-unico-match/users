@@ -1,0 +1,9 @@
+const LENGTH_MIN_NAME = 5;
+const LENGTH_MIN_PASSWORD = 6;
+const REGEXP_NUMBERS_SYMBOLS_PASSWORD = /(?=.*[0-9])(?=.*[@#$%^&-+=()])/;
+
+module.exports = {
+    LENGTH_MIN_NAME,
+    LENGTH_MIN_PASSWORD,
+    REGEXP_NUMBERS_SYMBOLS_PASSWORD
+}
