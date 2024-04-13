@@ -11,7 +11,7 @@ env:
 on:
   pull_request:
     types: [opened, synchronize, reopened, close]
-    branches: [ "dev" ]
+    branches: [ "main" ]
   workflow_dispatch:
   
 permissions:
