@@ -15,7 +15,7 @@ const createUser = async (req, res = response) => {
         const {email, password, role} = req.body;
         let user = await User.findOne({email: email});
         if (user){
-            return res.status(400).json({
+            return res.status(422).json({
                 ok: false,
                 msg: MSG_USER_EXISTS
             });
@@ -51,7 +51,7 @@ const loginUser = async (req, res = response) => {
         const {email, password} = req.body;
         const user = await User.findOne({email: email});
         if (!user){
-            return res.status(400).json({
+            return res.status(422).json({
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             });
@@ -59,7 +59,7 @@ const loginUser = async (req, res = response) => {
         // Confirmar contraseña
         const validPassword = bcrypt.compareSync(password, user.password);
         if (!validPassword) {
-            return res.status(400).json({
+            return res.status(422).json({
                 ok: false,
                 msg: MSG_PASSWORD_INCORRECT
             });    
