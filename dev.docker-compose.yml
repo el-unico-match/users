@@ -3,10 +3,8 @@ version: "2.2"
 services:
   app:
     build: .
-    environment:
-      - PORT = "4000"
-      - DB_CNN = "mongodb://db:27017/test"
-      - SECRET_JWT_SEED = ""
+    env_file:
+      - .dev.env
     ports:
       - "4000:4000"
     networks:
@@ -14,14 +12,16 @@ services:
     depends_on:
       - mongodb
   mongodb:
-    image: mongo:4.4.18
+    image: mongo:4.0
     container_name: mongodb
     hostname: mongodb
+    #volumes:
+    #  - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
     ports:
       - "27017:27017"
     networks:
       - dev-users-network
-  
+
 networks:
   dev-users-network:
     name: dev-users-network
