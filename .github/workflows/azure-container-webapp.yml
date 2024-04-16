@@ -41,7 +41,7 @@ jobs:
           push: false
           tags: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
           file: ./Dockerfile
-          outputs: type=docker,dest="${{ env.DOCKER_OUTPUT_FOLDER_LOCATION}}${{ env.DOCKER_OUTPUT_FILE_NAME }}"
+          outputs: type=docker,dest='${{ env.DOCKER_OUTPUT_FOLDER_LOCATION}}${{ env.DOCKER_OUTPUT_FILE_NAME }}'
 
       - name: List files in current working directory
         run: ls -R
@@ -66,5 +66,5 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
           clean: true
-          images: "{{ env.DOCKER_OUTPUT_FOLDER_LOCATION }}{{ env.DOCKER_OUTPUT_FILE_NAME }}"
+          images: '{{ env.DOCKER_OUTPUT_FOLDER_LOCATION }}{{ env.DOCKER_OUTPUT_FILE_NAME }}'
           configuration-file: ./docker-compose
