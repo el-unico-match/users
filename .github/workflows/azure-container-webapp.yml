@@ -32,7 +32,9 @@ jobs:
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Get branch name
-        run: echo "Branch name is ${{ github.ref }}"
+        run: 
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "Branch name is $CURRENT_BRANCH"
 
       - name: Get short commit hash
         run: |
@@ -48,7 +50,7 @@ jobs:
           push: false
           tags: 'docker/${{ env.REPO }}:${{ github.sha }}'
           file: ./Dockerfile
-          outputs: 'type=docker,dest=${{ env.DOCKER_OUTPUT_FOLDER_LOCATION}}${{ github.ref }}-$SHORT_COMMIT_HASH"'
+          outputs: 'type=docker,dest=${{ env.DOCKER_OUTPUT_FOLDER_LOCATION}}$CURRENT_BRANCH-$SHORT_COMMIT_HASH"'
 
       - name: List files in current working directory
         run: ls -R
@@ -72,6 +74,6 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: '${{ env.DOCKER_OUTPUT_FOLDER_LOCATION }}${{ github.ref }}-$SHORT_COMMIT_HASH"'
+          images: '${{ env.DOCKER_OUTPUT_FOLDER_LOCATION }}$CURRENT_BRANCH-$SHORT_COMMIT_HASH"'
           startup-command: docker-compose up --build
 
