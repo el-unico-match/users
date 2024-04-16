@@ -7,6 +7,8 @@ name: Build and deploy a container to an Azure Web App for testing PR
 env:
   AZURE_WEBAPP_NAME: pr-users-uniquegroup-match-fiuba
   AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_PR_USERS_PUBLISH_PROFILE }}
+  DOCKER_OUTPUT_FOLDER_LOCATION: ./docker-image/
+  DOCKER_OUTPUT_FILE_NAME: image-file
 
 on:
   pull_request:
@@ -30,8 +32,8 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
-      - name: Create a container-image folder
-        run: mkdir container-image
+      - name: Create a container image folder
+        run: mkdir ${{ env.DOCKER_OUTPUT_FOLDER_LOCATION }}
 
       - name: Build container image
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
@@ -39,7 +41,7 @@ jobs:
           push: false
           tags: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
           file: ./Dockerfile
-          outputs: type=oci,oci-mediatypes=true,dest=./container-image/image-file
+          outputs: type=docker,dest="${{ env.DOCKER_OUTPUT_FOLDER_LOCATION}}${{ env.DOCKER_OUTPUT_FILE_NAME }}"
 
       - name: List files in current working directory
         run: ls -R
@@ -63,5 +65,6 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: ./container-image/image-file
+          clean: true
+          images: "{{ env.DOCKER_OUTPUT_FOLDER_LOCATION }}{{ env.DOCKER_OUTPUT_FILE_NAME }}"
           configuration-file: ./docker-compose
