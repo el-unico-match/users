@@ -3,6 +3,7 @@ name: Build and deploy a container to an Azure Web App for testing PR
 env:
   AZURE_WEBAPP_NAME: pr-users-uniquegroup-match-fiuba
   AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_PR_USERS_PUBLISH_PROFILE }}
+  REPO: el-unico-match/users
   
 on:
   pull_request:
