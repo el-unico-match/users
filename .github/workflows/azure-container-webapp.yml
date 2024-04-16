@@ -33,7 +33,7 @@ jobs:
 
       - name: Get branch name
         run: 
-          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          CURRENT_BRANCH=$(git branch --show-current)
           echo "Branch name is $CURRENT_BRANCH"
 
       - name: Get short commit hash
