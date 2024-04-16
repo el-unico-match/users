@@ -30,8 +30,8 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
-      - name: Create a docker-image folder
-        run: mkdir docker-image
+      - name: Create a container-image folder
+        run: mkdir container-image
 
       - name: Build container image
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
@@ -39,7 +39,7 @@ jobs:
           push: false
           tags: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
           file: ./Dockerfile
-          outputs: type=oci,oci-mediatypes=true,name=docker-image-file,dest=./docker-image
+          outputs: type=oci,oci-mediatypes=true,dest=./container-image/image-file
 
       - name: List files in current working directory
         run: ls -R
@@ -63,4 +63,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: './docker-image/docker-image-file'
+          images: './container-image/image-file'
