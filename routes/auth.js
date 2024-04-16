@@ -14,13 +14,15 @@ const {
     deleteUser,
     getUsers, 
     revalidateToken,
-    validateToken} = require('../controllers/auth');
+    validateToken,
+    getDataUser} = require('../controllers/auth');
 const {
     checkCreateUser,  
     checkLoginUser,
     checkUpdateUser,
     checkDeleteUser,    
-    checkRevalidateToken} = require('../middlewares/checkers/users');
+    checkRevalidateToken,
+    checkGetDataUser} = require('../middlewares/checkers/users');
 
 const router = Router();
 
@@ -44,5 +46,8 @@ router.get('/renew', checkRevalidateToken, validateJWT, revalidateToken);
 
 // Check token
 router.get('/validate', validateJWT, validateToken);
+
+// Obtener datos del usuario en base al email
+router.get('/data', validateJWT, checkGetDataUser, getDataUser);
 
 module.exports = router;

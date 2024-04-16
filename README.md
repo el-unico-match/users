@@ -6,10 +6,12 @@
         * Eliminar su usuario.
         * Obtener usuarios.
         * Actualizar su usuario.
+        * Consultar datos de un usuario en base a un email en particular
     * Rol administrador:
         * Puede crear y eliminar cualquier tipo de usuario.
         * Obtener lista de usuarios.
         * Actualizar su usuario.
+        * Consultar datos de un usuario en base a un email en particular
 
 NOTA: Un usuario cliente no puede pasar a ser administrador y viceversa.
 
@@ -40,21 +42,33 @@ const UserSchema = Schema({
 module.exports = model('User', UserSchema);
 ```
 
-
 # Instrucciones:
 
-Tener el archivo .env (pasado por privado) en la raíz del proyecto.
+# Ejecutar servidor:
+
+1) Se debe disponer de las siguientes variables de entorno para su ejecución:
 
 ```
 PORT = 4000
 DB_CNN=********
 SECRET_JWT_SEED=************************
 ```
+Opcionalmente se podrá utilizar el archivo .env (pasado por privado) en la 
+raíz del proyecto para configurar dichas variables de entorno.
 
-# Ejecutar servidor:
+2) Ejecutar el siguiente comando:
 
+```
 docker-compose up --build
+```
 
-# Test en local 2.0 (en contrucción)
+# Ejecución sobre base de datos de desarrollo:
 
+1) Se debe disponer del archivo ".dev.env" (pasado por privado) en la raíz del proyecto
+el cual permite configurar las variables de entorno.
+
+2) Ejecutar el siguiente comando:
+
+```
 docker-compose -f dev.docker-compose.yml up --build
+```

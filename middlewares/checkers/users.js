@@ -108,10 +108,19 @@ const checkRevalidateToken = [
     validateFields
 ];
 
+/**
+* @returns {object} Un arreglo de middlewares que checkean la presencia de email.
+*/
+const checkGetDataUser = [
+    check('email', MSG_EMAIL_NOT_ENTERED).isEmail(),
+    validateFields
+];
+
 module.exports = {
     checkCreateUser,
     checkLoginUser,
     checkUpdateUser,
     checkDeleteUser,    
-    checkRevalidateToken
+    checkRevalidateToken,
+    checkGetDataUser
 }

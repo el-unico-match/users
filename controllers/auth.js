@@ -169,6 +169,34 @@ const validateToken = async (req, res = response) => {
     });
 }
 
+const getDataUser = async (req, res = response) => {
+    const userEmail = req.body.email;
+    try {
+        const user = await User.findOne({email: userEmail});
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                msg: MSG_USER_NOT_EXISTS
+            })
+        }
+        res.json({
+            ok: true,
+            msg: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: MSG_ERROR_500
+        });
+    }
+}
+
 module.exports = {
     createUser,
     loginUser,
@@ -176,5 +204,6 @@ module.exports = {
     deleteUser,
     getUsers,
     revalidateToken,
-    validateToken
+    validateToken,
+    getDataUser
 }
