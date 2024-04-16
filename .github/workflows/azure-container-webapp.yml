@@ -34,8 +34,9 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           push: false
-          tags: ${{ env.REPO }}:${{ github.sha }}
+          tags: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
           file: ./Dockerfile
+          output: type=oci,oci-mediatypes=true,name=docker-image-file,dest=./docker-image
 
       - name: List files in current working directory
         run: ls -R
@@ -59,4 +60,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
+          images: './docker-image/docker-image-file'
