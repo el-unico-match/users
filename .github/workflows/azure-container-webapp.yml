@@ -32,7 +32,7 @@ jobs:
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Get branch name
-        run: 
+        run: |
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Branch name is $CURRENT_BRANCH"
 
