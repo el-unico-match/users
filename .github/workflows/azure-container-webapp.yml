@@ -39,7 +39,7 @@ jobs:
           push: false
           tags: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
           file: ./Dockerfile
-          output: type=oci,oci-mediatypes=true,name=docker-image-file,dest=./docker-image
+          outputs: type=oci,oci-mediatypes=true,name=docker-image-file,dest=./docker-image
 
       - name: List files in current working directory
         run: ls -R
