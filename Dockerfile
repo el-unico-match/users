@@ -9,7 +9,6 @@ COPY models/ src/
 COPY routes/ src/
 COPY types/ src/
 COPY helpers/ src/
-COPY .env src/
 COPY package.json src/
 COPY index.js src/
 
