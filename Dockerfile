@@ -1,11 +1,22 @@
 FROM node:21
 
-COPY [".", ".env", "package.json","package-lock.json" , "/usr/src/"]
+COPY controllers/ src/
+COPY database/ src/
+COPY helpers/ src/
+COPY mesages/ src/
+COPY middlewares/ src/
+COPY models/ src/
+COPY routes/ src/
+COPY types/ src/
+COPY helpers/ src/
+COPY .env src/
+COPY .package.json src/
+COPY index.js sec/
 
-WORKDIR /usr/src
+WORKDIR /src/
 
 RUN npm install
 
 EXPOSE 3000
 
-CMD ["node", "index.js"]
+ENTRYPOINT ["node", "index.js"]
