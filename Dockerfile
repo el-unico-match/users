@@ -3,7 +3,7 @@ FROM node:21
 COPY controllers/ src/
 COPY database/ src/
 COPY helpers/ src/
-COPY mesages/ src/
+COPY messages/ src/
 COPY middlewares/ src/
 COPY models/ src/
 COPY routes/ src/
