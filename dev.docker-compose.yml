@@ -1,9 +1,17 @@
 version: "2.2"
 
 services:
+  
   app:
     build: .
     env_file:
       - .dev.env
     ports:
       - "4000:4000"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    container_name: "mongo"
+    ports:
+      - 27017:27017
