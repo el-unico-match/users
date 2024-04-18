@@ -11,7 +11,7 @@ COPY types/ src/
 COPY helpers/ src/
 COPY .env src/
 COPY .package.json src/
-COPY index.js sec/
+COPY index.js src/
 
 WORKDIR /src/
 
