@@ -8,6 +8,10 @@ const {
     MSG_USER_NOT_EXISTS,
     MSG_PASSWORD_INCORRECT
 } = require('../messages/auth');
+const {
+    HTTP_SUCCESS_2XX,
+    HTTP_CLIENT_ERROR_4XX,
+    HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
     
 const createUser = async (req, res = response) => {
     try {
@@ -15,7 +19,7 @@ const createUser = async (req, res = response) => {
         const {email, password, role} = req.body;
         let user = await User.findOne({email: email});
         if (user){
-            return res.status(422).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
                 ok: false,
                 msg: MSG_USER_EXISTS
             });
@@ -28,7 +32,7 @@ const createUser = async (req, res = response) => {
         await user.save();        
         // Generar el JWT (Java Web Token)
         const token = await generateJWT(user.id, user.name);
-        res.status(201).json({
+        res.status(HTTP_SUCCESS_2XX.CREATED).json({
             ok: true,
             uid: user.id,
             name: user.name,
@@ -38,7 +42,7 @@ const createUser = async (req, res = response) => {
         });    
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
         })
@@ -51,7 +55,7 @@ const loginUser = async (req, res = response) => {
         const {email, password} = req.body;
         const user = await User.findOne({email: email});
         if (!user){
-            return res.status(422).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             });
@@ -59,14 +63,14 @@ const loginUser = async (req, res = response) => {
         // Confirmar contraseña
         const validPassword = bcrypt.compareSync(password, user.password);
         if (!validPassword) {
-            return res.status(422).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
                 ok: false,
                 msg: MSG_PASSWORD_INCORRECT
             });    
         }
         // Generar el JWT (Java Web Token)
         const token = await generateJWT(user.id, user.name);
-        res.status(201).json({
+        res.status(HTTP_SUCCESS_2XX.ACCEPTED).json({
             ok: true,
             uid: user.id,
             name: user.name,
@@ -74,7 +78,7 @@ const loginUser = async (req, res = response) => {
         });    
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
         })
@@ -86,7 +90,7 @@ const updateUser = async (req, res = response) => {
     try {
         const user = await User.findOne({_id: userId});
         if (!user) {
-            return res.status(404).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             });        
@@ -113,7 +117,7 @@ const updateUser = async (req, res = response) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
         });

@@ -1,5 +1,6 @@
 const {response} = require('express');
 const jwt = require('jsonwebtoken');
+const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
 
 const MSG_NO_TOKEN = 'No hay un token la petición';
 const MSG_INVALID_TOKEN = 'Token no válido';
@@ -10,7 +11,7 @@ const MSG_INVALID_TOKEN = 'Token no válido';
 const validateJWT = (req, res = response, next) => {
     const token = req.header('x-token');
     if (!token) {
-        return res.status(401).json({
+        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
             ok: false,
             msg: MSG_NO_TOKEN
         });
@@ -18,7 +19,7 @@ const validateJWT = (req, res = response, next) => {
     try {
         doValidateJWT(req, token, res);
     } catch (error) {
-        return res.status(401).json({
+        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
             ok: false,
             msg: MSG_INVALID_TOKEN
         })
@@ -51,7 +52,7 @@ const validateLazyJWT = (req, res = response, next) => {
             doValidateJWT(req, token, res);
             req.token = token;
         } catch (error) {
-            return res.status(401).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                 ok: false,
                 msg: MSG_INVALID_TOKEN
             })

@@ -19,6 +19,7 @@ const {
     LENGTH_MIN_PASSWORD,
     REGEXP_NUMBERS_SYMBOLS_PASSWORD
 } = require('../../models/requirements/users');
+const {HTTP_CLIENT_ERROR_4XX} = require('../../helpers/httpCodes')
 
 /**
  * @returns Un middleware que checkea los siguiente invariante según el request:
@@ -32,7 +33,7 @@ const checkPermissionOnCreateUser = () => {
             let {role} = await User.findOne({_id: req.uid});
             // un cliente no puede crear otro usuario
             if (role === ROLES.CLIENT) {
-                return res.status(401).json({
+                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                     ok: false,
                     msg: MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER
                 });
@@ -41,7 +42,7 @@ const checkPermissionOnCreateUser = () => {
             const roleNewUser = req.body.role;
             // un usuario sin token no puede crear un administrador
             if (roleNewUser === ROLES.ADMINISTRATOR) {
-                return res.status(401).json({
+                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                     ok: false,
                     msg: MSG_WITHOUT_AUTH_TO_CREATE_ADMIN
                 })

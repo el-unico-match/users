@@ -1,6 +1,6 @@
 const {response} = require('express');
 const User = require('../models/Users');
-
+const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
 const MSG_ACCESS_DENIED = 'No tienes el nivel de acceso necesario';
 const MSG_USER_NOT_FOUND = 'No se encontró el usuario';
 
@@ -13,13 +13,13 @@ const createAccessRoleBased = (superRole) => {
     return async (req, res = response, next) => {        
         let {role} = await User.findOne({_id: req.uid});
         if (!role){
-            return res.status(401).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                 ok: false,
                 msg: MSG_USER_NOT_FOUND
             });
         }        
         if (role !== superRole) {
-            return res.status(401).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                 ok: false,
                 msg: MSG_ACCESS_DENIED
             });
