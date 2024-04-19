@@ -44,7 +44,7 @@ module.exports = model('User', UserSchema);
 
 # Instrucciones:
 
-# Ejecutar servidor:
+# Ejecución con base de datos remota en Mongo:
 
 1) Se debe disponer de las siguientes variables de entorno para su ejecución:
 
@@ -62,7 +62,7 @@ raíz del proyecto para configurar dichas variables de entorno.
 docker compose up --build
 ```
 
-# Ejecución sobre base de datos de desarrollo:
+# Ejecución sobre base de datos de desarrollo (local):
 
 1) Se debe disponer del archivo ".dev.env" (pasado por privado) en la raíz del proyecto
 el cual permite configurar las variables de entorno.
