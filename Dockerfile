@@ -1,7 +1,5 @@
 FROM node:21
 
-WORKDIR /
-
 COPY controllers/ controllers/
 COPY database/ database/
 COPY helpers/ helpers/
