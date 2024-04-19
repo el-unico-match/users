@@ -28,7 +28,7 @@ app.use('/api/login', require('./routes/login'));
 app.use('/api/token', require('./routes/token'));
 
 // Escuchar peticiones
-app.listen(process.env.PORT, () => {
-    console.log(`Api REST USUARIOS corriendo en el puerto ${process.env.PORT}`);
+app.listen(process.env.PORT, process.env.HOST, () => {
+    console.log(`Api REST USUARIOS corriendo en ${process.env.HOST}:${process.env.PORT}`);
 });
 
