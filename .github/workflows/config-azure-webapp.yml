@@ -33,8 +33,14 @@ jobs:
 
       - name: Create Environment File and data
         run: |
-          echo "PORT=3000" > .env    
+          echo "PORT=${{ vars.PORT }}" > .env    
+          echo "HOST=${{ vars.HOST }}" >> .env
+          echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
+          echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
           cat .env
+          
+      - name: List directory contents
+        run: ls -al
 
       - name: Build and push container image to registry
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
