@@ -59,7 +59,7 @@ raíz del proyecto para configurar dichas variables de entorno.
 2) Ejecutar el siguiente comando:
 
 ```
-docker-compose up --build
+docker compose up --build
 ```
 
 # Ejecución sobre base de datos de desarrollo:
@@ -70,5 +70,5 @@ el cual permite configurar las variables de entorno.
 2) Ejecutar el siguiente comando:
 
 ```
-docker-compose -f dev.docker-compose.yml up --build
+docker compose -f dev.docker-compose.yml up --build
 ```

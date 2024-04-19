@@ -21,7 +21,11 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // Rutas
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/current', require('./routes/current'));
+app.use('/api/edit', require('./routes/edit'));
+app.use('/api/info', require('./routes/info'));
+app.use('/api/login', require('./routes/login'));
+app.use('/api/token', require('./routes/token'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {
