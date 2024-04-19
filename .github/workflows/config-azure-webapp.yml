@@ -12,13 +12,22 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-  
-  env:
-    PORT=${{ vars.PORT }}
-    HOST=${{ vars.HOST }}
 
+  setup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Create Environment File and data
+        run: |
+          echo "PORT=${{ vars.PORT }}" > .env    
+          echo "HOST=${{ vars.HOST }}" >> .env
+          echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
+          echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
+          cat .env
+
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -35,14 +44,6 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
-      - name: Create Environment File and data
-        run: |
-          echo "PORT=${{ env.PORT }}" > .env    
-          echo "HOST=${{ env.HOST }}" >> .env
-          echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
-          echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
-          cat .env
-          
       - name: List directory contents
         run: ls -al
 
