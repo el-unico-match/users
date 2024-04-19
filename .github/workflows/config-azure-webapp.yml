@@ -14,6 +14,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+  
+  env:
+    PORT=${{ vars.PORT }}
+    HOST=${{ vars.HOST }}
 
     steps:
       - uses: actions/checkout@v3
@@ -33,8 +37,8 @@ jobs:
 
       - name: Create Environment File and data
         run: |
-          echo "PORT=${{ vars.PORT }}" > .env    
-          echo "HOST=${{ vars.HOST }}" >> .env
+          echo "PORT=${{ env.PORT }}" > .env    
+          echo "HOST=${{ env.HOST }}" >> .env
           echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
           echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
           cat .env
