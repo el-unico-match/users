@@ -26,6 +26,7 @@ app.use('/api/edit', require('./routes/edit'));
 app.use('/api/info', require('./routes/info'));
 app.use('/api/login', require('./routes/login'));
 app.use('/api/token', require('./routes/token'));
+app.use('/api/status', require('./routes/status'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, process.env.HOST, () => {
