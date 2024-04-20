@@ -32,13 +32,12 @@ const validateJWT = (req, res = response, next) => {
  * Válida el token del request.
  */
 const doValidateJWT = (req, token, res = response, next) =>  {
-    const {uid, name, role} = jwt.verify(
+    const {uid, name} = jwt.verify(
         token,
         process.env.SECRET_JWT_SEED
     )
     req.uid = uid;
     req.name = name;
-    req.role = role;
 }
 
 /**

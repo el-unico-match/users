@@ -4,8 +4,8 @@
 */
 
 const {Router} = require('express');
-const {loginUser} = require('../controllers/auth');
-const {checkLoginUser} = require('../middlewares/checkers/users');
+const {loginUser} = require('../controllers/login');
+const {checkLoginUser} = require('../middlewares/checkers/login');
 
 const router = Router();
 

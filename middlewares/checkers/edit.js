@@ -4,8 +4,6 @@ const {validateFields} = require('../validateFields');
 const User = require('../../models/Users');
 const {createAccessRoleAndOwnerBased} = require('../validateAccess');
 const {
-    MSG_EMAIL_NOT_ENTERED,
-    MSG_PASSWORD_NOT_ENTERED,
     MSG_NAME_IS_REQUIRED,
     MSG_NAME_ERROR_LENGTH,
     MSG_EMAIL_IS_REQUIRED,
@@ -69,15 +67,6 @@ const checkCreateUser = [
 ];
 
 /**
-* @returns {object} Un arreglo de middlewares que checkean la presencia de email y password.
-*/
-const checkLoginUser = [
-    check('email', MSG_EMAIL_NOT_ENTERED).isEmail(),
-    check('password', MSG_PASSWORD_NOT_ENTERED).not().isEmpty(),
-    validateFields
-];
-
-/**
 * @returns {object}  Un arreglo de middlewares que checkean la longitud del nombre, la existencia de
 un email, la existencia de un rol y la longitud del password y que el mismo contenga al menos un número
 y un símbolo. Además chequea el acceso según propietario y rol (si es propiertario autoriza automáticamente).
@@ -100,28 +89,8 @@ const checkDeleteUser = [
     validateFields
 ];
 
-/**
-* @returns {object} Un arreglo de middlewares que checkean la presencia de email y password.
-*/
-const checkRevalidateToken = [
-    check('email', MSG_EMAIL_NOT_ENTERED).isEmail(),
-    check('password', MSG_PASSWORD_NOT_ENTERED).not().isEmpty(),
-    validateFields
-];
-
-/**
-* @returns {object} Un arreglo de middlewares que checkean la presencia de email.
-*/
-const checkGetDataUser = [
-    check('email', MSG_EMAIL_NOT_ENTERED).isEmail(),
-    validateFields
-];
-
 module.exports = {
     checkCreateUser,
-    checkLoginUser,
     checkUpdateUser,
-    checkDeleteUser,    
-    checkRevalidateToken,
-    checkGetDataUser
+    checkDeleteUser    
 }

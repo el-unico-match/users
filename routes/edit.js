@@ -10,17 +10,17 @@ const {
 const {
     createUser,  
     updateUser, 
-    deleteUser} = require('../controllers/auth');
+    deleteUser} = require('../controllers/edit');
 const {
     checkCreateUser,
     checkUpdateUser,
     checkDeleteUser,    
-    } = require('../middlewares/checkers/users');
+    } = require('../middlewares/checkers/edit');
 
 const router = Router();
 
 // Crear usuario
-router.post('/', validateLazyJWT, checkCreateUser, createUser);
+router.post('/',validateLazyJWT, checkCreateUser, createUser);
 
 // Actualizar usuario
 router.put('/:id', validateJWT, checkUpdateUser, updateUser);

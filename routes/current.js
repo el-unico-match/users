@@ -5,12 +5,11 @@
 
 const {Router} = require('express');
 const {validateJWT} = require('../middlewares/validateJWT');
-const {getDataUser} = require('../controllers/auth');
-const {checkGetDataUser} = require('../middlewares/checkers/users');
+const {getDataUser} = require('../controllers/current');
 
 const router = Router();
 
-// Obtener datos del usuario en base al email
-router.get('/', validateJWT, checkGetDataUser, getDataUser);
+// Obtener datos del usuario
+router.get('/', validateJWT, getDataUser);
 
 module.exports = router;
