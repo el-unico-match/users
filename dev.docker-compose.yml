@@ -2,6 +2,7 @@ version: "2.2"
 
 services:  
   app:
+    container_name: users
     build: .
     env_file:
       - .dev.env
