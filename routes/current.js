@@ -9,7 +9,12 @@ const {getDataUser} = require('../controllers/current');
 
 const router = Router();
 
-// Obtener datos del usuario
+/**
+ * @swagger
+ * /api/current:
+ *  get:
+        summary: get user data
+*/
 router.get('/', validateJWT, getDataUser);
 
 module.exports = router;
