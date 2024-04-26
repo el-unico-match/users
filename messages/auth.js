@@ -17,9 +17,11 @@ const MSG_NAME_ERROR_LENGTH = `El nombre debe tener al menos ${LENGTH_MIN_NAME} 
 const MSG_EMAIL_IS_REQUIRED = 'El email es obligatorio';
 const MSG_PASSWORD_ERROR_LENGTH = `La contraseña debe tener al menos ${LENGTH_MIN_PASSWORD} carácteres de los cuales al menos uno debe ser un número y al menos uno debe ser un símbolo`;
 const MSG_ROLE_ERROR_TYPE = `El usuario debe tener alguno de los siguiente roles: ${Object.values(ROLES)}`;
+const MSG_BLOCKED_REQUIRED = 'El estado de bloqueo del usuario es requerido';
 
 const MSG_WITHOUT_AUTH_TO_CREATE_ADMIN = 'El usuario no tiene permiso para crear un nuevo administrador';
 const MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER = 'No tiene permiso para crear otro usuario';
+const MSG_USER_BLOCKED = 'The user has been blocked';
 
 module.exports = {
     MSG_USER_EXISTS,
@@ -33,5 +35,7 @@ module.exports = {
     MSG_PASSWORD_ERROR_LENGTH,
     MSG_ROLE_ERROR_TYPE,
     MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
-    MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER
+    MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
+    MSG_USER_BLOCKED, 
+    MSG_BLOCKED_REQUIRED
 }

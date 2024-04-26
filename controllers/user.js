@@ -15,7 +15,7 @@ const {
 const createUser = async (req, res = response) => {
     try {
         // Check en DB si ya existe el usuario
-        const {email, password, role} = req.body;
+        const {email, password, role, blocked} = req.body;
         let user = await User.findOne({email: email});
         if (user){
             return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
@@ -37,7 +37,8 @@ const createUser = async (req, res = response) => {
             name: user.name,
             email,
             token,
-            role            
+            role,
+            blocked         
         });    
     } catch (error) {
         console.log(error);
@@ -75,7 +76,8 @@ const updateUser = async (req, res = response) => {
                 name: userUpdated.name,
                 email: userUpdated.email,
                 role: userUpdated.role,
-                token: token
+                token: token,
+                blocked: user.blocked
             }
         });
     } catch (error) {

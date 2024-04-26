@@ -1,6 +1,6 @@
 /*
-    Rutas de Usuarios /edit
-    host + /api/edit
+    Rutas de Usuarios /user
+    host + /api/user
 */
 
 const {Router} = require('express');
@@ -10,12 +10,12 @@ const {
 const {
     createUser,  
     updateUser, 
-    deleteUser} = require('../controllers/edit');
+    deleteUser} = require('../controllers/user');
 const {
     checkCreateUser,
     checkUpdateUser,
     checkDeleteUser,    
-    } = require('../middlewares/checkers/edit');
+    } = require('../middlewares/checkers/user');
 
 const router = Router();
 

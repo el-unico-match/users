@@ -1,11 +1,11 @@
 /*
-    Rutas de Usuarios /info
-    host + /api/info
+    Rutas de Usuarios /users
+    host + /api/users
 */
 
 const {Router} = require('express');
 const {validateJWT} = require('../middlewares/validateJWT');
-const {getUsers} = require('../controllers/info');
+const {getUsers} = require('../controllers/users');
 
 const router = Router();
 

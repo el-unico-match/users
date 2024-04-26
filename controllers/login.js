@@ -5,7 +5,8 @@ const {generateJWT} = require('../helpers/jwt')
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
     MSG_USER_NOT_EXISTS,
-    MSG_PASSWORD_INCORRECT
+    MSG_PASSWORD_INCORRECT,
+    MSG_USER_BLOCKED
 } = require('../messages/auth');
 const {
     HTTP_SUCCESS_2XX,
@@ -22,6 +23,13 @@ const loginUser = async (req, res = response) => {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             });
+        } else {
+            if (user.blocked) {
+                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+                    ok: false,
+                    msg: MSG_USER_BLOCKED
+                }); 
+            }
         }
         // Confirmar contraseña
         const validPassword = bcrypt.compareSync(password, user.password);
@@ -37,6 +45,7 @@ const loginUser = async (req, res = response) => {
             ok: true,
             uid: user.id,
             name: user.name,
+            blocked: user.blocked,
             token
         });    
     } catch (error) {

@@ -49,8 +49,8 @@ app.use(express.json());
 app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)))
 // Rutas Usuario
 app.use('/api/current', require('./routes/current'));
-app.use('/api/edit', require('./routes/edit'));
-app.use('/api/info', require('./routes/info'));
+app.use('/api/user', require('./routes/user'));
+app.use('/api/users', require('./routes/users'));
 app.use('/api/login', require('./routes/login'));
 app.use('/api/token', require('./routes/token'));
 app.use('/api/status', require('./routes/status'));

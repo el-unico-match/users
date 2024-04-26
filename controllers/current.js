@@ -19,7 +19,8 @@ const getDataUser = async (req, res = response) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                blocked: user.blocked
             }
         });
     } catch (error) {

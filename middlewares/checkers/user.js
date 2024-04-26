@@ -10,7 +10,8 @@ const {
     MSG_PASSWORD_ERROR_LENGTH,
     MSG_ROLE_ERROR_TYPE, 
     MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
-    MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER
+    MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
+    MSG_BLOCKED_REQUIRED
 } = require('../../messages/auth');
 const {
     LENGTH_MIN_NAME,
@@ -62,6 +63,8 @@ const checkCreateUser = [
     check('password', MSG_PASSWORD_ERROR_LENGTH).isLength({ min: LENGTH_MIN_PASSWORD})
         .matches(REGEXP_NUMBERS_SYMBOLS_PASSWORD),
     check('role', MSG_ROLE_ERROR_TYPE).custom((role) => isRole(role)),
+    check('blocked', MSG_BLOCKED_REQUIRED).not().isEmpty(),
+    check('blocked', MSG_BLOCKED_REQUIRED).isBoolean(),
     checkPermissionOnCreateUser(),
     validateFields,
 ];
@@ -77,6 +80,7 @@ const checkUpdateUser = [
     check('password', MSG_PASSWORD_ERROR_LENGTH).optional().isLength({ min: LENGTH_MIN_PASSWORD})
         .matches(REGEXP_NUMBERS_SYMBOLS_PASSWORD),
     check('role', MSG_ROLE_ERROR_TYPE).isEmpty(),
+    check('blocked', MSG_BLOCKED_REQUIRED).optional().isBoolean(),
     createAccessRoleAndOwnerBased(ROLES.ADMINISTRATOR),
     validateFields
 ];

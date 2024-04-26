@@ -9,7 +9,7 @@ const {Schema, model} = require('mongoose');
  *          properties:
  *              name: 
  *                  type: string
- *                  description: user name
+ *                  description: unique user name
  *              email:
  *                  type: string
  *                  description: unique user email
@@ -19,11 +19,15 @@ const {Schema, model} = require('mongoose');
  *              role:
  *                  type: string
  *                  description: cliente or administrador
+ *              blocked:
+ *                  type: boolean
+ *                  description: unique. Disables the service for the user.
  *          required: 
  *              - name
  *              - email
  *              - password
  *              - role
+ *              - blocked
  *          example:
  *              name: rafael
  *              email: rafaelputaro@gmail.com
@@ -33,7 +37,8 @@ const {Schema, model} = require('mongoose');
 const UserSchema = Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     email: {
         type: String,
@@ -48,6 +53,11 @@ const UserSchema = Schema({
         type: String,
         required: true
     },
+    blocked: {
+        type: Boolean,
+        required: true
+    }
+
 });
 
 module.exports = model('User', UserSchema);
