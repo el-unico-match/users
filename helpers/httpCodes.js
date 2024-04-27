@@ -36,6 +36,8 @@ const HTTP_SERVER_ERROR_5XX = Object.freeze({
     INTERNAL_SERVER_ERROR: 500,
     // Funcionalidad no implementada
     NOT_IMPLEMENTED: 501,
+    // Un servicio que no esta disponible
+    SERVICE_NOT_AVAILABLE: 503
 });
 
 module.exports = {

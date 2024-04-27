@@ -43,9 +43,13 @@ const loginUser = async (req, res = response) => {
         const token = await generateJWT(user.id, user.name);
         res.status(HTTP_SUCCESS_2XX.ACCEPTED).json({
             ok: true,
-            uid: user.id,
-            name: user.name,
-            blocked: user.blocked,
+            user: {
+                uid: user.id,
+                name: user.name,
+                email,
+                role: user.role,
+                blocked: user.blocked
+            },
             token
         });    
     } catch (error) {

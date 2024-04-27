@@ -5,22 +5,22 @@ const {
 
 const {ROLES} = require('../types/role');
 
-const MSG_USER_EXISTS = 'Ya existe un usuario con ese correo';
-const MSG_USER_NOT_EXISTS = 'No existe el usuario ingresado';
-const MSG_PASSWORD_INCORRECT = 'Usuario o contraseña incorrectos';
+const MSG_USER_EXISTS = 'There is already a user with that email';
+const MSG_USER_NOT_EXISTS = 'The user does not exist';
+const MSG_PASSWORD_INCORRECT = 'Incorrect username or password';
 
-const MSG_EMAIL_NOT_ENTERED = 'No se ha ingresado el email';
-const MSG_PASSWORD_NOT_ENTERED = 'No se ha ingresado la contraseña';
+const MSG_EMAIL_NOT_ENTERED = 'Email has not been entered';
+const MSG_PASSWORD_NOT_ENTERED = 'Password not entered';
 
-const MSG_NAME_IS_REQUIRED = 'El nombre es obligatorio';
-const MSG_NAME_ERROR_LENGTH = `El nombre debe tener al menos ${LENGTH_MIN_NAME} caracteres`;
-const MSG_EMAIL_IS_REQUIRED = 'El email es obligatorio';
-const MSG_PASSWORD_ERROR_LENGTH = `La contraseña debe tener al menos ${LENGTH_MIN_PASSWORD} carácteres de los cuales al menos uno debe ser un número y al menos uno debe ser un símbolo`;
-const MSG_ROLE_ERROR_TYPE = `El usuario debe tener alguno de los siguiente roles: ${Object.values(ROLES)}`;
-const MSG_BLOCKED_REQUIRED = 'El estado de bloqueo del usuario es requerido';
+const MSG_NAME_IS_REQUIRED = 'Name is required';
+const MSG_NAME_ERROR_LENGTH = `The name must be at least ${LENGTH_MIN_NAME} characters`;
+const MSG_EMAIL_IS_REQUIRED = 'Email is required';
+const MSG_PASSWORD_ERROR_LENGTH = `The name must be at least ${LENGTH_MIN_PASSWORD} characters of which at least one must be a number and at least one must be a symbol`;
+const MSG_ROLE_ERROR_TYPE = `The user must have one of the following roles: ${Object.values(ROLES)}`;
+const MSG_BLOCKED_REQUIRED = 'User lock status is required';
 
-const MSG_WITHOUT_AUTH_TO_CREATE_ADMIN = 'El usuario no tiene permiso para crear un nuevo administrador';
-const MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER = 'No tiene permiso para crear otro usuario';
+const MSG_WITHOUT_AUTH_TO_CREATE_ADMIN = 'The user does not have permission to create a new administrator';
+const MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER = 'You do not have permission to create another user';
 const MSG_USER_BLOCKED = 'The user has been blocked';
 
 module.exports = {

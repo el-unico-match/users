@@ -10,15 +10,18 @@ const {Schema, model} = require('mongoose');
  *              name: 
  *                  type: string
  *                  description: unique user name
+ *                  minLength: 5
  *              email:
  *                  type: string
  *                  description: unique user email
  *              password:
  *                  type: string
- *                  description: user password
+ *                  description: user password. Numbers, letters and at least one symbol
+ *                  minLength: 6
  *              role:
  *                  type: string
- *                  description: cliente or administrador
+ *                  description: role in the system
+ *                  enum: [administrador, cliente]
  *              blocked:
  *                  type: boolean
  *                  description: unique. Disables the service for the user.
@@ -33,6 +36,7 @@ const {Schema, model} = require('mongoose');
  *              email: rafaelputaro@gmail.com
  *              password: rafa123el88*
  *              role: administrador
+ *              blocked: false
  */
 const UserSchema = Schema({
     name: {
@@ -59,5 +63,43 @@ const UserSchema = Schema({
     }
 
 });
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      UserSharedData:
+ *          type: object
+ *          properties:
+ *              uid:
+ *                  type: string
+ *                  description: unique user id 
+ *              name: 
+ *                  type: string
+ *                  description: unique user name
+ *                  minLength: 5
+ *              email:
+ *                  type: string
+ *                  description: unique user email              
+ *              role:
+ *                  type: string
+ *                  description: cliente or administrador
+ *                  enum: [administrador, cliente]
+ *              blocked:
+ *                  type: boolean
+ *                  description: unique. Disables the service for the user.
+ *          required: 
+ *              - name
+ *              - email
+ *              - password
+ *              - role
+ *              - blocked
+ *          example:
+ *              id: 645547541243dfdsfe2132142134234203
+ *              name: rafael
+ *              email: rafaelputaro@gmail.com
+ *              role: administrador
+ *              blocked: false
+ */
 
 module.exports = model('User', UserSchema);
