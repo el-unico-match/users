@@ -26,22 +26,9 @@ const router = Router();
  *                                  type: boolean
  *                                  example: true
  *                              status:
- *                                  type: object
- *          400:
- *              description: return error "Incorrect username or password" or "Email has not been entered" or "Email has not been entered"!
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              ok:
- *                                  type: boolean
- *                                  example: false
- *                              msg:
- *                                  type: object
- *                                  example: The user has been blocked
- *          401:
- *              description: return error "The user has been blocked"!
+ *                                  type: integer
+ *          503:
+ *              description: return bad status!
  *              content:
  *                  application/json:
  *                      schema:
@@ -52,33 +39,7 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: string
- *                                  example: The user has been blocked
- *          404:
- *              description: return error not found!
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              ok:
- *                                  type: boolean
- *                                  example: false
- *                              msg:
- *                                  type: string
- *                                  example: The user does not exist
- *          500:
- *              description: return internal error!
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              ok:
- *                                  type: boolean
- *                                  example: false
- *                              msg:
- *                                  type: string
- *                                  example: Please talk to the administrator
+ *                                  example: "The database is not available"
 */
 router.get('/', getStatus);
 

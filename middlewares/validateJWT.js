@@ -17,7 +17,7 @@ const validateJWT = (req, res = response, next) => {
         });
     }
     try {
-        doValidateJWT(req, token, res);
+        doValidateJWT(req, token);
     } catch (error) {
         return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
             ok: false,
@@ -31,13 +31,16 @@ const validateJWT = (req, res = response, next) => {
  * 
  * Válida el token del request.
  */
-const doValidateJWT = (req, token, res = response, next) =>  {
-    const {uid, name} = jwt.verify(
+const doValidateJWT = (req, token) =>  {
+    const {uid, name, email, role, blocked} = jwt.verify(
         token,
         process.env.SECRET_JWT_SEED
     )
     req.uid = uid;
     req.name = name;
+    req.email = email;
+    req.role = role;
+    req.blocked = blocked;
 }
 
 /**

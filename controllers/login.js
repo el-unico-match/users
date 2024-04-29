@@ -40,7 +40,7 @@ const loginUser = async (req, res = response) => {
             });    
         }
         // Generar el JWT (Java Web Token)
-        const token = await generateJWT(user.id, user.name);
+        const token = await generateJWT(user.id, user.name, user.role, user.blocked);
         res.status(HTTP_SUCCESS_2XX.ACCEPTED).json({
             ok: true,
             user: {
