@@ -5,11 +5,7 @@
 
 const {Router} = require('express');
 const {validateJWT} = require('../middlewares/validateJWT');
-const {checkAccessBlocked} = require('../middlewares/validateAccess')
-const {
-    revalidateToken,
-    validateToken} = require('../controllers/token');
-const {checkRevalidateToken} = require('../middlewares/checkers/token');
+const {refreshToken} = require('../controllers/token');
 
 const router = Router();
 
@@ -17,7 +13,7 @@ const router = Router();
  * @swagger
  * /api/token:
  *  post:
- *      summary: revalite token
+ *      summary: returns a new token from request's token. In case of error use login
  *      tags: [User]
  *      parameters:
  *          - in: header
@@ -27,8 +23,8 @@ const router = Router();
  *              required: true
  *              description: user token
  *      responses:
- *          202: 
- *              description: return user data and token!
+ *          201: 
+ *              description: return user token!
  *              content:
  *                  application/json:
  *                      schema:
@@ -37,14 +33,11 @@ const router = Router();
  *                              ok:
  *                                  type: boolean
  *                                  example: true
- *                              user:
- *                                  type: object
- *                                  $ref: '#/components/schemas/UserSharedData'
  *                              token:
  *                                  type: string
  *                                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjJkMGMxMzRmMjA5MTk5ZDJmMjc0YTMiLCJuYW1lIjoicmFmYWVsIiwiaWF0IjoxNzE0MjUxMjUxLCJleHAiOjE3MTQyNTg0NTF9.ky8davH_RhQrscgs4k3dnLXJPB5mrdD6RVmWtv5dqUA
  *          400:
- *              description: return error "Incorrect username or password" or "Email has not been entered" or "Email has not been entered"!
+ *              description: error when there is no token in the request!
  *              content:
  *                  application/json:
  *                      schema:
@@ -55,9 +48,9 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: object
- *                                  example: The user has been blocked
+ *                                  example: There is no token in the request
  *          401:
- *              description: return error "The user has been blocked"!
+ *              description: return error "The user has been blocked" or "Invalid token"!
  *              content:
  *                  application/json:
  *                      schema:
@@ -70,7 +63,7 @@ const router = Router();
  *                                  type: string
  *                                  example: The user has been blocked
  *          404:
- *              description: return error not found!
+ *              description: return error when uid extracted from the token does not exist!
  *              content:
  *                  application/json:
  *                      schema:
@@ -95,10 +88,8 @@ const router = Router();
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ * 
 */
-router.post('/', checkAccessBlocked, checkRevalidateToken, validateJWT, revalidateToken);
-
-// Check token
-router.get('/', checkAccessBlocked, validateJWT, validateToken);
+router.post('/', validateJWT, refreshToken);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const EXPIRE_IN = '5m';
+const MSG_TOKEN_COULD_NOT_BE_GENERATED = "Token could not be generated";
 
 const generateJWT = (uid, name, email, role, blocked) => {
     return new Promise((resolve, reject) => {
@@ -15,7 +16,7 @@ const generateJWT = (uid, name, email, role, blocked) => {
         }, (error, token) => {
             if (error) {
                 console.log(error);
-                reject('No se pudo generar el token')
+                reject(MSG_TOKEN_COULD_NOT_BE_GENERATED)
             }
             resolve(token)
         });

@@ -74,4 +74,4 @@ docker compose -f dev.docker-compose.yml up --build
 ```
 3) Acceder a documentación en local: http://localhost:<PORT>/api-doc/
 
-Nota: PORT normalmente es 4000
+Nota: PORT normalmente es 4000 o sea: http://localhost:4000/api-doc/

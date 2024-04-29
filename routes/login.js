@@ -48,7 +48,7 @@ const router = Router();
  *                                  type: string
  *                                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjJkMGMxMzRmMjA5MTk5ZDJmMjc0YTMiLCJuYW1lIjoicmFmYWVsIiwiaWF0IjoxNzE0MjUxMjUxLCJleHAiOjE3MTQyNTg0NTF9.ky8davH_RhQrscgs4k3dnLXJPB5mrdD6RVmWtv5dqUA
  *          400:
- *              description: return error "Incorrect username or password" or "Email has not been entered" or "Email has not been entered"!
+ *              description: return error "Incorrect username or password" or "Email has not been entered" or "Password has not been entered"!
  *              content:
  *                  application/json:
  *                      schema:

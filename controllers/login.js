@@ -13,6 +13,13 @@ const {
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @return una función que en base al request's responde con token y el usuario
+ * que ha sido logueado.
+ */
 const loginUser = async (req, res = response) => {
     try {
         // Check en DB si ya existe el usuario

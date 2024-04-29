@@ -33,12 +33,14 @@ const createUser = async (req, res = response) => {
         const token = await generateJWT(user.id, user.name);
         res.status(HTTP_SUCCESS_2XX.CREATED).json({
             ok: true,
-            uid: user.id,
-            name: user.name,
-            email,
-            token,
-            role,
-            blocked         
+            user: {
+                uid: user.id,
+                name: user.name,
+                email,
+                role,
+                blocked         
+            },            
+            token            
         });    
     } catch (error) {
         console.log(error);
@@ -68,17 +70,17 @@ const updateUser = async (req, res = response) => {
         // Actualizar en DB
         const userUpdated = await User.findByIdAndUpdate(userId, newUser, {new: true});
         // Generar el JWT (Java Web Token)
-        const token = await generateJWT(userUpdated.id, userUpdated.name);
-        res.json({
+        const token = await generateJWT(userUpdated.id, userUpdated.name, userUpdated.email, userUpdated.role, userUpdated.blocked);
+        res.status(HTTP_SUCCESS_2XX.OK).json({
             ok: true,
-            msg: {
+            user: {
                 id: userUpdated._id,
                 name: userUpdated.name,
                 email: userUpdated.email,
                 role: userUpdated.role,
-                token: token,
-                blocked: user.blocked
-            }
+                blocked: userUpdated.blocked
+            },
+            token: token,
         });
     } catch (error) {
         console.log(error);

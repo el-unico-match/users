@@ -11,7 +11,9 @@ const {
     MSG_ROLE_ERROR_TYPE, 
     MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
     MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
-    MSG_BLOCKED_REQUIRED
+    MSG_BLOCKED_REQUIRED,
+    MSG_USER_CANNOT_CHANGE_ROLE,
+    MSG_INVALIDAD_LOCK_STATE
 } = require('../../messages/auth');
 const {
     LENGTH_MIN_NAME,
@@ -29,7 +31,7 @@ const checkPermissionOnCreateUser = () => {
     return async (req, res = response, next) => {     
         if (req.token) {
             // rol del usuario que hace la operación
-            let {role} = await User.findOne({_id: req.uid});
+            let {role} = await User.findOne({_id: req.tokenExtractedData.uid});
             // un cliente no puede crear otro usuario
             if (role === ROLES.CLIENT) {
                 return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
@@ -53,8 +55,8 @@ const checkPermissionOnCreateUser = () => {
 
 /**
 * @returns {object} Un arreglo de middlewares que checkean la longitud del nombre, la existencia de
-un email, la existencia de un rol y la longitud del password y que el mismo contenga al menos un número
-y un símbolo.
+* un email, la longitud del password y que el mismo contenga al menos un número
+* y un símbolo, la existencia de un rol y estado de bloqueo.
 */
 const checkCreateUser = [
     check('name', MSG_NAME_IS_REQUIRED).not().isEmpty(),
@@ -62,25 +64,26 @@ const checkCreateUser = [
     check('email', MSG_EMAIL_IS_REQUIRED).isEmail(),
     check('password', MSG_PASSWORD_ERROR_LENGTH).isLength({ min: LENGTH_MIN_PASSWORD})
         .matches(REGEXP_NUMBERS_SYMBOLS_PASSWORD),
+    check('role', MSG_ROLE_ERROR_TYPE).not().isEmpty(),
     check('role', MSG_ROLE_ERROR_TYPE).custom((role) => isRole(role)),
     check('blocked', MSG_BLOCKED_REQUIRED).not().isEmpty(),
-    check('blocked', MSG_BLOCKED_REQUIRED).isBoolean(),
+    check('blocked', MSG_INVALIDAD_LOCK_STATE).isBoolean(),
     checkPermissionOnCreateUser(),
     validateFields,
 ];
 
 /**
 * @returns {object}  Un arreglo de middlewares que checkean la longitud del nombre, la existencia de
-un email, la existencia de un rol y la longitud del password y que el mismo contenga al menos un número
-y un símbolo. Además chequea el acceso según propietario y rol (si es propiertario autoriza automáticamente).
+* un email, la existencia de un rol y la longitud del password y que el mismo contenga al menos un número
+* y un símbolo. Además chequea el acceso según propietario y rol (si es propiertario autoriza automáticamente).
 */
 const checkUpdateUser = [
     check('name', MSG_NAME_ERROR_LENGTH).optional().isLength({min: LENGTH_MIN_NAME}),
     check('email', MSG_EMAIL_IS_REQUIRED).optional().isEmail(),
     check('password', MSG_PASSWORD_ERROR_LENGTH).optional().isLength({ min: LENGTH_MIN_PASSWORD})
         .matches(REGEXP_NUMBERS_SYMBOLS_PASSWORD),
-    check('role', MSG_ROLE_ERROR_TYPE).isEmpty(),
-    check('blocked', MSG_BLOCKED_REQUIRED).optional().isBoolean(),
+    check('role', MSG_USER_CANNOT_CHANGE_ROLE).isEmpty(),
+    check('blocked', MSG_INVALIDAD_LOCK_STATE).optional().isBoolean(),
     createAccessRoleAndOwnerBased(ROLES.ADMINISTRATOR),
     validateFields
 ];

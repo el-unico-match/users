@@ -1,9 +1,8 @@
 const {response} = require('express');
 const User = require('../models/Users');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
-const {MSG_USER_BLOCKED} = require('../messages/auth');
-const MSG_ACCESS_DENIED = 'No tienes el nivel de acceso necesario';
-const MSG_USER_NOT_FOUND = 'No se encontró el usuario';
+const MSG_ACCESS_DENIED = 'You do not have the necessary access level';
+const MSG_USER_NOT_FOUND = 'User not found';
 
 /**
  * 
@@ -12,7 +11,8 @@ const MSG_USER_NOT_FOUND = 'No se encontró el usuario';
  */
 const createAccessRoleBased = (superRole) => {
     return async (req, res = response, next) => {        
-        let {role} = await User.findOne({_id: req.uid});
+        //let {role} = await User.findOne({_id: req.tokenExtractedData.uid});
+        const role = req.tokenExtractedData.role;
         if (!role){
             return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                 ok: false,
@@ -39,7 +39,7 @@ const createAccessRoleBased = (superRole) => {
 const createAccessRoleAndOwnerBased = (superRole) => {
     const checkAccessRoleBased = createAccessRoleBased(superRole);
     return async (req, res = response, next) => {        
-        const {uid} = req;
+        const uid = req.tokenExtractedData.uid;
         const {id} = req.params;
         if (uid !== id) {
             checkAccessRoleBased(req, res, next);
@@ -49,28 +49,7 @@ const createAccessRoleAndOwnerBased = (superRole) => {
     }
 }
 
-/**
- * 
- * @returns Retorna un middleware que checkea si el usuario se encuentra bloqueado.
- */
-const checkAccessBlocked = async (req, res = response, next) => {        
-    let user = await User.findOne({_id: req.uid});
-    try {    
-        if (user.blocked) {
-            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
-                ok: false,
-                msg: MSG_USER_BLOCKED
-            }); 
-        } else {
-            next();
-        }        
-    } catch (error) {
-        next();
-    }
-}
-
 module.exports = {
     createAccessRoleBased,
     createAccessRoleAndOwnerBased,
-    checkAccessBlocked
 }

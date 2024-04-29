@@ -16,7 +16,7 @@ const router = Router();
  *      tags: [User]
  *      responses:
  *          202: 
- *              description: return user data and token!
+ *              description: aplication status!
  *              content:
  *                  application/json:
  *                      schema:
@@ -25,8 +25,9 @@ const router = Router();
  *                              ok:
  *                                  type: boolean
  *                                  example: true
- *                              status:
+ *                              count_users:
  *                                  type: integer
+ *                                  example: 1
  *          503:
  *              description: return bad status!
  *              content:

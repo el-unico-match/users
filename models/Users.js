@@ -32,42 +32,11 @@ const {Schema, model} = require('mongoose');
  *              - role
  *              - blocked
  *          example:
- *              name: rafael
- *              email: rafaelputaro@gmail.com
- *              password: rafa123el88*
- *              role: administrador
+ *              name: carlos
+ *              email: carlos@mail.com
+ *              password: cli123te1*
+ *              role: cliente
  *              blocked: false
- */
-const UserSchema = Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        required: true
-    },
-    blocked: {
-        type: Boolean,
-        required: true
-    }
-
-});
-
-/**
- * @swagger
- * components:
- *  schemas:
  *      UserSharedData:
  *          type: object
  *          properties:
@@ -100,6 +69,53 @@ const UserSchema = Schema({
  *              email: rafaelputaro@gmail.com
  *              role: administrador
  *              blocked: false
+ *      UserUpdateData:
+ *          type: object
+ *          properties:
+ *              name: 
+ *                  type: string
+ *                  description: unique user name
+ *                  minLength: 5
+ *              email:
+ *                  type: string
+ *                  description: unique user email              
+ *              password:
+ *                  type: string
+ *                  description: user password. Numbers, letters and at least one symbol
+ *                  minLength: 6
+ *              blocked:
+ *                  type: boolean
+ *                  description: unique. Disables the service for the user.
+ *          example:
+ *              name: carlos
+ *              email: carlos@mail.com
+ *              password: cli123te1*
+ *              blocked: false
  */
+const UserSchema = Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        required: true
+    },
+    blocked: {
+        type: Boolean,
+        required: true
+    }
+
+});
 
 module.exports = model('User', UserSchema);

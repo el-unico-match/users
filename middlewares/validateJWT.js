@@ -1,7 +1,6 @@
 const {response} = require('express');
 const jwt = require('jsonwebtoken');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
-
 const MSG_NO_TOKEN = 'There is no token in the request';
 const MSG_INVALID_TOKEN = 'Invalid token';
 
@@ -35,12 +34,14 @@ const doValidateJWT = (req, token) =>  {
     const {uid, name, email, role, blocked} = jwt.verify(
         token,
         process.env.SECRET_JWT_SEED
-    )
-    req.uid = uid;
-    req.name = name;
-    req.email = email;
-    req.role = role;
-    req.blocked = blocked;
+    );
+    req.tokenExtractedData = {
+        uid,
+        name,
+        email,
+        role,
+        blocked
+    };
 }
 
 /**

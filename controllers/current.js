@@ -5,7 +5,7 @@ const {MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const {HTTP_SUCCESS_2XX, HTTP_SERVER_ERROR_5XX, HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
 
 const getDataUser = async (req, res = response) => {
-    const userId = req.uid;
+    const userId = req.tokenExtractedData.uid;
     try {
         const user = await User.findOne({_id: userId});
         if (!user) {
