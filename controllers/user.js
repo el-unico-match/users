@@ -30,11 +30,11 @@ const createUser = async (req, res = response) => {
         // Guardar en DB
         await user.save();        
         // Generar el JWT (Java Web Token)
-        const token = await generateJWT(user.id, user.name);
+        const token = await generateJWT(user.id, user. role, user.blocked);
         res.status(HTTP_SUCCESS_2XX.CREATED).json({
             ok: true,
             user: {
-                uid: user.id,
+                id: user.id,
                 name: user.name,
                 email,
                 role,
@@ -70,7 +70,7 @@ const updateUser = async (req, res = response) => {
         // Actualizar en DB
         const userUpdated = await User.findByIdAndUpdate(userId, newUser, {new: true});
         // Generar el JWT (Java Web Token)
-        const token = await generateJWT(userUpdated.id, userUpdated.name, userUpdated.email, userUpdated.role, userUpdated.blocked);
+        const token = await generateJWT(userUpdated.id, userUpdated.role, userUpdated.blocked);
         res.status(HTTP_SUCCESS_2XX.OK).json({
             ok: true,
             user: {
@@ -102,12 +102,11 @@ const deleteUser = async (req, res = response) => {
                 msg: MSG_USER_NOT_EXISTS
             })
         }
-        await User.status(HTTP_SUCCESS_2XX.OK).findByIdAndDelete(userId);
-        res.json({
+        await User.findByIdAndDelete(userId);
+        res.status(HTTP_SUCCESS_2XX.OK).json({
             ok: true
         });
     } catch (error) {
-        console.log(error);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500

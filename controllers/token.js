@@ -17,6 +17,7 @@ const User = require('../models/Users');
 const refreshToken = async (req, res = response) => {
     const uid = req.tokenExtractedData.uid;
     const blocked = req.tokenExtractedData.blocked
+    console.log(req.tokenExtractedData);
     // Tarda a lo sumo dos tiempos de validez del token en ser efectivo un bloqueo
     if (blocked) {
         res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
@@ -33,7 +34,7 @@ const refreshToken = async (req, res = response) => {
             });
         } else {
             // Generar el JWT (Java Web Token)
-            const token = await generateJWT(uid, user.name, user.email, user.role, user.blocked);
+            const token = await generateJWT(uid, user.role, user.blocked);
             res.status(HTTP_SUCCESS_2XX.CREATED).json({
                 ok: true,
                 token

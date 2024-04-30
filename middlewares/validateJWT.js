@@ -31,14 +31,12 @@ const validateJWT = (req, res = response, next) => {
  * Válida el token del request.
  */
 const doValidateJWT = (req, token) =>  {
-    const {uid, name, email, role, blocked} = jwt.verify(
+    const {uid, role, blocked} = jwt.verify(
         token,
         process.env.SECRET_JWT_SEED
     );
     req.tokenExtractedData = {
         uid,
-        name,
-        email,
         role,
         blocked
     };
@@ -52,7 +50,7 @@ const validateLazyJWT = (req, res = response, next) => {
     const token = req.header('x-token');
     if (token) {
         try {
-            doValidateJWT(req, token, res);
+            doValidateJWT(req, token);
             req.token = token;
         } catch (error) {
             return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({

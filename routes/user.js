@@ -147,7 +147,7 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
  *                                  type: object
  *                                  example: The name must be at least 5 characters
  *          401:
- *              description: return error "Invalid token" or "You do not have the necessary access level" or "User not found"
+ *              description: return error "Invalid token" or "User without role" or "You do not have the necessary access level"
  *              content:
  *                  application/json:
  *                      schema:
@@ -218,7 +218,7 @@ router.put('/:id', validateJWT, checkUpdateUser, updateUser);
  *                                  type: boolean
  *                                  example: true                              
  *          400:
- *              description: return error "There is no token in the request"
+ *              description: return error "There is no token in the request" 
  *              content:
  *                  application/json:
  *                      schema:
@@ -231,7 +231,7 @@ router.put('/:id', validateJWT, checkUpdateUser, updateUser);
  *                                  type: object
  *                                  example: There is no token in the request
  *          401:
- *              description: return error "Invalid token" or "User not found" or "You do not have the necessary access level"
+ *              description: return error "Invalid token" or "User without role" or "You do not have the necessary access level"
  *              content:
  *                  application/json:
  *                      schema:

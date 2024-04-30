@@ -2,7 +2,7 @@ const {response} = require('express');
 const User = require('../models/Users');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
 const MSG_ACCESS_DENIED = 'You do not have the necessary access level';
-const MSG_USER_NOT_FOUND = 'User not found';
+const MSG_ROLE_NOT_FOUND = 'User without role';
 
 /**
  * 
@@ -11,12 +11,11 @@ const MSG_USER_NOT_FOUND = 'User not found';
  */
 const createAccessRoleBased = (superRole) => {
     return async (req, res = response, next) => {        
-        //let {role} = await User.findOne({_id: req.tokenExtractedData.uid});
         const role = req.tokenExtractedData.role;
         if (!role){
             return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
                 ok: false,
-                msg: MSG_USER_NOT_FOUND
+                msg: MSG_ROLE_NOT_FOUND
             });
         }        
         if (role !== superRole) {
