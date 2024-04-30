@@ -1,7 +1,7 @@
 const {response} = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/Users');
-const {generateJWT} = require('../helpers/jwt')
+const {generateJWT} = require('../helpers/jwt');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
     MSG_USER_EXISTS,
@@ -97,18 +97,18 @@ const deleteUser = async (req, res = response) => {
     try {
         const user = await User.findOne({_id: userId});
         if (!user) {
-            return res.status(404).json({
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             })
         }
-        await User.findByIdAndDelete(userId);
+        await User.status(HTTP_SUCCESS_2XX.OK).findByIdAndDelete(userId);
         res.json({
             ok: true
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
         });

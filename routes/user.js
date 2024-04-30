@@ -188,7 +188,88 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
 */
 router.put('/:id', validateJWT, checkUpdateUser, updateUser);
 
-// Borrar usuario
+/**
+ * @swagger
+ * /api/user/{id}:
+ *  delete:
+ *      summary: delete user
+ *      tags: [User]
+ *      parameters:
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: user token
+ *          - in: path
+ *            name: id
+ *            required: true
+ *            schema:
+ *              type: string
+ *      responses:
+ *          200: 
+ *              description: xreturn user data and token!
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: true                              
+ *          400:
+ *              description: return error "There is no token in the request"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: object
+ *                                  example: There is no token in the request
+ *          401:
+ *              description: return error "Invalid token" or "User not found" or "You do not have the necessary access level"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalid token"
+ *          404:
+ *              description: return error "The user does not exist"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: The user does not exist
+ *          500:
+ *              description: return internal error!
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: Please talk to the administrator
+*/
 router.delete('/:id', validateJWT, checkDeleteUser, deleteUser);
 
 module.exports = router;
