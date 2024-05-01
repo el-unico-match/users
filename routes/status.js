@@ -25,9 +25,8 @@ const router = Router();
  *                              ok:
  *                                  type: boolean
  *                                  example: true
- *                              count_users:
- *                                  type: integer
- *                                  example: 1
+ *                              status:
+ *                                  type: object
  *          503:
  *              description: return bad status!
  *              content:
@@ -38,6 +37,8 @@ const router = Router();
  *                              ok:
  *                                  type: boolean
  *                                  example: false
+ *                              status:
+ *                                  type: object
  *                              msg:
  *                                  type: string
  *                                  example: "The database is not available"

@@ -5,8 +5,8 @@ const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
 
 /**
  * 
- * @return un función que retorna como true la cantidad de usuarios en la base 
- * de datos, y en caso que la base de datos no se encuentre disponible false 
+ * @return una función que retorna como true (y el estado del servicio) si
+ * el servicio funciona correctamente, y en caso contrario false 
  * con mensaje de error.
  */
 const getStatus = async (req, res = response) => {
@@ -14,12 +14,21 @@ const getStatus = async (req, res = response) => {
         let users = await User.find();
         res.json({
             ok: true,
-            count_users: users.length
+            status: {
+                database: {
+                    online: users.length > 0 
+                } 
+            }            
         })
     } catch(error) {
         console.log(error);
         res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json({
             ok: false,
+            status: {
+                database: {
+                    online: false 
+                } 
+            },
             msg: MSG_DATABASE_ERROR
         })
     }
