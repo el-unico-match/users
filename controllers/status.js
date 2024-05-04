@@ -11,12 +11,16 @@ const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
  */
 const getStatus = async (req, res = response) => {
     try {
-        let users = await User.find();
+        let users = await User.find();        
         res.json({
             ok: true,
             status: {
                 database: {
                     online: users.length > 0 
+                },
+                service: {
+                    host: process.env.HOST,
+                    port: process.env.PORT
                 } 
             }            
         })
@@ -27,6 +31,10 @@ const getStatus = async (req, res = response) => {
             status: {
                 database: {
                     online: false 
+                },
+                service: {
+                    host: process.env.HOST,
+                    port: process.env.PORT
                 } 
             },
             msg: MSG_DATABASE_ERROR

@@ -11,6 +11,7 @@ const path = require("path");
 // Configuración Swagger
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+
 const swaggerSpec = {
     definition: {
         openapi: "3.0.0",
@@ -23,7 +24,7 @@ const swaggerSpec = {
                 url: `http://localhost:${process.env.PORT}`
             },
             {
-                url: `http://${process.env.HOST}:${process.env.PORT}`
+                url: `http://0.0.0.0:${process.env.PORT}`
             }
         ]
     },
