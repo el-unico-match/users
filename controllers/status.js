@@ -19,7 +19,6 @@ const getStatus = async (req, res = response) => {
                     online: users.length > 0 
                 },
                 service: {
-                    host: process.env.HOST,
                     port: process.env.PORT
                 } 
             }            
@@ -33,7 +32,6 @@ const getStatus = async (req, res = response) => {
                     online: false 
                 },
                 service: {
-                    host: process.env.HOST,
                     port: process.env.PORT
                 } 
             },

@@ -37,9 +37,12 @@ const UserSchema = Schema({
         type: String,
         required: true
     },
+    blocked: {
+        type: Boolean,
+        required: true
+    }
 });
 
-module.exports = model('User', UserSchema);
 ```
 
 # Instrucciones:
@@ -52,7 +55,7 @@ module.exports = model('User', UserSchema);
 PORT = 4000
 DB_CNN=********
 SECRET_JWT_SEED=************************
-HOST=?
+HOST=0.0.0.0
 ```
 Opcionalmente se podrá utilizar el archivo .env (pasado por privado) en la 
 raíz del proyecto para configurar dichas variables de entorno.
@@ -63,10 +66,22 @@ raíz del proyecto para configurar dichas variables de entorno.
 docker compose up --build
 ```
 
+3) Acceder a documentación en el servidor de desarrollo: https://users-uniquegroup-match-fiuba.azurewebsites.net/api-doc/
+
+4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: https://users-uniquegroup-match-fiuba.azurewebsites.net/api/status
+
+
 # Ejecución sobre base de datos de desarrollo (local):
 
 1) Se debe disponer del archivo ".dev.env" (pasado por privado) en la raíz del proyecto
 el cual permite configurar las variables de entorno.
+
+```
+PORT = 4000
+DB_CNN=mongodb://mongo:27017/match_dev
+SECRET_JWT_SEED=************************
+HOST=0.0.0.0
+```
 
 2) Ejecutar el siguiente comando:
 
@@ -76,3 +91,5 @@ docker compose -f dev.docker-compose.yml up --build
 3) Acceder a documentación en local: http://localhost:<PORT>/api-doc/
 
 Nota: PORT normalmente es 4000 o sea: http://localhost:4000/api-doc/
+
+4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: http://localhost:4000/api/status

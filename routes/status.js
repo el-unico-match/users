@@ -15,7 +15,7 @@ const router = Router();
  *      summary: user service status 
  *      tags: [User]
  *      responses:
- *          202: 
+ *          200: 
  *              description: aplication status!
  *              content:
  *                  application/json:

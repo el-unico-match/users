@@ -21,10 +21,10 @@ const swaggerSpec = {
         },
         servers: [
             {
-                url: `http://localhost:${process.env.PORT}`
+                url: `https://users-uniquegroup-match-fiuba.azurewebsites.net`
             },
             {
-                url: `http://0.0.0.0:${process.env.PORT}`
+                url: `http://${process.env.HOST}:${process.env.PORT}`
             }
         ]
     },
