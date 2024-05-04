@@ -52,6 +52,7 @@ module.exports = model('User', UserSchema);
 PORT = 4000
 DB_CNN=********
 SECRET_JWT_SEED=************************
+HOST=?
 ```
 Opcionalmente se podrá utilizar el archivo .env (pasado por privado) en la 
 raíz del proyecto para configurar dichas variables de entorno.
