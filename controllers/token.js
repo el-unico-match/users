@@ -17,7 +17,6 @@ const User = require('../models/Users');
 const refreshToken = async (req, res = response) => {
     const uid = req.tokenExtractedData.uid;
     const blocked = req.tokenExtractedData.blocked
-    console.log(req.tokenExtractedData);
     // Tarda a lo sumo dos tiempos de validez del token en ser efectivo un bloqueo
     if (blocked) {
         res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({

@@ -52,7 +52,6 @@ const loginUser = async (req, res = response) => {
             ok: true,
             user: {
                 id: user.id,
-                name: user.name,
                 email,
                 role: user.role,
                 blocked: user.blocked

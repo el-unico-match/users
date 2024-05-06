@@ -19,10 +19,6 @@ components:
                 uid:
                     type: string
                     description: unique user id 
-                name: 
-                    type: string
-                    description: unique user name
-                    minLength: 5
                 email:
                     type: string
                     description: unique user email              
@@ -34,24 +30,18 @@ components:
                     type: boolean
                     description: unique. Disables the service for the user.
             required: 
-                - name
                 - email
                 - password
                 - role
                 - blocked
             example:
                 id: 645547541243dfdsfe2132142134234203
-                name: rafael
                 email: rafaelputaro@gmail.com
                 role: administrador
                 blocked: false
         UserUpdateData:
             type: object
             properties:
-                name: 
-                    type: string
-                    description: unique user name
-                    minLength: 5
                 email:
                     type: string
                     description: unique user email              
@@ -63,7 +53,6 @@ components:
                     type: boolean
                     description: unique. Disables the service for the user.
             example:
-                name: carlos
                 email: carlos@mail.com
                 password: cli123te1*
                 blocked: false

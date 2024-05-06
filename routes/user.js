@@ -56,7 +56,7 @@ const router = Router();
  *                                  type: string
  *                                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjJkMGMxMzRmMjA5MTk5ZDJmMjc0YTMiLCJuYW1lIjoicmFmYWVsIiwiaWF0IjoxNzE0MjUxMjUxLCJleHAiOjE3MTQyNTg0NTF9.ky8davH_RhQrscgs4k3dnLXJPB5mrdD6RVmWtv5dqUA
  *          400:
- *              description: return error "Name is required" or "The name must be at least 5 characters" or "Email is required" or "The password must be at least 6 characters of which at least one must be a number and at least one must be a symbol" or "User lock status is required" or "There is already a user with that email"
+ *              description: return error "Email is required" or "The password must be at least 6 characters of which at least one must be a number and at least one must be a symbol" or "User lock status is required" or "There is already a user with that email"
  *              content:
  *                  application/json:
  *                      schema:
@@ -67,7 +67,7 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: object
- *                                  example: The name must be at least 5 characters
+ *                                  example: Email is required
  *          401:
  *              description: return error "Invalid token" or "You do not have permission to create another user" or "The user does not have permission to create a new administrator"!
  *              content:
@@ -140,7 +140,7 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
  *                                  type: string
  *                                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjJkMGMxMzRmMjA5MTk5ZDJmMjc0YTMiLCJuYW1lIjoicmFmYWVsIiwiaWF0IjoxNzE0MjUxMjUxLCJleHAiOjE3MTQyNTg0NTF9.ky8davH_RhQrscgs4k3dnLXJPB5mrdD6RVmWtv5dqUA
  *          400:
- *              description: return error "There is no token in the request" or "The name must be at least 5 characters" or "The password must be at least 6 characters of which at least one must be a number and at least one must be a symbol" or "There is already a user with that email" or "The user cannot change their role" or "Invalidad lock state"
+ *              description: return error "There is no token in the request" or "The password must be at least 6 characters of which at least one must be a number and at least one must be a symbol" or "There is already a user with that email" or "The user cannot change their role" or "Invalidad lock state"
  *              content:
  *                  application/json:
  *                      schema:
@@ -151,7 +151,7 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
  *                                  example: false
  *                              msg:
  *                                  type: object
- *                                  example: The name must be at least 5 characters
+ *                                  example: There is no token in the request
  *          401:
  *              description: return error "Invalid token" or "User without role" or "You do not have the necessary access level"
  *              content:

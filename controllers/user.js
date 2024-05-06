@@ -11,9 +11,21 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
-    
+
+/**
+ * 
+ * @param {*} req Si el request tiene blocked vacío lo setea en falso.
+ */
+const prepareBlocked = (req) => {
+    if (!req.body.blocked) {
+        req.body.blocked = false;
+    }
+}   
+
 const createUser = async (req, res = response) => {
     try {
+        // Normalizar el parámetro del body
+        prepareBlocked(req);
         // Check en DB si ya existe el usuario
         const {email, password, role, blocked} = req.body;
         let user = await User.findOne({email: email});
@@ -22,7 +34,8 @@ const createUser = async (req, res = response) => {
                 ok: false,
                 msg: MSG_USER_EXISTS
             });
-        }
+        };        
+        // Crear un nuevo usuario en base al body
         user = new User(req.body);
         // Encriptar contraseña
         const salt = bcrypt.genSaltSync();
@@ -35,7 +48,6 @@ const createUser = async (req, res = response) => {
             ok: true,
             user: {
                 id: user.id,
-                name: user.name,
                 email,
                 role,
                 blocked         
@@ -75,7 +87,6 @@ const updateUser = async (req, res = response) => {
             ok: true,
             user: {
                 id: userUpdated._id,
-                name: userUpdated.name,
                 email: userUpdated.email,
                 role: userUpdated.role,
                 blocked: userUpdated.blocked
@@ -89,7 +100,6 @@ const updateUser = async (req, res = response) => {
             msg: MSG_ERROR_500
         });
     }   
-    
 }
 
 const deleteUser = async (req, res = response) => {
