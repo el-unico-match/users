@@ -1,18 +1,18 @@
 version: "2.2"
 
 services:  
-  app:
-    container_name: users
+  users_app:
+#    container_name: users
     build: .
     env_file:
       - .dev.env
     ports:
       - "4000:4000"
     depends_on:
-      - mongo
-  mongo:
+      - users_mongo
+  users_mongo:
     image: mongo:4.4.6
-    container_name: "mongo"
+#    container_name: "mongo"
     ports:
       - 27017:27017
     volumes:
