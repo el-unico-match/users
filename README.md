@@ -20,10 +20,6 @@ NOTA: Un usuario cliente no puede pasar a ser administrador y viceversa.
 const {Schema, model} = require('mongoose');
 
 const UserSchema = Schema({
-    name: {
-        type: String,
-        required: true
-    },
     email: {
         type: String,
         required: true,
@@ -78,7 +74,7 @@ el cual permite configurar las variables de entorno.
 
 ```
 PORT = 4000
-DB_CNN=mongodb://mongo:27017/match_dev
+DB_CNN=mongodb://users_mongo:27017/match_dev
 SECRET_JWT_SEED=************************
 HOST=0.0.0.0
 ```
