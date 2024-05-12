@@ -7,6 +7,8 @@ services:
       - .dev.env
     ports:
       - "4000:4000"
+#    healthcheck:
+#      test: "npm test"
     depends_on:
       - users_mongo
   users_mongo:
