@@ -9,7 +9,7 @@ describe('insert', () => {
   let connection;
   let db;
   let app;
-  let server;
+  //let server;
 
   beforeAll(async () => {
     process.env.PORT ||= 4000;
@@ -32,7 +32,7 @@ describe('insert', () => {
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
     // Escuchar peticiones
-    server = app.listen(process.env.PORT, process.env.HOST, () => {});
+    //server = app.listen(process.env.PORT, process.env.HOST, () => {});
   });
 
   afterAll(async () => {
@@ -41,9 +41,39 @@ describe('insert', () => {
       await db.close();
     }
     expect(true).toBe(true);
-    server.close();
+    //server.close();
   });
 
+    it('should insert a doc into collection', async () => {
+      
+      const users = db.collection('users');
+
+      const mockUser = {
+        "id": "645547541243dfdsfe2132142134234203",
+        "email": "rafaelputaro@gmail.com",
+        "role": "administrador",
+        "blocked": false
+      };
+      await users.insertOne(mockUser);
+
+      const insertedUser = await users.findOne({_id: 'some-user-id'});
+      expect(insertedUser).toEqual(mockUser);
+    });
+
+    it('should log user', async () => {
+      app.use('/api/', require('../../routes/api'));    
+      const payload = {
+        "email": "rafaelputaro@gmail.com",
+        "password": "rafa123el88*"
+      };
+      const response = await request(app).post('/api/login').send(payload)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(202);
+    });
+
+    /*
     it('should insert a doc into collection', async () => {
       
       const users = db.collection('users');
@@ -53,7 +83,7 @@ describe('insert', () => {
 
       const insertedUser = await users.findOne({_id: 'some-user-id'});
       expect(insertedUser).toEqual(mockUser);
-    });
+    });*/
 });
 
 
