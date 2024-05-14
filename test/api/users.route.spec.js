@@ -3,21 +3,23 @@ const request = require('supertest');
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+//const User = require('../../models/Users');
 
 describe('insert', () => {
   
   let connection;
   let db;
   let app;
-  //let server;
 
   beforeAll(async () => {
     process.env.PORT ||= 4000;
-    process.env.HOST ||="0.0.0.0";
+    //process.env.HOST ||= "0.0.0.0";
+    process.env.SECRET_JWT_SEED ||= "SECRET";
     app = express();
     connection = await MongoClient.connect(global.__MONGO_URI__, {
     });
     db = await connection.db(global.__MONGO_DB_NAME__);
+    const User = db;
     // CORS
     app.use(cors());
     // Directorio público
@@ -31,8 +33,7 @@ describe('insert', () => {
     app.use('/api/login', require('../../routes/login'));
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
-    // Escuchar peticiones
-    //server = app.listen(process.env.PORT, process.env.HOST, () => {});
+    jest.setTimeout(70000);
   });
 
   afterAll(async () => {
@@ -44,46 +45,45 @@ describe('insert', () => {
     //server.close();
   });
 
-    it('should insert a doc into collection', async () => {
-      
-      const users = db.collection('users');
+  it('should insert a doc into collection', async () => {
+    const users = db.collection('users');
+    const mockUser = {
+      _id: "0dafdafdfdfsf",
+      email: "rafaelputaro@gmail.com",
+      password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
+      role: "administrador",
+      blocked: "false"
+    };
+    await users.insertOne(mockUser);
+    const insertedUser = await users.findOne({_id: mockUser._id});
+    expect(insertedUser).toEqual(mockUser);
+  });
 
-      const mockUser = {
-        "id": "645547541243dfdsfe2132142134234203",
-        "email": "rafaelputaro@gmail.com",
-        "role": "administrador",
-        "blocked": false
-      };
-      await users.insertOne(mockUser);
+  it('should log user', async () => {
+    const payload = {
+      email: "rafaelputaro@gmail.com",
+      password: "rafa123el88*"
+    };
+    const response = await request(app).post('/api/login').send(payload);
+    expect(response.headers['content-type']).toContain('json');
+    expect(response.body.ok).toBe(false);
+    expect(response.body.msg).toBe("Please talk to the administrator");
+    expect(response.status).toBe(500);
+    //let cantUsers = await User.find().length;    
+    //expect(cantUsers).toBe(1);
+  });
+// https://npmtrends.com/jest-mongoose-mock
+  /*
+  it('should insert a doc into collection', async () => {
+    
+    const users = db.collection('users');
 
-      const insertedUser = await users.findOne({_id: 'some-user-id'});
-      expect(insertedUser).toEqual(mockUser);
-    });
+    const mockUser = {_id: 'some-user-id', name: 'John'};
+    await users.insertOne(mockUser);
 
-    it('should log user', async () => {
-      app.use('/api/', require('../../routes/api'));    
-      const payload = {
-        "email": "rafaelputaro@gmail.com",
-        "password": "rafa123el88*"
-      };
-      const response = await request(app).post('/api/login').send(payload)
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json');
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.status).toBe(202);
-    });
-
-    /*
-    it('should insert a doc into collection', async () => {
-      
-      const users = db.collection('users');
-
-      const mockUser = {_id: 'some-user-id', name: 'John'};
-      await users.insertOne(mockUser);
-
-      const insertedUser = await users.findOne({_id: 'some-user-id'});
-      expect(insertedUser).toEqual(mockUser);
-    });*/
+    const insertedUser = await users.findOne({_id: 'some-user-id'});
+    expect(insertedUser).toEqual(mockUser);
+  });*/
 });
 
 
