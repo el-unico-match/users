@@ -1,4 +1,4 @@
 module.exports =  {
-    preset: "@shelf/jest-mongodb",
-    testTimeout: 70000
+    testTimeout: 70000, 
+    testEnvironment: 'node'
 };

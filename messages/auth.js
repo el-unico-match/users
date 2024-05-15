@@ -14,6 +14,8 @@ const MSG_WITHOUT_AUTH_TO_CREATE_ADMIN = 'The user does not have permission to c
 const MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER = 'You do not have permission to create another user';
 const MSG_USER_BLOCKED = 'The user has been blocked';
 const MSG_INVALID_LOCK_STATE = 'Invalid lock state'
+const MSG_NO_TOKEN = 'There is no token in the request';
+const MSG_INVALID_TOKEN = 'Invalid token';
 
 module.exports = {
     MSG_USER_EXISTS,
@@ -28,5 +30,7 @@ module.exports = {
     MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
     MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
     MSG_USER_BLOCKED, 
-    MSG_INVALID_LOCK_STATE
+    MSG_INVALID_LOCK_STATE,
+    MSG_NO_TOKEN,
+    MSG_INVALID_TOKEN
 }

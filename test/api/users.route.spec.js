@@ -1,29 +1,20 @@
-const {MongoClient} = require('mongodb');
+const MockModel = require("jest-mongoose-mock");
+const {ObjectId} =  require('mongodb');
+jest.mock('../../models/Users', () => new MockModel());
+const User = require('../../models/Users');
 const request = require('supertest');
 const express = require('express');
-const cors = require('cors');
 require('dotenv').config();
-//const User = require('../../models/Users');
+const { MSG_PASSWORD_INCORRECT, MSG_USER_BLOCKED, MSG_USER_NOT_EXISTS, MSG_NO_TOKEN } = require('../../messages/auth');
+const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
 
-describe('insert', () => {
+describe('test routes', () => {
   
-  let connection;
-  let db;
   let app;
 
   beforeAll(async () => {
-    process.env.PORT ||= 4000;
-    //process.env.HOST ||= "0.0.0.0";
-    process.env.SECRET_JWT_SEED ||= "SECRET";
+    process.env.SECRET_JWT_SEED ||= "SECRET121212121edefadfsadfds";
     app = express();
-    connection = await MongoClient.connect(global.__MONGO_URI__, {
-    });
-    db = await connection.db(global.__MONGO_DB_NAME__);
-    const User = db;
-    // CORS
-    app.use(cors());
-    // Directorio público
-    app.use(express.static('public'));
     // Lectura y parseo del body
     app.use(express.json());
     // Rutas Usuario
@@ -33,95 +24,140 @@ describe('insert', () => {
     app.use('/api/login', require('../../routes/login'));
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
-    jest.setTimeout(70000);
+    //jest.setTimeout(70000);
   });
 
-  afterAll(async () => {
-    await connection.close();
-    if(db.close) {
-      await db.close();
-    }
-    expect(true).toBe(true);
-    //server.close();
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
-  it('should insert a doc into collection', async () => {
-    const users = db.collection('users');
-    const mockUser = {
-      _id: "0dafdafdfdfsf",
-      email: "rafaelputaro@gmail.com",
-      password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
-      role: "administrador",
-      blocked: "false"
-    };
-    await users.insertOne(mockUser);
-    const insertedUser = await users.findOne({_id: mockUser._id});
-    expect(insertedUser).toEqual(mockUser);
-  });
+  describe('admin over routes', () => {
+    // https://npmtrends.com/jest-mongoose-mock
+    let admin;
+    let token;
 
-  it('should log user', async () => {
-    const payload = {
-      email: "rafaelputaro@gmail.com",
-      password: "rafa123el88*"
-    };
-    const response = await request(app).post('/api/login').send(payload);
-    expect(response.headers['content-type']).toContain('json');
-    expect(response.body.ok).toBe(false);
-    expect(response.body.msg).toBe("Please talk to the administrator");
-    expect(response.status).toBe(500);
-    //let cantUsers = await User.find().length;    
-    //expect(cantUsers).toBe(1);
-  });
-// https://npmtrends.com/jest-mongoose-mock
-  /*
-  it('should insert a doc into collection', async () => {
-    
-    const users = db.collection('users');
-
-    const mockUser = {_id: 'some-user-id', name: 'John'};
-    await users.insertOne(mockUser);
-
-    const insertedUser = await users.findOne({_id: 'some-user-id'});
-    expect(insertedUser).toEqual(mockUser);
-  });*/
-});
-
-
-/*
-
-const request = require('supertest');
-const {MongoClient} = require('mongodb');
-
-process.env.PORT = 4000;
-process.env.HOST="0.0.0.0";
-
-describe('Tests over API users', () => {
-    let connection;
-    let db;
-    beforeAll(async () => {
-        connection = await MongoClient.connect(global.__MONGO_URI__, {});
-          db = await connection.db(global.__MONGO_DB_NAME__);
-        expect("1").toBe("1");
+    beforeAll(async () => {      
+      admin = {
+        id: new ObjectId().toString(),
+        email: "rafaelputaro@gmail.com",
+        password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
+        role: "administrador",
+        blocked: false
+      };
     });
 
-    describe('GET /api/users', () => {
-        
-        beforeEach(() => {
-            
-        })
-        
-        it('La ruta funciona', async () => {
-            const users = db.collection('users');
-            const mockUser = {_id: 'some-user-id', name: 'John'};
-            await users.insertOne(mockUser);
-   //         const response = await request(app).get('/api/users').send();
-   //         expect(response.status).toBe(200);
-            expect("1").toBe("1");
-   //         console.log(response);
-            const insertedUser = await users.findOne({_id: 'some-user-id'});
-            expect(insertedUser).toEqual(mockUser);
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should fail on log user, wrong password', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
+      const payload = {
+        email: "rafaelputaro@gmail.com",
+        password: "rafa123el88*incorrecto"
+      };
+      const response = await request(app).post('/api/login').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.user).toBeUndefined();
+      expect(response.body.token).toBeUndefined();
+      expect(response.body.msg).toBe(MSG_PASSWORD_INCORRECT);
+    });
+
+    it('should fail on log user, user not exists', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(undefined);
+      const payload = {
+        email: "rafaelputaro22@gmail.com",
+        password: "rafa123el88*"
+      };
+      const response = await request(app).post('/api/login').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.user).toBeUndefined();
+      expect(response.body.token).toBeUndefined();
+      expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
+    });
+
+    it('should fail on log user, user blocked', async () => {
+      let blocked = {...admin};
+      blocked.blocked = true;
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(blocked);
+      const payload = {
+        email: "rafaelputaro@gmail.com",
+        password: "rafa123el88*"
+      };
+      const response = await request(app).post('/api/login').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.user).toBeUndefined();
+      expect(response.body.token).toBeUndefined();
+      expect(response.body.msg).toBe(MSG_USER_BLOCKED);
+    });
+
+    it('should not log user, internal error', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(new Error());
+      const payload = {
+        email: "rafaelputaro@gmail.com",
+        password: "rafa123el88*"
+      };
+      const response = await request(app).post('/api/login').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.body.ok).toBe(false);
+      expect(response.body.user).toBeUndefined();
+      expect(response.body.token).toBeUndefined();
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
+    });    
+
+    it('should log user', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
+      const payload = {
+        email: "rafaelputaro@gmail.com",
+        password: "rafa123el88*"
+      };
+      const response = await request(app).post('/api/login').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.ACCEPTED);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(admin.role);
+      expect(response.body.user.email).toBe(admin.email);
+      expect(response.body.user.blocked).toBe(admin.blocked);
+      expect(response.body.user.id).toBe(admin.id);
+      expect(response.body.user.id).toBeDefined();
+      token = response.body.token;
+    });
+
+    it('should return data from token', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(
+        {
+          _id: admin.id,
+          ...admin
         });
+      const response = await request(app)
+        .get('/api/current')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(admin.role);
+      expect(response.body.user.email).toBe(admin.email);
+      expect(response.body.user.blocked).toBe(admin.blocked);
+      expect(response.body.user.id).toBe(admin.id);
+      expect(response.body.user.id).toBeDefined();
     });
+
+    it('should return error no token', async () => {
+      const response = await request(app)
+        .get('/api/current');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_NO_TOKEN);
+    });
+
+  });
+
 });
 
-*/

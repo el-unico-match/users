@@ -1,8 +1,7 @@
 const {response} = require('express');
 const jwt = require('jsonwebtoken');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
-const MSG_NO_TOKEN = 'There is no token in the request';
-const MSG_INVALID_TOKEN = 'Invalid token';
+const {MSG_NO_TOKEN, MSG_INVALID_TOKEN} = require('../messages/auth');
 
 /**
  * Valida un token que viene por el header como "x-token" 
