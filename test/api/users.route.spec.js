@@ -5,8 +5,10 @@ const User = require('../../models/Users');
 const request = require('supertest');
 const express = require('express');
 require('dotenv').config();
-const { MSG_PASSWORD_INCORRECT, MSG_USER_BLOCKED, MSG_USER_NOT_EXISTS, MSG_NO_TOKEN } = require('../../messages/auth');
+const { MSG_PASSWORD_INCORRECT, MSG_USER_BLOCKED, MSG_USER_NOT_EXISTS, MSG_NO_TOKEN, MSG_INVALID_TOKEN } = require('../../messages/auth');
 const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
+const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
+const {generateJWT} = require('../../helpers/jwt');
 
 describe('test routes', () => {
   
@@ -24,7 +26,6 @@ describe('test routes', () => {
     app.use('/api/login', require('../../routes/login'));
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
-    //jest.setTimeout(70000);
   });
 
   afterEach(() => {
@@ -33,8 +34,10 @@ describe('test routes', () => {
 
   describe('admin over routes', () => {
     // https://npmtrends.com/jest-mongoose-mock
-    let admin;
+    let admin;//jest.setTimeout(70000);
     let token;
+    let admin2;
+    let token2;
 
     beforeAll(async () => {      
       admin = {
@@ -44,6 +47,13 @@ describe('test routes', () => {
         role: "administrador",
         blocked: false
       };
+      admin2 = {
+        id: new ObjectId().toString(),
+        email: "admin_2@gmail.com",
+        password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
+        role: "administrador",
+        blocked: false
+      }; 
     });
 
     afterEach(() => {
@@ -148,6 +158,17 @@ describe('test routes', () => {
       expect(response.body.user.id).toBeDefined();
     });
 
+    it('should return error invalid token', async () => {
+      const token_fake = token + 'f';
+      const response = await request(app)
+        .get('/api/current')
+        .set('x-token', token_fake);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_INVALID_TOKEN);
+    });
+
     it('should return error no token', async () => {
       const response = await request(app)
         .get('/api/current');
@@ -157,6 +178,120 @@ describe('test routes', () => {
       expect(response.body.msg).toBe(MSG_NO_TOKEN);
     });
 
+    it('should return not found', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(undefined);
+      const response = await request(app)
+        .get('/api/current')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
+    });
+
+    it('should return internal error', async () => {
+      jest.spyOn(User, 'findOne').mockImplementation(() => Promise.reject(new Error()));
+      const response = await request(app)
+        .get('/api/current')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_ERROR_500);
+    });
+
+    it('should return api status', async () => {
+      jest.spyOn(User, 'find').mockReturnValueOnce(admin);
+      const response = await request(app).get('/api/status');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.status).toBeDefined();
+    });
+
+    it('should return database not available', async () => {
+      jest.spyOn(User, 'find').mockReturnValueOnce(null);
+      const response = await request(app).get('/api/status');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.status).toBeDefined();
+      expect(response.body.msg).toBe(MSG_DATABASE_ERROR);
+    });
+
+    it('should return a new token', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
+      const response = await request(app)
+        .post('/api/token')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+      expect(response.body.ok).toBe(true);
+      token = response.body.token;
+    });
+
+    it('should return a error no token in request', async () => {
+      const response = await request(app)
+        .post('/api/token');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_NO_TOKEN);
+    });
+
+    it('should return error invalid token', async () => {
+      const response = await request(app)
+        .post('/api/token')
+        .set('x-token', token + 'F');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_INVALID_TOKEN);
+    });
+
+    it('should return user blocked', async () => {
+      const token_blocked = await generateJWT(admin.id, admin.role, true);
+      const response = await request(app)
+        .post('/api/token')
+        .set('x-token', token_blocked);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_USER_BLOCKED);
+    });jest.mock('../../models/Users');
+
+    it('should return user not exists', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const response = await request(app)
+        .post('/api/token')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.body.token).toBeUndefined();
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
+    });
+
+    //TODO Problemas con el constructor
+    /* 
+    it('should return new admin', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const response = await request(app)
+        .post('/api/user')
+        .set('x-token', token)
+        .send(admin2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.body.token).toBeUndefined();
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(admin2.role);
+      expect(response.body.user.email).toBe(admin2.email);
+      expect(response.body.user.blocked).toBe(admin2.blocked);
+      expect(response.body.user.id).toBe(admin2.id);
+      expect(response.body.user.id).toBeDefined();
+    }); 
+  */
   });
 
 });

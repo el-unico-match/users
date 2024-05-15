@@ -75,20 +75,6 @@ const router = Router();
  *                              msg:
  *                                  type: string
  *                                  example: The user does not exist
- *          500:
- *              description: return internal error!
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              ok:
- *                                  type: boolean
- *                                  example: false
- *                              msg:
- *                                  type: string
- *                                  example: Please talk to the administrator
- * 
 */
 router.post('/', validateJWT, refreshToken);
 

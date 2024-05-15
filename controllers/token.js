@@ -26,18 +26,18 @@ const refreshToken = async (req, res = response) => {
     } else {
         // Refrescar datos de usuario
         const user = await User.findOne({_id: uid});
-        if (!user){
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
-                ok: false,
-                msg: MSG_USER_NOT_EXISTS
-            });
-        } else {
+        if (user){
             // Generar el JWT (Java Web Token)
             const token = await generateJWT(uid, user.role, user.blocked);
             res.status(HTTP_SUCCESS_2XX.CREATED).json({
                 ok: true,
                 token
             });
+        } else {
+            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+                ok: false,
+                msg: MSG_USER_NOT_EXISTS
+            });            
         }        
     }
 }
