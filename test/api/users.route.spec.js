@@ -1,6 +1,7 @@
 const MockModel = require("jest-mongoose-mock");
 const {ObjectId} =  require('mongodb');
-jest.mock('../../models/Users', () => new MockModel());
+//jest.mock('../../models/Users', () => new MockModel());
+jest.mock('../../models/Users');
 const User = require('../../models/Users');
 const request = require('supertest');
 const express = require('express');
@@ -34,10 +35,14 @@ describe('test routes', () => {
 
   describe('admin over routes', () => {
     // https://npmtrends.com/jest-mongoose-mock
+    // https://jestjs.io/docs/mock-function-api#mockfnmockimplementationfn
     let admin;//jest.setTimeout(70000);
     let token;
     let admin2;
     let token2;
+    let mockUserConstructor = jest.fn((param) => {
+      return {id: new ObjectId().toString(), ...param};
+    });
 
     beforeAll(async () => {      
       admin = {
@@ -53,7 +58,13 @@ describe('test routes', () => {
         password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
         role: "administrador",
         blocked: false
-      }; 
+      };
+      
+      User.mockImplementation(() => {
+        return {
+          constructor: mockUserConstructor,
+        }
+      });
     });
 
     afterEach(() => {
