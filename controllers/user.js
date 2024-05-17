@@ -102,6 +102,30 @@ const updateUser = async (req, res = response) => {
     }   
 }
 
+const getUser = async (req, res = response) => {
+    const userId = req.params.id;
+    try {
+        const user = await User.findOne({_id: userId}, {_id:1, email: 1, role:1, blocked:1});
+        if (!user) {
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+                ok: false,
+                msg: MSG_USER_NOT_EXISTS
+            });
+        } else {
+            res.status(HTTP_SUCCESS_2XX.OK).json({
+                ok: true,
+                users: user
+            });
+        }      
+    } catch (error) {
+        console.log(error);
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+            ok: false,
+            msg: MSG_ERROR_500
+        }); 
+    }    
+}
+
 const deleteUser = async (req, res = response) => {
     const userId = req.params.id;
     try {
@@ -127,5 +151,6 @@ const deleteUser = async (req, res = response) => {
 module.exports = {
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUser
 }

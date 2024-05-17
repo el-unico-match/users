@@ -4,7 +4,7 @@
 */
 
 const {Router} = require('express');
-const {validateJWT} = require('../middlewares/validateJWT');
+const {decodeJWT} = require('../middlewares/validateJWT');
 const {refreshToken} = require('../controllers/token');
 
 const router = Router();
@@ -76,6 +76,6 @@ const router = Router();
  *                                  type: string
  *                                  example: The user does not exist
 */
-router.post('/', validateJWT, refreshToken);
+router.post('/', decodeJWT, refreshToken);
 
 module.exports = router;

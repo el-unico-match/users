@@ -1,6 +1,6 @@
 /*
     Rutas de Usuarios /current
-    host + /api/current
+    host + /api/current-user
 */
 
 const {Router} = require('express');
@@ -11,7 +11,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/current:
+ * /api/current-user:
  *  get:
  *      summary: get data from the user associated with the token 
  *      tags: [User]

@@ -1,4 +1,4 @@
-version: "2.2"
+version: "2.27.0"
 
 services:  
   users_app:
