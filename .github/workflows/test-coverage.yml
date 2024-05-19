@@ -26,7 +26,7 @@ jobs:
         npm install --force
 
     - name: Run tests
-      run: npm test
+      run: npm test --detectOpenHandles
 
     - name: Run coverage and report to Coveralls
       run: npm run coverage
