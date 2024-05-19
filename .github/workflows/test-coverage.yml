@@ -26,9 +26,10 @@ jobs:
         npm install --force
 
     - name: Run tests
-      run: npm test --detectOpenHandles
+      run: npm test --detectOpenHandles --maxWorkers=2 --forceExit
 
     - name: Run coverage and report to Coveralls
+      if: always()
       run: npm run coverage
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} 
