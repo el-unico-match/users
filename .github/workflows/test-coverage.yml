@@ -1,0 +1,35 @@
+name: Tests coverage CI
+
+on:
+  push:
+    branches: [ "main", "coveral-integration" ]
+  pull_request:
+    branches: [ "main", "coveral-integration" ]
+
+jobs:
+  coverall:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Run coverage and report to Coveralls
+      run: npm run coverage
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
