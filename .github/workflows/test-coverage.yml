@@ -25,9 +25,6 @@ jobs:
       run: |
         npm install --force
 
-    - name: Run tests
-      run: npm test --detectOpenHandles --maxWorkers=2 --forceExit
-
     - name: Run coverage and report to Coveralls
       if: always()
       run: npm run coverage
