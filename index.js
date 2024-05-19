@@ -52,7 +52,7 @@ app.use(express.json());
 // Ruta Swagger
 app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)))
 // Rutas Usuario
-app.use('/api/current-user', require('./routes/current'));
+app.use('/api/current', require('./routes/current'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/login', require('./routes/login'));

@@ -11,7 +11,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/current-user:
+ * /api/current:
  *  get:
  *      summary: get data from the user associated with the token 
  *      tags: [User]
