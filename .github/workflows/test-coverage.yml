@@ -24,7 +24,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        npm install
+        npm install --save-dev @babel/core @babel/preset-env babel-jest
 
     - name: Run tests
       run: npm test
@@ -32,4 +34,4 @@ jobs:
     - name: Run coverage and report to Coveralls
       run: npm run coverage
       env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} 
