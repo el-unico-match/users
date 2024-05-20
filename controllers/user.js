@@ -76,9 +76,18 @@ const updateUser = async (req, res = response) => {
         const newUser = {
             ...req.body,
         }
+        newUser.email ||= user.email;
+        if (newUser.blocked === undefined) {
+            newUser.blocked = user.blocked;
+        };       
+        newUser.role = user.role;
         // Encriptar contraseña
-        const salt = bcrypt.genSaltSync();
-        newUser.password = bcrypt.hashSync(newUser.password, salt);
+        if (newUser.password) {
+            const salt = bcrypt.genSaltSync();
+            newUser.password = bcrypt.hashSync(newUser.password, salt);
+        } else {
+            newUser.password = user.password;    
+        }       
         // Actualizar en DB
         const userUpdated = await User.findByIdAndUpdate(userId, newUser, {new: true});
         // Generar el JWT (Java Web Token)
