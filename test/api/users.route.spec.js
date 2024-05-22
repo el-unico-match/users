@@ -14,9 +14,8 @@ const {generateJWT} = require('../../helpers/jwt');
 describe('test routes', () => {
   
   let app;
-  let server;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     process.env.SECRET_JWT_SEED ||= "SECRET121212121edefadfsadfds";
     app = express();
     // Lectura y parseo del body
@@ -28,12 +27,10 @@ describe('test routes', () => {
     app.use('/api/login', require('../../routes/login'));
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
-    server = app.listen(done);
   });
 
-  afterEach((done) => {
+  afterEach(() => {
     jest.restoreAllMocks();
-    server.close(done);
   });
 
   describe('admin over routes', () => {
