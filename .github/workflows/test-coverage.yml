@@ -13,6 +13,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      
+    - name: Set Node.js version
+      uses: actions/setup-node@v3
 
     - name: Create Environment File
       run: |
@@ -25,6 +28,7 @@ jobs:
       run: |
         npm install --force
         npm install --save-dev jest
+        npm install coveralls-next --save-dev
 
     - name: Run coverage and report to Coveralls
       if: always()
