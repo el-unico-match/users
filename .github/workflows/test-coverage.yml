@@ -37,7 +37,7 @@ jobs:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} 
 
   finish:
-    needs: test
+    needs: coverall
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
