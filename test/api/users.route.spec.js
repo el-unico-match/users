@@ -14,8 +14,9 @@ const {generateJWT} = require('../../helpers/jwt');
 describe('test routes', () => {
   
   let app;
+  let server;
 
-  beforeAll(async () => {
+  beforeAll(async (done) => {
     process.env.SECRET_JWT_SEED ||= "SECRET121212121edefadfsadfds";
     app = express();
     // Lectura y parseo del body
@@ -27,10 +28,12 @@ describe('test routes', () => {
     app.use('/api/login', require('../../routes/login'));
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
+    server = app.listen(done);
   });
 
-  afterEach(() => {
+  afterEach((done) => {
     jest.restoreAllMocks();
+    server.close(done);
   });
 
   describe('admin over routes', () => {
@@ -167,6 +170,16 @@ describe('test routes', () => {
       expect(response.body.user.blocked).toBe(admin.blocked);
       expect(response.body.user.id).toBe(admin.id);
       expect(response.body.user.id).toBeDefined();
+    });
+    it('should return error invalid token', async () => {
+      const token_fake = token + 'f';
+      const response = await request(app)
+        .get('/api/current')
+        .set('x-token', token_fake);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_INVALID_TOKEN);
     });
     it('should return error no token', async () => {
       const response = await request(app)
