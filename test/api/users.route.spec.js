@@ -168,18 +168,6 @@ describe('test routes', () => {
       expect(response.body.user.id).toBe(admin.id);
       expect(response.body.user.id).toBeDefined();
     });
-/*
-    it('should return error invalid token', async () => {
-      const token_fake = token + 'f';
-      const response = await request(app)
-        .get('/api/current')
-        .set('x-token', token_fake);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
-      expect(response.body.ok).toBe(false);
-      expect(response.body.msg).toBe(MSG_INVALID_TOKEN);
-    });
-*/
     it('should return error no token', async () => {
       const response = await request(app)
         .get('/api/current');
