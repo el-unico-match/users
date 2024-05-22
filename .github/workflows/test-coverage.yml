@@ -31,20 +31,15 @@ jobs:
         npm install coveralls-next --save-dev
 
     - name: Run coverage and report to Coveralls
-      if: always()
       run: npm run coverage
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} 
 
-  finish:
-    needs: coverall
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
-
-      - name: Coveralls Finished
-        run: |
-          curl -kv -d 'payload[build_num]=${{github.run_id}}&payload[status]=done' https://coveralls.io/webhook?repo_token=${COVERALLS_REPO_TOKEN}
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+    - name: Upload coverage to Coveralls
+      if: always()
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./coverage/lcov.info
+        coveralls-endpoint: https://coveralls.io
+        repo-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
