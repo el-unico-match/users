@@ -6,51 +6,35 @@ on:
   pull_request:
     branches: [ "main", "coveral-integration" ]
 
-env:
-  CI: true
-
 jobs:
-  test:
-    name: Node ${{ matrix.node }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [ 16, 18, 20, 21]
-        os: [ubuntu-latest, windows-latest]
+  coverall:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set Node.js version
+      uses: actions/setup-node@v3
 
-      - name: Set Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
+    - name: Create Environment File
+      run: |
+        echo "PORT=${{ vars.PORT }}" > .env    
+        echo "HOST=${{ vars.HOST }}" >> .env
+        echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
+        echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
 
-      - name: Install npm dependencies
-        run: npm install # switch to `npm ci` when Node.js 6 support is dropped
+    - name: Install dependencies
+      run: |
+        npm install --force
+        npm install --save-dev jest
+        npm install coveralls-next --save-dev
 
-      - name: Run lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npm run test-cov
-
-      - name: test token
-        run: echo "${{ secrets.COVERALLS_REPO_TOKEN }}"
-    
-      - name: Coveralls
-        run: cat ./coverage/lcov.info | node ./bin/coveralls.js
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          COVERALLS_SERVICE_NAME: CI-pipeline
-          COVERALLS_SERVICE_JOB_ID: ${{github.run_id}}
-          COVERALLS_SERVICE_JOB_NUMBER: ${{github.run_number}}
-          COVERALLS_FLAG_NAME: ${{matrix.os}}-node-${{ matrix.node }}
-          COVERALLS_PARALLEL: true 
-          NODE_COVERALLS_DEBUG: 1
+    - name: Run coverage and report to Coveralls
+      if: always()
+      run: npm run coverage
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} 
 
   finish:
     needs: test
