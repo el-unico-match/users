@@ -1,7 +1,10 @@
-//const MockModel = require("jest-mongoose-mock");
+const MockModel = require("jest-mongoose-mock");
 const {ObjectId} =  require('mongodb');
-//jest.mock('../../models/Users', () => new MockModel());
 jest.mock('../../models/Users');
+jest.mock('../../helpers/user');
+const {
+  newUser,
+  saveUser} = require('../../helpers/user');
 const User = require('../../models/Users');
 const request = require('supertest');
 const express = require('express');
@@ -27,6 +30,14 @@ describe('test routes', () => {
     app.use('/api/login', require('../../routes/login'));
     app.use('/api/token', require('../../routes/token'));
     app.use('/api/status', require('../../routes/status'));
+    // Mockeo creación de usuario
+    newUser.mockImplementation((userSchema) => {
+      return userSchema;
+    });
+    // Mockeo guardado de usuario
+    saveUser.mockImplementation((userSchema) => {
+      return userSchema;
+    });
   });
 
   afterEach(() => {
@@ -34,12 +45,13 @@ describe('test routes', () => {
   });
 
   describe('admin over routes', () => {
-    // https://npmtrends.com/jest-mongoose-mock
-    // https://jestjs.io/docs/mock-function-api#mockfnmockimplementationfn
-    let admin;//jest.setTimeout(70000);
+    const passUnique = "rafa123el88*";
+    const passUpdated = "rafa123el88*77";
+    let admin;
     let token;
     let admin2;
     let token2;
+    let admin2Updated;
     let mockUserConstructor = jest.fn((param) => {
       return {id: new ObjectId().toString(), ...param};
     });
@@ -59,23 +71,24 @@ describe('test routes', () => {
         role: "administrador",
         blocked: false
       };
-      
-      User.mockImplementation(() => {
-        return {
-          constructor: mockUserConstructor,
-        }
-      });
+      admin2Updated = {
+        id: admin2.id,
+        email: `22${admin2.email}`,
+        password: "$2a$04$fIq3ZDewYkQmVdeUSWRiN.1HzZas1Hhz6cczRqLucvRnv6PwBq9um",
+        role: "administrador",
+        blocked: true
+      };
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      jest.restoreAllMocks();admin
     });
 
     it('should fail on log user, wrong password', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
       const payload = {
         email: "rafaelputaro@gmail.com",
-        password: "rafa123el88*incorrecto"
+        password: `${passUnique}incorrecto`
       };
       const response = await request(app).post('/api/login').send(payload);
       expect(response.headers['content-type']).toContain('json');
@@ -90,7 +103,7 @@ describe('test routes', () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(undefined);
       const payload = {
         email: "rafaelputaro22@gmail.com",
-        password: "rafa123el88*"
+        password: passUnique
       };
       const response = await request(app).post('/api/login').send(payload);
       expect(response.headers['content-type']).toContain('json');
@@ -107,7 +120,7 @@ describe('test routes', () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(blocked);
       const payload = {
         email: "rafaelputaro@gmail.com",
-        password: "rafa123el88*"
+        password: passUnique
       };
       const response = await request(app).post('/api/login').send(payload);
       expect(response.headers['content-type']).toContain('json');
@@ -119,10 +132,14 @@ describe('test routes', () => {
     });
 
     it('should not log user, internal error', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(new Error());
+      jest.spyOn(User, 'findOne')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
       const payload = {
         email: "rafaelputaro@gmail.com",
-        password: "rafa123el88*"
+        password: passUnique
       };
       const response = await request(app).post('/api/login').send(payload);
       expect(response.headers['content-type']).toContain('json');
@@ -136,7 +153,7 @@ describe('test routes', () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
       const payload = {
         email: "rafaelputaro@gmail.com",
-        password: "rafa123el88*"
+        password: passUnique
       };
       const response = await request(app).post('/api/login').send(payload);
       expect(response.headers['content-type']).toContain('json');
@@ -201,7 +218,11 @@ describe('test routes', () => {
     });
 
     it('should return internal error', async () => {
-      jest.spyOn(User, 'findOne').mockImplementation(() => Promise.reject(new Error()));
+      jest.spyOn(User, 'findOne')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
       const response = await request(app)
         .get('/api/current')
         .set('x-token', token);
@@ -251,13 +272,14 @@ describe('test routes', () => {
     });
 
     it('should return error invalid token', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
       const response = await request(app)
         .post('/api/token')
         .set('x-token', token + 'F');
       expect(response.headers['content-type']).toContain('json');
-      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
       expect(response.body.ok).toBe(false);
-      expect(response.body.msg).toBe(MSG_INVALID_TOKEN);
+      expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
     });
 
     it('should return user blocked', async () => {
@@ -282,9 +304,7 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(false);
       expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
     });
-
-    //TODO Problemas con el constructor
-    /* 
+    
     it('should return new admin', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
       jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
@@ -293,16 +313,138 @@ describe('test routes', () => {
         .set('x-token', token)
         .send(admin2);
       expect(response.headers['content-type']).toContain('json');
-      expect(response.body.token).toBeUndefined();
+      expect(response.body.token).toBeDefined();
       expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
       expect(response.body.ok).toBe(true);
       expect(response.body.user.role).toBe(admin2.role);
       expect(response.body.user.email).toBe(admin2.email);
       expect(response.body.user.blocked).toBe(admin2.blocked);
       expect(response.body.user.id).toBe(admin2.id);
-      expect(response.body.user.id).toBeDefined();
+      token2 = response.body.token;
     }); 
-  */
+
+    it('should return a new token for admin just created', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      const response = await request(app)
+        .post('/api/token')
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+      expect(response.body.ok).toBe(true);
+      token2 = response.body.token;
+    });
+  
+    it('should log admin just created', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      const payload = {
+        email: admin2.email,
+        password: passUnique
+      };
+      const response = await request(app).post('/api/login').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.ACCEPTED);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(admin2.role);
+      expect(response.body.user.email).toBe(admin2.email);
+      expect(response.body.user.blocked).toBe(admin2.blocked);
+      expect(response.body.user.id).toBe(admin2.id);
+      expect(response.body.user.id).toBeDefined();
+    });
+
+    it('should return admin just created', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      const response = await request(app).get(`/api/user/${admin2.id}`)
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.email).toBe(admin2.email);
+      expect(response.body.user.blocked).toBe(admin2.blocked);
+      expect(response.body.user.id).toBe(admin2.id);
+      expect(response.body.user.role).toBe(admin2.role);
+    });
+
+    it('should  admin not found', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const response = await request(app).get(`/api/user/${admin2.id}`)
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
+    });
+
+    it('should return internal error', async () => {
+      jest.spyOn(User, 'findOne')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
+      const response = await request(app).get(`/api/user/${admin2.id}`)
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_ERROR_500);
+    });
+
+    it('delete admin just created', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findByIdAndDelete').mockReturnValueOnce(admin2);
+      const response = await request(app).delete(`/api/user/${admin2.id}`)
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+    });
+
+    it('try delete admin just created not found', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const response = await request(app).delete(`/api/user/${admin2.id}`)
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('try delete admin just created return internal error', async () => {
+      jest.spyOn(User, 'findOne')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
+      const response = await request(app).delete(`/api/user/${admin2.id}`)
+        .set('x-token', token2);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('admin just created self updated', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
+        {
+          _id: admin2.id,
+          ...admin2Updated
+        }      
+      );
+      const payload = {
+        email: admin2Updated.email,
+        password: passUpdated,
+        blocked: admin2Updated.blocked
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(admin2Updated.role);
+      expect(response.body.user.email).toBe(admin2Updated.email);
+      expect(response.body.user.blocked).toBe(admin2Updated.blocked);
+      expect(response.body.user.id).toBe(admin2.id);
+    });
+
   });
 
 });

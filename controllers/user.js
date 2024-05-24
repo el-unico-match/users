@@ -1,12 +1,14 @@
 const {response} = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/Users');
+const {
+    newUser, 
+    saveUser} = require('../helpers/user');
 const {generateJWT} = require('../helpers/jwt');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
     MSG_USER_EXISTS,
-    MSG_USER_NOT_EXISTS
-} = require('../messages/auth');
+    MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const {
     HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
@@ -36,12 +38,12 @@ const createUser = async (req, res = response) => {
             });
         };        
         // Crear un nuevo usuario en base al body
-        user = new User(req.body);
+        user = newUser(req.body);
         // Encriptar contraseña
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
         // Guardar en DB
-        await user.save();        
+        await saveUser(user);    
         // Generar el JWT (Java Web Token)
         const token = await generateJWT(user.id, user. role, user.blocked);
         res.status(HTTP_SUCCESS_2XX.CREATED).json({
@@ -123,7 +125,7 @@ const getUser = async (req, res = response) => {
         } else {
             res.status(HTTP_SUCCESS_2XX.OK).json({
                 ok: true,
-                users: user
+                user: user
             });
         }      
     } catch (error) {

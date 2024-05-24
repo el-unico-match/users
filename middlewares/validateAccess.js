@@ -1,5 +1,4 @@
 const {response} = require('express');
-const User = require('../models/Users');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
 const MSG_ACCESS_DENIED = 'You do not have the necessary access level';
 const MSG_ROLE_NOT_FOUND = 'User without role';
