@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "test": "jest --forceExit",
-    "start": "node index.js"
+    "test": "jest --forceExit ",
+    "start": "node index.js",
+    "coverage": "jest --coverage --detectOpenHandles --forceExit && coveralls < coverage/lcov.info"
   },
   "keywords": [],
   "author": "unico grupo",
