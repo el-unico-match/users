@@ -1,4 +1,3 @@
-const MockModel = require("jest-mongoose-mock");
 const {ObjectId} =  require('mongodb');
 jest.mock('../../models/Users');
 jest.mock('../../helpers/user');
@@ -20,6 +19,7 @@ describe('test routes', () => {
 
   beforeAll(async () => {
     process.env.SECRET_JWT_SEED ||= "SECRET121212121edefadfsadfds";
+    process.env.PORT ||= "0.0.0.0";
     app = express();
     // Lectura y parseo del body
     app.use(express.json());
@@ -161,6 +161,31 @@ describe('test routes', () => {
       expect(response.body.token).toBeUndefined();
       expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
     });    
+
+    it('should get status module', async () => {
+      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+      const response = await request(app).get('/api/status').send();
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.body.ok).toBe(true);
+      expect(response.body.status.database.online).toBe(true);
+      expect(response.body.status.service.port).toBe(process.env.PORT);
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    }); 
+
+    it('should fail get status module', async () => {
+      jest.spyOn(User, 'find')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
+      const response = await request(app).get('/api/status').send();
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.body.ok).toBe(false);
+      expect(response.body.status.database.online).toBe(false);
+      expect(response.body.status.service.port).toBe(process.env.PORT);
+      expect(response.body.msg).toBe(MSG_DATABASE_ERROR);
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    }); 
 
     it('should log user', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
