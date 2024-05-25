@@ -32,11 +32,19 @@ describe('test routes', () => {
     app.use('/api/status', require('../../routes/status'));
     // Mockeo creación de usuario
     newUser.mockImplementation((userSchema) => {
-      return userSchema;
+      return {
+        id: new ObjectId().toString(),
+        email: userSchema.email,
+        password: userSchema.password,
+        role: userSchema.role,
+        blocked: userSchema.blocked        
+      };
     });
     // Mockeo guardado de usuario
     saveUser.mockImplementation((userSchema) => {
-      return userSchema;
+      return {
+        id: new ObjectId().toString(),
+        ...userSchema};
     });
   });
 
@@ -52,9 +60,7 @@ describe('test routes', () => {
     let admin2;
     let token2;
     let admin2Updated;
-    let mockUserConstructor = jest.fn((param) => {
-      return {id: new ObjectId().toString(), ...param};
-    });
+    let client;
 
     beforeAll(async () => {      
       admin = {
@@ -65,7 +71,7 @@ describe('test routes', () => {
         blocked: false
       };
       admin2 = {
-        id: new ObjectId().toString(),
+        id: undefined,
         email: "admin_2@gmail.com",
         password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
         role: "administrador",
@@ -77,6 +83,13 @@ describe('test routes', () => {
         password: "$2a$04$fIq3ZDewYkQmVdeUSWRiN.1HzZas1Hhz6cczRqLucvRnv6PwBq9um",
         role: "administrador",
         blocked: true
+      };
+      client = {
+        id: new ObjectId().toString(),
+        email: "cliente@gmail.com",
+        password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
+        role: "cliente",
+        blocked: false
       };
     });
 
@@ -162,8 +175,8 @@ describe('test routes', () => {
       expect(response.body.user.role).toBe(admin.role);
       expect(response.body.user.email).toBe(admin.email);
       expect(response.body.user.blocked).toBe(admin.blocked);
-      expect(response.body.user.id).toBe(admin.id);
       expect(response.body.user.id).toBeDefined();
+      expect(response.body.user.id).toBe(admin.id);
       token = response.body.token;
     });
 
@@ -319,7 +332,8 @@ describe('test routes', () => {
       expect(response.body.user.role).toBe(admin2.role);
       expect(response.body.user.email).toBe(admin2.email);
       expect(response.body.user.blocked).toBe(admin2.blocked);
-      expect(response.body.user.id).toBe(admin2.id);
+      expect(response.body.user.id).toBeDefined();
+      admin2.id = response.body.user.id;
       token2 = response.body.token;
     }); 
 
@@ -388,7 +402,7 @@ describe('test routes', () => {
       expect(response.body.msg).toBe(MSG_ERROR_500);
     });
 
-    it('delete admin just created', async () => {
+    it('should delete admin just created', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
       jest.spyOn(User, 'findByIdAndDelete').mockReturnValueOnce(admin2);
       const response = await request(app).delete(`/api/user/${admin2.id}`)
@@ -398,7 +412,7 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(true);
     });
 
-    it('try delete admin just created not found', async () => {
+    it('should fail on delete admin just created', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
       const response = await request(app).delete(`/api/user/${admin2.id}`)
         .set('x-token', token2);
@@ -407,7 +421,7 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(false);
     });
 
-    it('try delete admin just created return internal error', async () => {
+    it('should fail on delete admin just created. Return internal error', async () => {
       jest.spyOn(User, 'findOne')
         .mockImplementation( () => {
           throw new Error();
@@ -420,7 +434,7 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(false);
     });
 
-    it('admin just created self updated', async () => {
+    it('should update admin just created', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
       jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
         {
@@ -443,6 +457,145 @@ describe('test routes', () => {
       expect(response.body.user.email).toBe(admin2Updated.email);
       expect(response.body.user.blocked).toBe(admin2Updated.blocked);
       expect(response.body.user.id).toBe(admin2.id);
+    });
+
+    it('should fail on update admin just created because user not found', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const payload = {
+        email: admin2Updated.email,
+        password: passUpdated,
+        blocked: admin2Updated.blocked
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+      expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('should fail on update admin just created because an internal error occurred', async () => {
+      jest.spyOn(User, 'findOne')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
+      const payload = {
+        email: admin2Updated.email,
+        password: passUpdated,
+        blocked: admin2Updated.blocked
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
+      expect(response.body.msg).toBe(MSG_ERROR_500);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('should return all the users', async () => {
+      let users = [
+        {
+          id: admin.id,
+          email: admin.email,
+          role: admin.role,
+          blocked: admin.blocked
+        }, 
+        {
+          id: admin2Updated.id,
+          email: admin2Updated.email,
+          role: admin2Updated.role,
+          blocked: admin2Updated.blocked
+        }];
+      jest.spyOn(User, 'find').mockReturnValueOnce(users);
+      const response = await request(app)
+        .get('/api/users')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.users).toEqual(users);
+    });
+
+    it('should fail on get all the users', async () => {
+      jest.spyOn(User, 'find')
+        .mockImplementation( () => {
+          throw new Error();
+        }          
+      );
+      const response = await request(app)
+        .get('/api/users')
+        .set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toEqual(MSG_ERROR_500);
+    });
+
+    it('should return new client', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const payload = {
+        email: client.email,
+        password: passUnique,
+        role: client.role,
+        blocked: client.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+      expect(response.body.token).toBeDefined();
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(client.role);
+      expect(response.body.user.email).toBe(client.email);
+      expect(response.body.user.blocked).toBe(client.blocked);
+      expect(response.body.user.id).toBeDefined();
+      client.id = response.body.id;      
+    }); 
+
+    it('should block client', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      client.blocked = true;
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
+        client
+      );
+      const payload = {
+        blocked: true
+      };
+      const response = await request(app).put(`/api/user/${client.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(client.role);
+      expect(response.body.user.email).toBe(client.email);
+      expect(response.body.user.blocked).toBe(true);
+      expect(response.body.user.id).toBe(client.id);
+    });
+
+    it('should unblock client', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      client.blocked = false;
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
+        client
+      );
+      const payload = {
+        blocked: true
+      };
+      const response = await request(app).put(`/api/user/${client.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(client.role);
+      expect(response.body.user.email).toBe(client.email);
+      expect(response.body.user.blocked).toBe(false);
+      expect(response.body.user.id).toBe(client.id);
     });
 
   });

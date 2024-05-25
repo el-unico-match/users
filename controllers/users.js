@@ -1,6 +1,7 @@
 const {response} = require('express');
 const User = require('../models/Users');
 const {HTTP_SUCCESS_2XX, HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
+const {MSG_ERROR_500} = require('../messages/uncategorized');
 
 const getUsers = async (req, res = response) => {
     try {
