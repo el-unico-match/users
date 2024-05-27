@@ -39,7 +39,6 @@ describe('test routes', () => {
     // Lectura y parseo del body
     app.use(express.json());
     // Rutas Usuario
-    app.use('/api/current', require('../../routes/current'));
     app.use('/api/user', require('../../routes/user'));
     app.use('/api/users', require('../../routes/users'));
     app.use('/api/login', require('../../routes/login'));
@@ -228,7 +227,7 @@ describe('test routes', () => {
           ...admin
         });
       const response = await request(app)
-        .get('/api/current')
+        .get('/api/user/current')
         .set('x-token', token);
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
@@ -242,7 +241,7 @@ describe('test routes', () => {
     it('should return error invalid token', async () => {
       const token_fake = token + 'f';
       const response = await request(app)
-        .get('/api/current')
+        .get('/api/user/current')
         .set('x-token', token_fake);
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
@@ -251,7 +250,7 @@ describe('test routes', () => {
     });
     it('should return error no token', async () => {
       const response = await request(app)
-        .get('/api/current');
+        .get('/api/user/current');
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
       expect(response.body.ok).toBe(false);
@@ -261,7 +260,7 @@ describe('test routes', () => {
     it('should return not found', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(undefined);
       const response = await request(app)
-        .get('/api/current')
+        .get('/api/user/current')
         .set('x-token', token);
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
@@ -276,7 +275,7 @@ describe('test routes', () => {
         }          
       );
       const response = await request(app)
-        .get('/api/current')
+        .get('/api/user/current')
         .set('x-token', token);
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR);
