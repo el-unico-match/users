@@ -50,4 +50,5 @@ const createAccessRoleAndOwnerBased = (superRole) => {
 module.exports = {
     createAccessRoleBased,
     createAccessRoleAndOwnerBased,
+    MSG_ACCESS_DENIED
 }

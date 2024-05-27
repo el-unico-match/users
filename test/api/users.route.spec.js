@@ -8,10 +8,25 @@ const User = require('../../models/Users');
 const request = require('supertest');
 const express = require('express');
 require('dotenv').config();
-const { MSG_PASSWORD_INCORRECT, MSG_USER_BLOCKED, MSG_USER_NOT_EXISTS, MSG_NO_TOKEN, MSG_INVALID_TOKEN } = require('../../messages/auth');
+const {MSG_ACCESS_DENIED} = require('../../middlewares/validateAccess');
+const { 
+  MSG_PASSWORD_INCORRECT, 
+  MSG_USER_BLOCKED, 
+  MSG_USER_NOT_EXISTS, 
+  MSG_NO_TOKEN, 
+  MSG_INVALID_TOKEN,
+  MSG_EMAIL_IS_REQUIRED,
+  MSG_PASSWORD_ERROR_LENGTH,
+  MSG_ROLE_ERROR_TYPE,
+  MSG_INVALID_LOCK_STATE,
+  MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
+  MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
+  MSG_USER_EXISTS
+  } = require('../../messages/auth');
 const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
 const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
-const {generateJWT} = require('../../helpers/jwt');
+const {isRole, ROLES} = require('../../types/role');
+const {generateJWT} =require('../../helpers/jwt');
 
 describe('test routes', () => {
   
@@ -52,7 +67,7 @@ describe('test routes', () => {
     jest.restoreAllMocks();
   });
 
-  describe('admin over routes', () => {
+  describe('user', () => {
     const passUnique = "rafa123el88*";
     const passUpdated = "rafa123el88*77";
     let admin;
@@ -61,6 +76,7 @@ describe('test routes', () => {
     let token2;
     let admin2Updated;
     let client;
+    let token_client;
 
     beforeAll(async () => {      
       admin = {
@@ -85,7 +101,7 @@ describe('test routes', () => {
         blocked: true
       };
       client = {
-        id: new ObjectId().toString(),
+        id: undefined,
         email: "cliente@gmail.com",
         password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
         role: "cliente",
@@ -327,7 +343,7 @@ describe('test routes', () => {
       expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
       expect(response.body.ok).toBe(false);
       expect(response.body.msg).toBe(MSG_USER_BLOCKED);
-    });jest.mock('../../models/Users');
+    });
 
     it('should return user not exists', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
@@ -482,6 +498,30 @@ describe('test routes', () => {
       expect(response.body.user.id).toBe(admin2.id);
     });
 
+    it('should update admin just created', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
+        {
+          _id: admin2.id,
+          ...admin2Updated
+        }      
+      );
+      const payload = {
+        email: admin2Updated.email,
+        password: passUpdated
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.role).toBe(admin2Updated.role);
+      expect(response.body.user.email).toBe(admin2Updated.email);
+      expect(response.body.user.blocked).toBe(admin2Updated.blocked);
+      expect(response.body.user.id).toBe(admin2.id);
+    });
+
     it('should fail on update admin just created because user not found', async () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
       const payload = {
@@ -495,6 +535,51 @@ describe('test routes', () => {
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
       expect(response.body.msg).toBe(MSG_USER_NOT_EXISTS);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('should fail on update admin just created because bad email', async () => {
+      const payload = {
+        email: `${admin2Updated.email}++`,
+        password: passUpdated,
+        blocked: admin2Updated.blocked
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.msg.email.msg).toBe(MSG_EMAIL_IS_REQUIRED);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('should fail on update admin just created because bad password', async () => {
+      const payload = {
+        email: admin2Updated.email,
+        password: 'bad pass',
+        blocked: admin2Updated.blocked
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.msg.password.msg).toBe(MSG_PASSWORD_ERROR_LENGTH);
+      expect(response.body.ok).toBe(false);
+    });
+
+    it('should fail on update admin just created because bad blocked state', async () => {
+      const payload = {
+        email: admin2Updated.email,
+        password: passUpdated,
+        blocked: 'cualquier cosa'
+      };
+      const response = await request(app).put(`/api/user/${admin2.id}`)
+        .set('x-token', token2)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.msg.blocked.msg).toBe(MSG_INVALID_LOCK_STATE);
       expect(response.body.ok).toBe(false);
     });
 
@@ -576,7 +661,8 @@ describe('test routes', () => {
       expect(response.body.user.email).toBe(client.email);
       expect(response.body.user.blocked).toBe(client.blocked);
       expect(response.body.user.id).toBeDefined();
-      client.id = response.body.id;      
+      client.id = response.body.user.id;
+      token_client = response.body.token;    
     }); 
 
     it('should block client', async () => {
@@ -597,7 +683,6 @@ describe('test routes', () => {
       expect(response.body.user.role).toBe(client.role);
       expect(response.body.user.email).toBe(client.email);
       expect(response.body.user.blocked).toBe(true);
-      expect(response.body.user.id).toBe(client.id);
     });
 
     it('should unblock client', async () => {
@@ -615,10 +700,149 @@ describe('test routes', () => {
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
       expect(response.body.ok).toBe(true);
-      expect(response.body.user.role).toBe(client.role);
+      expect(response.body.user.role).toBe(ROLES.CLIENT);
       expect(response.body.user.email).toBe(client.email);
       expect(response.body.user.blocked).toBe(false);
-      expect(response.body.user.id).toBe(client.id);
+    });
+
+    it('should fail o create new client', async () => {
+      const payload = {
+        email: "no mail",
+        password: passUnique,
+        role: client.role,
+        blocked: client.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg.email.msg).toBe(MSG_EMAIL_IS_REQUIRED);
+    });
+
+    it('should fail o create new client', async () => {
+      const payload = {
+        email: client.email,
+        password: 'passUnique',
+        role: client.role,
+        blocked: client.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg.password.msg).toBe(MSG_PASSWORD_ERROR_LENGTH);
+    }); 
+
+    it('should fail o create new client', async () => {
+      const payload = {
+        email: client.email,
+        password: passUnique,
+        role: 'jefe',
+        blocked: client.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg.role.msg).toBe(MSG_ROLE_ERROR_TYPE);
+    }); 
+
+    it('should fail o create new client', async () => {
+      const payload = {
+        email: client.email,
+        password: passUnique,
+        role: client.role,
+        blocked: 'sarasa'
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg.blocked.msg).toBe(MSG_INVALID_LOCK_STATE);
+    }); 
+
+    it('should fail on create admin because is client', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      const payload = {
+        email: admin.email,
+        password: passUnique,
+        role: admin.role,
+        blocked: admin.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .set('x-token', token_client)
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER);
+    });
+
+    it('should fail on create admin because no token', async () => {
+      const payload = {
+        email: admin.email,
+        password: passUnique,
+        role: admin.role,
+        blocked: admin.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_WITHOUT_AUTH_TO_CREATE_ADMIN);
+    });
+
+    it('should fail delete admin because token client', async () => {
+      const response = await request(app).delete(`/api/user/${admin2.id}`)
+        .set('x-token', token_client);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_ACCESS_DENIED)
+    });
+
+    it('should fail on create new client', async () => {
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      const payload = {
+        email: client.email,
+        password: passUnique,
+        role: client.role,
+        blocked: client.blocked
+      };
+      const response = await request(app)
+        .post('/api/user')
+        .send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.msg).toBe(MSG_USER_EXISTS);
+      expect(response.body.ok).toBe(false);
+    }); 
+
+  });
+
+  describe('test role', () => {
+    
+    it('should return true on check "cliente"', async () => {
+      expect(isRole(ROLES.CLIENT)).toBe(true);
+    });
+
+    it('should return true on check "administrador"', async () => {
+      expect(isRole(ROLES.ADMINISTRATOR)).toBe(true);
+    });
+
+    it('should return false on check other string', async () => {
+      expect(isRole("jefe")).toBe(false);
     });
 
   });
