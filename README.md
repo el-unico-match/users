@@ -90,4 +90,4 @@ Nota: PORT normalmente es 4000 o sea: http://localhost:4000/api-doc/
 
 4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: http://localhost:4000/api/status
 
-5) Covertura de codigo [![Coverage Status](https://coveralls.io/repos/github/el-unico-match/users/badge.svg?branch=coveral-integration)](https://coveralls.io/github/el-unico-match/users?branch=coveral-integration)
+5) Covertura de codigo [![Coverage Status](https://coveralls.io/repos/github/el-unico-match/users/badge.svg?branch=main)](https://coveralls.io/github/el-unico-match/users?branch=main)
