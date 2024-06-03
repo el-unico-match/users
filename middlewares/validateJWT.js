@@ -8,38 +8,8 @@ const {MSG_NO_TOKEN, MSG_INVALID_TOKEN} = require('../messages/auth');
  * Valida un token que viene por el header como "x-token" 
  */
 const validateJWT = (req, res = response, next) => {
-    const token = req.header('x-token');
-    if (!token) {
-        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
-            ok: false,
-            msg: MSG_NO_TOKEN
-        });
-    }
-    try {
-        doValidateJWT(req, token);
-    } catch (error) {
-        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
-            ok: false,
-            msg: MSG_INVALID_TOKEN
-        })
-    }
+    genericValidateJWT(req, res, doValidateJWT);
     next();
-}
-
-/**
- * 
- * Válida el token del request.
- */
-const doValidateJWT = (req, token) =>  {
-    const {uid, role, blocked} = jwt.verify(
-        token,
-        process.env.SECRET_JWT_SEED
-    );
-    req.tokenExtractedData = {
-        uid,
-        role,
-        blocked
-    };
 }
 
 /**
@@ -60,6 +30,45 @@ const validateLazyJWT = (req, res = response, next) => {
         }
     }    
     next();
+}
+
+/**
+ * Valida un token de restauración de constraseña que viene por el header como "x-token" 
+ */
+const validateRestoreJWT = (req, res = response, next) => {
+    genericValidateJWT(req, res, doValidateRestoreJWT);
+    next();
+}
+
+/**
+ * 
+ * Válida el token del request.
+ */
+const doValidateJWT = (req, token) =>  {
+    const {uid, role, blocked} = jwt.verify(
+        token,
+        process.env.SECRET_JWT_SEED
+    );
+    req.tokenExtractedData = {
+        uid,
+        role,
+        blocked
+    };
+}
+
+/**
+ * 
+ * Válida el token del request.
+ */
+const doValidateRestoreJWT = (req, token) =>  {
+    const {pin, email} = jwt.verify(
+        token,
+        process.env.SECRET_JWT_SEED
+    );
+    req.tokenExtractedData = {
+        pin,
+        email
+    };
 }
 
 /**
@@ -97,8 +106,30 @@ const doDecodeJWT = (req, token) =>  {
     };
 }
 
+/**
+ * Valida un token que viene por el header como "x-token" mediante la función parámetro 
+ */
+const genericValidateJWT = (req, res = response, doValidate) => {
+    const token = req.header('x-token');
+    if (!token) {
+        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
+            ok: false,
+            msg: MSG_NO_TOKEN
+        });
+    }
+    try {
+        doValidate(req, token);
+    } catch (error) {
+        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+            ok: false,
+            msg: MSG_INVALID_TOKEN
+        })
+    }
+}
+
 module.exports = {
     validateJWT,
     validateLazyJWT,
-    decodeJWT
+    decodeJWT,
+    validateRestoreJWT
 }

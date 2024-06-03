@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport(
             pass: process.env.PASS_EMAIL_APP
         }
     }
-);
+)
 
 const createMailOptions = (to, subject, text) => {
     return {
@@ -24,15 +24,15 @@ const createMailOptions = (to, subject, text) => {
         subject,
         text
     }
-} ;
+}
 
 const sendMail = async (to, subject, text) => {
     const options = createMailOptions(to, subject, text);
     await transporter.sendMail(options);
 }
 
-const sendRestoreMail = (email, pin) => {
-    sendMail(email, SUBJECT_RESTORE, `${TEXT_RESTORE}:${pin}`);
+const sendRestoreMail = async (email, pin) => {
+    await sendMail(email, SUBJECT_RESTORE, `${TEXT_RESTORE}${pin}`);
 }
 
 module.exports = {
