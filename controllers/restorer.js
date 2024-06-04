@@ -3,7 +3,6 @@ const User = require('../models/Users');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
     MSG_USER_NOT_EXISTS, 
-    MSG_COULD_NOT_BE_SENT_RESTORE_PIN,
     MSG_WRONG_PIN} = require('../messages/auth');
 const {
     HTTP_SUCCESS_2XX,
@@ -52,23 +51,24 @@ const sendRestoreMessage = async (req, res = response, email, cellphone) => {
     const token = await generateRestoreJWT(email, pin);
     try {
         if (cellphone) {
-            await sendRestoreWhatsapp(cellphone, pin);
+            await sendRestoreWhatsapp(res, cellphone, pin, token);
         } else {
-            await sendRestoreMail(email, pin);    
+            await sendRestoreMail(res, email, pin, token);  
+            res.status(HTTP_SUCCESS_2XX.CREATED).json({
+                ok: true,
+                user: {
+                    email,
+                    cellphone
+                },            
+                token: token      
+            });
         }
-        res.status(HTTP_SUCCESS_2XX.CREATED).json({
-            ok: true,
-            user: {
-                email,
-                cellphone
-            },            
-            token: token            
-        });    
     } catch (error) {
         console.log(error);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
-            msg: MSG_COULD_NOT_BE_SENT_RESTORE_PIN         
+            msg: MSG_ERROR_500,
+            detail: error.toString()
         });    
     }            
 }
