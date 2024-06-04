@@ -31,7 +31,7 @@ const sendMail = async (to, subject, text) => {
     await transporter.sendMail(options);
 }
 
-const sendRestoreMail = async (email, pin) => {
+const sendRestoreMail = async (res, email, pin, token) => {
     await sendMail(email, SUBJECT_RESTORE, `${TEXT_RESTORE}${pin}`);
 }
 

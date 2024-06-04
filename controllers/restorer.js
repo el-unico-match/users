@@ -27,7 +27,7 @@ const restorePassword = async (req, res = response) => {
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await sendRestoreMessage(req, res, email, cellphone)      
+            await sendRestoreMessage(res, email, cellphone)      
         } else {
             res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
@@ -46,7 +46,7 @@ const restorePassword = async (req, res = response) => {
 /**
  * @description Envía efectivamente el mensaje
  */
-const sendRestoreMessage = async (req, res = response, email, cellphone) => {
+const sendRestoreMessage = async (res = response, email, cellphone) => {
     const pin = generatePin();
     const token = await generateRestoreJWT(email, pin);
     try {
