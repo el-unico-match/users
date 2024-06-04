@@ -1,7 +1,7 @@
 const request = require("request");
 const ultraMsgReferenceId = process.env.ULTRA_MSG_ID;
 const ultraMsgToken = process.env.ULTRA_MSG_TOKEN;
-const ultraMsgApiUrl = process.env.ULTRA_MSG_API_URL;
+const ultraMsgApiUrl = `https://api.ultramsg.com/${ultraMsgReferenceId}/`;
 const TEXT_RESTORE = "Your restore PIN is: ";
 
 const sendWhatsapp = async (to, body) => {

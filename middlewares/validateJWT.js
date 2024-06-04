@@ -8,8 +8,7 @@ const {MSG_NO_TOKEN, MSG_INVALID_TOKEN} = require('../messages/auth');
  * Valida un token que viene por el header como "x-token" 
  */
 const validateJWT = (req, res = response, next) => {
-    genericValidateJWT(req, res, doValidateJWT);
-    next();
+    genericValidateJWT(req, res, doValidateJWT, next);
 }
 
 /**
@@ -36,8 +35,7 @@ const validateLazyJWT = (req, res = response, next) => {
  * Valida un token de restauración de constraseña que viene por el header como "x-token" 
  */
 const validateRestoreJWT = (req, res = response, next) => {
-    genericValidateJWT(req, res, doValidateRestoreJWT);
-    next();
+    genericValidateJWT(req, res, doValidateRestoreJWT, next);
 }
 
 /**
@@ -109,14 +107,14 @@ const doDecodeJWT = (req, token) =>  {
 /**
  * Valida un token que viene por el header como "x-token" mediante la función parámetro 
  */
-const genericValidateJWT = (req, res = response, doValidate) => {
+const genericValidateJWT = (req, res = response, doValidate, next) => {
     const token = req.header('x-token');
     if (!token) {
         return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
             ok: false,
             msg: MSG_NO_TOKEN
         });
-    }
+    } 
     try {
         doValidate(req, token);
     } catch (error) {
@@ -125,6 +123,7 @@ const genericValidateJWT = (req, res = response, doValidate) => {
             msg: MSG_INVALID_TOKEN
         })
     }
+    next();
 }
 
 module.exports = {

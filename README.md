@@ -1,7 +1,10 @@
 # Usuarios
-* Usuario sin token:
+* Usuario sin token de acceso:
     Crear cliente.
-* Usuario con token:
+    Iniciar recuperación contraseña.
+* Usuario con token de recuperación:
+    Validar pin de recuperación.
+* Usuario con token de acceso:
     * Rol cliente:
         * Eliminar su usuario.
         * Obtener usuarios.
@@ -51,7 +54,16 @@ const UserSchema = Schema({
 PORT = 4000
 DB_CNN=********
 SECRET_JWT_SEED=************************
+EMAIL_APP = matchunico@gmail.com
+PASS_EMAIL_APP = '************************'
+SERVICE_EMAIL_APP = Gmail
+HOST_EMAIL_APP = smtp.gmail.com
+PORT_EMAIL_APP = 465
+ULTRA_MSG_ID = *****************
+ULTRA_MSG_TOKEN =  *************
+ULTRA_MSG_API_URL = https://api.ultramsg.com/instance87184/
 HOST=0.0.0.0
+
 ```
 Opcionalmente se podrá utilizar el archivo .env (pasado por privado) en la 
 raíz del proyecto para configurar dichas variables de entorno.
@@ -76,6 +88,14 @@ el cual permite configurar las variables de entorno.
 PORT = 4000
 DB_CNN=mongodb://users_mongo:27017/match_dev
 SECRET_JWT_SEED=************************
+EMAIL_APP = matchunico@gmail.com
+PASS_EMAIL_APP = '************************'
+SERVICE_EMAIL_APP = Gmail
+HOST_EMAIL_APP = smtp.gmail.com
+PORT_EMAIL_APP = 465
+ULTRA_MSG_ID = *****************
+ULTRA_MSG_TOKEN =  *************
+ULTRA_MSG_API_URL = https://api.ultramsg.com/instance87184/
 HOST=0.0.0.0
 ```
 

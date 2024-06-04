@@ -16,6 +16,12 @@ const {
     generateJWT, 
     generateRestoreJWT} = require('../helpers/jwt');
 
+/**
+ * 
+ * @param {*} req: En body email y cellphone(opcional).
+ * @description un Pin de recuperación de contraseña al mail y si en el body hay un cellphone
+ * envía el Pin sólo a este. Retorna un token de recuperación.
+ */
 const restorePassword = async (req, res = response) => {
     try {
         const {email, cellphone} = req.body;
@@ -38,6 +44,9 @@ const restorePassword = async (req, res = response) => {
     }
 }
 
+/**
+ * @description Envía efectivamente el mensaje
+ */
 const sendRestoreMessage = async (req, res = response, email, cellphone) => {
     const pin = generatePin();
     const token = await generateRestoreJWT(email, pin);
@@ -64,6 +73,13 @@ const sendRestoreMessage = async (req, res = response, email, cellphone) => {
     }            
 }
 
+/**
+ * 
+ * @param {*} req: Como parámetro en path el pin de recuperación y por header el x-token de recuperación.
+ * @description Chequea el pin de recuperación comparando con el token de recuperación.
+ * Retorna los datos del usuario junto a un token (regular) que puede ser utiliza para actualizar
+ * el password.
+ */
 const verifyPin = async (req, res = response) => {
     try {
         const {pin, email} = req.tokenExtractedData;
@@ -86,6 +102,10 @@ const verifyPin = async (req, res = response) => {
     }
 }
 
+/**
+ * 
+ * @description Hace la verificación efectiva de pin.
+ */
 const doVerifyPin = async (req, res = response, pinToken, user) => {
     const pinParam = req.params.pin;
     if (pinToken === pinParam) {
