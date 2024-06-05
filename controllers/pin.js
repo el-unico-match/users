@@ -8,12 +8,13 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
-const {sendRestoreMail} = require('../helpers/email');
-const {sendRestoreWhatsapp} = require('../helpers/whatsapp');
+const {sendPinMail} = require('../helpers/email');
+const {sendPinWhatsapp} = require('../helpers/whatsapp');
 const {generatePin} = require('../helpers/pin');
 const {
     generateJWT, 
-    generateRestoreJWT} = require('../helpers/jwt');
+    generatePinJWT} = require('../helpers/jwt');
+const TEXT_RESTORE = "Your restore PIN is: ";
 
 /**
  * 
@@ -21,13 +22,17 @@ const {
  * @description un Pin de recuperación de contraseña al mail y si en el body hay un cellphone
  * envía el Pin sólo a este. Retorna un token de recuperación.
  */
-const restorePassword = async (req, res = response) => {
+const sendRestorePin = async (req, res = response) => {
+    await sendPin(req, res, TEXT_RESTORE);
+}
+
+const sendPin = async (req, res = response, text) => {
     try {
         const {email, cellphone} = req.body;
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await sendRestoreMessage(res, email, cellphone)      
+            await sendPinMessage(res, email, cellphone, text)      
         } else {
             res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
@@ -46,22 +51,15 @@ const restorePassword = async (req, res = response) => {
 /**
  * @description Envía efectivamente el mensaje
  */
-const sendRestoreMessage = async (res = response, email, cellphone) => {
+const sendPinMessage = async (res = response, email, cellphone, text) => {
     const pin = generatePin();
-    const token = await generateRestoreJWT(email, pin);
+    const token = await generatePinJWT(email, pin);
+    const message = `${TEXT_RESTORE}${pin}`;
     try {
         if (cellphone) {
-            await sendRestoreWhatsapp(res, cellphone, pin, token);
+            await sendPinWhatsapp(res, cellphone, message, token);
         } else {
-            await sendRestoreMail(res, email, pin, token);  
-            res.status(HTTP_SUCCESS_2XX.CREATED).json({
-                ok: true,
-                user: {
-                    email,
-                    cellphone
-                },            
-                token: token      
-            });
+            await sendPinMail(res, email, message, token);
         }
     } catch (error) {
         console.log(error);
@@ -131,6 +129,6 @@ const doVerifyPin = async (req, res = response, pinToken, user) => {
 }
 
 module.exports = {
-    restorePassword,
+    sendRestorePin,
     verifyPin
 }

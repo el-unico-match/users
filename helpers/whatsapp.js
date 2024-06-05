@@ -2,7 +2,7 @@
 const axios = require('axios');
 const qs = require('qs');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
-const {MSG_COULD_NOT_BE_SENT_RESTORE_PIN} = require('../messages/auth');
+const {MSG_COULD_NOT_BE_SENT_PIN} = require('../messages/auth');
 const {
     HTTP_SUCCESS_2XX,
     HTTP_SERVER_ERROR_5XX,
@@ -10,9 +10,8 @@ const {
 const ultraMsgReferenceId = process.env.ULTRA_MSG_ID;
 const ultraMsgToken = process.env.ULTRA_MSG_TOKEN;
 const ultraMsgApiUrl = `https://api.ultramsg.com/${ultraMsgReferenceId}`;
-const TEXT_RESTORE = "Your restore PIN is: ";
 
-const sendWhatsapp = async (res, to, body, token) => {
+const doSendPinWhatsapp = async (res, to, body, token) => {
     const data = qs.stringify({
         "token": ultraMsgToken,
         "to": to,
@@ -46,7 +45,7 @@ const sendWhatsapp = async (res, to, body, token) => {
             } else {
                 res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
                     ok: false,    
-                    msg: MSG_COULD_NOT_BE_SENT_RESTORE_PIN
+                    msg: MSG_COULD_NOT_BE_SENT_PIN
                 });    
             }            
         }
@@ -92,15 +91,15 @@ const checkMessageSended = async (res, to, token, id) => {
     } else {
         res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
             ok: false,    
-            msg: MSG_COULD_NOT_BE_SENT_RESTORE_PIN
+            msg: MSG_COULD_NOT_BE_SENT_PIN
         });    
     }
 }
 
-const sendRestoreWhatsapp = async (res, to, pin, token) => {
-    await sendWhatsapp(res, to, `${TEXT_RESTORE}${pin}`, token);
+const sendPinWhatsapp = async (res, to, message, token) => {
+    await doSendPinWhatsapp(res, to, message, token);
 }
 
 module.exports = {
-    sendRestoreWhatsapp
+    sendPinWhatsapp
 }

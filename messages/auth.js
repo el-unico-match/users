@@ -17,7 +17,7 @@ const MSG_INVALID_LOCK_STATE = 'Invalid lock state'
 const MSG_NO_TOKEN = 'There is no token in the request';
 const MSG_INVALID_TOKEN = 'Invalid token';
 const MSG_INVALID_CELLPHONE = 'Invalid cellphone';
-const MSG_COULD_NOT_BE_SENT_RESTORE_PIN = 'Restore pin could not be sent';
+const MSG_COULD_NOT_BE_SENT_PIN = 'Pin could not be sent';
 const MSG_WRONG_PIN = 'It was not possible to verify the pin';
 
 module.exports = {
@@ -37,6 +37,6 @@ module.exports = {
     MSG_NO_TOKEN,
     MSG_INVALID_TOKEN,
     MSG_INVALID_CELLPHONE,
-    MSG_COULD_NOT_BE_SENT_RESTORE_PIN,
+    MSG_COULD_NOT_BE_SENT_PIN,
     MSG_WRONG_PIN
 }

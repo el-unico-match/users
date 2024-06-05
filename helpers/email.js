@@ -1,8 +1,15 @@
 const nodemailer = require('nodemailer');
 
 const NO_REPLY_EMAIL = "info-noreply@math.com";
-const SUBJECT_RESTORE = "Restore password MATCH";
-const TEXT_RESTORE = "Your restore PIN is: ";
+const SUBJECT_PIN_MESSAGE = "Match App - PIN";
+const {MSG_ERROR_500} = require('../messages/uncategorized');
+const {MSG_COULD_NOT_BE_SENT_PIN} = require('../messages/auth');
+const {
+    HTTP_SUCCESS_2XX,
+    HTTP_SERVER_ERROR_5XX,
+    HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
+
+let mailServiceConfigError = null;
 
 const transporter = nodemailer.createTransport(
     {
@@ -17,6 +24,15 @@ const transporter = nodemailer.createTransport(
     }
 )
 
+// Verificar conexión
+transporter.verify( (error) => {
+    if (error) {
+      mailServiceConfigError = `Mail Service Configuration Fail: ${error}`;
+    } else {
+      console.log("Mail service is ready.");
+    }
+});
+
 const createMailOptions = (to, subject, text) => {
     return {
         from: NO_REPLY_EMAIL,
@@ -26,15 +42,37 @@ const createMailOptions = (to, subject, text) => {
     }
 }
 
-const sendMail = async (to, subject, text) => {
+const doSendPinMail = async (res, to, subject, text, token) => {
+    if (mailServiceConfigError) {
+        return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json({
+            ok: false,
+            msg: MSG_ERROR_500,
+            detail: mailServiceConfigError
+        });
+    }
     const options = createMailOptions(to, subject, text);
-    await transporter.sendMail(options);
+    await transporter.sendMail(options, (error, info) => {
+        if (error) {
+            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+                ok: false,
+                msg: MSG_COULD_NOT_BE_SENT_PIN
+            });
+        } else {            
+            res.status(HTTP_SUCCESS_2XX.CREATED).json({
+                ok: true,
+                user: {
+                    email: to
+                },            
+                token: token            
+            });   
+        }        
+    });
 }
 
-const sendRestoreMail = async (res, email, pin, token) => {
-    await sendMail(email, SUBJECT_RESTORE, `${TEXT_RESTORE}${pin}`);
+const sendPinMail = async (res, email, text, token) => {
+    await doSendPinMail(res, email, SUBJECT_PIN_MESSAGE, text, token);
 }
 
 module.exports = {
-    sendRestoreMail
+    sendPinMail
 }
