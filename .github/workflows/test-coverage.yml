@@ -28,7 +28,7 @@ jobs:
         echo "SERVICE_EMAIL_APP=${{ vars.SERVICE_EMAIL_APP }}" >> .env
         echo "HOST_EMAIL_APP=${{ vars.HOST_EMAIL_APP }}" >> .env
         echo "PORT_EMAIL_APP=${{ vars.PORT_EMAIL_APP }}" >> .env
-        echo "PASS_EMAIL_APP=${{ secrets.PASS_EMAIL_APP }}" >> .env
+        echo "PASS_EMAIL_APP='${{ secrets.PASS_EMAIL_APP }}'" >> .env
         
         echo "ULTRA_MSG_ID=${{ vars.ULTRA_MSG_ID }}" >> .env
         echo "ULTRA_MSG_TOKEN=${{ secrets.ULTRA_MSG_TOKEN }}" >> .env
