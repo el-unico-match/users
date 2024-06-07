@@ -9,7 +9,6 @@ const {
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
 const {sendPinMail} = require('../helpers/email');
-const {sendPinWhatsapp} = require('../helpers/whatsapp');
 const {generatePin} = require('../helpers/pin');
 const {
     generateJWT, 
@@ -18,9 +17,8 @@ const TEXT_RESTORE = "Your restore PIN is: ";
 
 /**
  * 
- * @param {*} req: En body email y cellphone(opcional).
- * @description un Pin de recuperación de contraseña al mail y si en el body hay un cellphone
- * envía el Pin sólo a este. Retorna un token de recuperación.
+ * @param {*} req: En body email.
+ * @description un Pin de recuperación de contraseña al mail. Retorna un token de recuperación.
  */
 const sendRestorePin = async (req, res = response) => {
     await sendPin(req, res, TEXT_RESTORE);
@@ -28,11 +26,11 @@ const sendRestorePin = async (req, res = response) => {
 
 const sendPin = async (req, res = response, text) => {
     try {
-        const {email, cellphone} = req.body;
+        const {email} = req.body;
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await sendPinMessage(res, email, cellphone, text)      
+            await sendPinMessage(res, email, text)      
         } else {
             res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
@@ -51,16 +49,12 @@ const sendPin = async (req, res = response, text) => {
 /**
  * @description Envía efectivamente el mensaje
  */
-const sendPinMessage = async (res = response, email, cellphone, text) => {
+const sendPinMessage = async (res = response, email, text) => {
     const pin = generatePin();
     const token = await generatePinJWT(email, pin);
     const message = `${TEXT_RESTORE}${pin}`;
-    try {
-        if (cellphone) {
-            await sendPinWhatsapp(res, cellphone, message, token);
-        } else {
-            await sendPinMail(res, email, message, token);
-        }
+    try {        
+        await sendPinMail(res, email, message, token);        
     } catch (error) {
         console.log(error);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({

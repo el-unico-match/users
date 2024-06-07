@@ -5,7 +5,7 @@
 
 const {Router} = require('express');
 const {sendRestorePin} = require('../controllers/pin');
-const {checkRestorePassword} = require('../middlewares/checkers/restorer');
+const {checkSendPin} = require('../middlewares/checkers/restorer');
 
 const router = Router();
 
@@ -89,6 +89,6 @@ const router = Router();
  *                                  type: string
  *                                  example: Please talk to the administrator
 */
-router.post('/', checkRestorePassword, sendRestorePin);
+router.post('/', checkSendPin, sendRestorePin);
 
 module.exports = router;

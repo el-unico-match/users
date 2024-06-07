@@ -13,6 +13,7 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
+const { ROLES } = require('../types/role');
 
 /**
  * 
@@ -23,6 +24,15 @@ const prepareBlocked = (req) => {
         req.body.blocked = false;
     }
 }   
+
+const checkMustBeSetVerified = (role) => {
+    switch (role) {
+        case ROLES.ADMINISTRATOR:
+            return true;
+        default:
+            return false;
+    }
+}
 
 const createUser = async (req, res = response) => {
     try {
@@ -37,8 +47,12 @@ const createUser = async (req, res = response) => {
                 msg: MSG_USER_EXISTS
             });
         };        
+        const verified = checkMustBeSetVerified(role);
         // Crear un nuevo usuario en base al body
-        user = newUser(req.body);
+        user = newUser({
+            ...req.body,
+            verified
+        });
         // Encriptar contraseña
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
@@ -52,7 +66,8 @@ const createUser = async (req, res = response) => {
                 id: user.id,
                 email,
                 role,
-                blocked         
+                blocked,
+                verified        
             },            
             token            
         });    
@@ -100,7 +115,8 @@ const updateUser = async (req, res = response) => {
                 id: userUpdated._id,
                 email: userUpdated.email,
                 role: userUpdated.role,
-                blocked: userUpdated.blocked
+                blocked: userUpdated.blocked,
+                verified: userUpdated.verified
             },
             token: token,
         });

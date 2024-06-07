@@ -12,7 +12,7 @@ const {HTTP_SUCCESS_2XX, HTTP_SERVER_ERROR_5XX, HTTP_CLIENT_ERROR_4XX} = require
 const getDataUser = async (req, res = response) => {
     try {
         const userId = req.tokenExtractedData.uid;
-        const user = await User.findOne({_id: userId}, {_id: 1, email: 1, role:1, blocked:1});
+        const user = await User.findOne({_id: userId}, {_id: 1, email: 1, role:1, blocked:1, verified:1});
         if (!user) {
             return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
@@ -25,7 +25,8 @@ const getDataUser = async (req, res = response) => {
                 id: user._id,
                 email: user.email,
                 role: user.role,
-                blocked: user.blocked
+                blocked: user.blocked,
+                verified: user.verified
             }
         });
     } catch (error) {

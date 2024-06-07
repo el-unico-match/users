@@ -19,6 +19,7 @@ const MSG_INVALID_TOKEN = 'Invalid token';
 const MSG_INVALID_CELLPHONE = 'Invalid cellphone';
 const MSG_COULD_NOT_BE_SENT_PIN = 'Pin could not be sent';
 const MSG_WRONG_PIN = 'It was not possible to verify the pin';
+const MSG_CANNOT_SET_VERIFICATION_STATE = 'You cannot set the verification status';
 
 module.exports = {
     MSG_USER_EXISTS,
@@ -38,5 +39,6 @@ module.exports = {
     MSG_INVALID_TOKEN,
     MSG_INVALID_CELLPHONE,
     MSG_COULD_NOT_BE_SENT_PIN,
-    MSG_WRONG_PIN
+    MSG_WRONG_PIN,
+    MSG_CANNOT_SET_VERIFICATION_STATE
 }

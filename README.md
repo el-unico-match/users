@@ -39,7 +39,11 @@ const UserSchema = Schema({
     blocked: {
         type: Boolean,
         required: true
-    }
+    },
+    verified: {
+        type: Boolean,
+        required: true
+    } 
 });
 
 ```

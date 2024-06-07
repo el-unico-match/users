@@ -54,7 +54,8 @@ const loginUser = async (req, res = response) => {
                 id: user.id,
                 email,
                 role: user.role,
-                blocked: user.blocked
+                blocked: user.blocked,
+                verified: user.verified
             },
             token
         });    

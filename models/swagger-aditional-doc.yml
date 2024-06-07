@@ -29,16 +29,21 @@ components:
                 blocked:
                     type: boolean
                     description: unique. Disables the service for the user.
+                verified:
+                    type: boolean
+                    description: unique. Indicates whether the user has verified their account.
             required: 
                 - email
                 - password
                 - role
                 - blocked
+                - verified
             example:
                 id: 645547541243dfdsfe2132142134234203
                 email: rafaelputaro@gmail.com
                 role: administrador
                 blocked: false
+                verified: true
         UserUpdateData:
             type: object
             properties:

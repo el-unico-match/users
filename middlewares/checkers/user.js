@@ -10,7 +10,8 @@ const {
     MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
     MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
     MSG_USER_CANNOT_CHANGE_ROLE,
-    MSG_INVALID_LOCK_STATE
+    MSG_INVALID_LOCK_STATE,
+    MSG_CANNOT_SET_VERIFICATION_STATE
 } = require('../../messages/auth');
 const {
     LENGTH_MIN_PASSWORD,
@@ -61,6 +62,7 @@ const checkCreateUser = [
     check('role', MSG_ROLE_ERROR_TYPE).not().isEmpty(),
     check('role', MSG_ROLE_ERROR_TYPE).custom((role) => isRole(role)),
     check('blocked', MSG_INVALID_LOCK_STATE).optional().isBoolean(),
+    check('verified', MSG_CANNOT_SET_VERIFICATION_STATE).isEmpty(),
     checkPermissionOnCreateUser(),
     validateFields,
 ];
@@ -77,6 +79,7 @@ const checkUpdateUser = [
     check('role', MSG_USER_CANNOT_CHANGE_ROLE).isEmpty(),
     check('blocked', MSG_INVALID_LOCK_STATE).optional().isBoolean(),
     createAccessRoleAndOwnerBased(ROLES.ADMINISTRATOR),
+    check('verified', MSG_CANNOT_SET_VERIFICATION_STATE).isEmpty(),
     validateFields
 ];
 

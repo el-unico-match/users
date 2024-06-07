@@ -21,17 +21,21 @@ const {Schema, model} = require('mongoose');
  *              blocked:
  *                  type: boolean
  *                  description: unique. Disables the service for the user.
+ *              verified:
+ *                  type: boolean
+ *                  description: unique. Indicates whether the user has verified their account.
  *          required:
  *              - email
  *              - password
  *              - role
  *              - blocked
+ *              - verified
  *          example:
  *              email: carlos@mail.com
  *              password: cli123te1*
  *              role: cliente
  *              blocked: false
- * 
+ *              verified: false
  */
 const UserSchema = Schema({
     email: {
@@ -50,8 +54,11 @@ const UserSchema = Schema({
     blocked: {
         type: Boolean,
         required: true
-    }
-
+    },
+    verified: {
+        type: Boolean,
+        required: true
+    } 
 });
 
 module.exports = model('User', UserSchema);

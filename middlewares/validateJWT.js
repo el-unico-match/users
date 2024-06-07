@@ -32,10 +32,10 @@ const validateLazyJWT = (req, res = response, next) => {
 }
 
 /**
- * Valida un token de restauración de constraseña que viene por el header como "x-token" 
+ * Valida un token con Pin que viene por el header como "x-token" 
  */
-const validateRestoreJWT = (req, res = response, next) => {
-    genericValidateJWT(req, res, doValidateRestoreJWT, next);
+const validatePinJWT = (req, res = response, next) => {
+    genericValidateJWT(req, res, doValidatePinJWT, next);
 }
 
 /**
@@ -58,7 +58,7 @@ const doValidateJWT = (req, token) =>  {
  * 
  * Válida el token del request.
  */
-const doValidateRestoreJWT = (req, token) =>  {
+const doValidatePinJWT = (req, token) =>  {
     const {pin, email} = jwt.verify(
         token,
         process.env.SECRET_JWT_SEED
@@ -130,5 +130,5 @@ module.exports = {
     validateJWT,
     validateLazyJWT,
     decodeJWT,
-    validateRestoreJWT
+    validatePinJWT
 }

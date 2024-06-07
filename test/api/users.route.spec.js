@@ -203,7 +203,10 @@ describe('test routes', () => {
     }); 
 
     it('should log user', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...admin,
+        verified: true
+      });
       const payload = {
         email: "rafaelputaro@gmail.com",
         password: passUnique
@@ -217,6 +220,7 @@ describe('test routes', () => {
       expect(response.body.user.blocked).toBe(admin.blocked);
       expect(response.body.user.id).toBeDefined();
       expect(response.body.user.id).toBe(admin.id);
+      expect(response.body.user.verified).toBe(true);
       token = response.body.token;
     });
 
@@ -224,7 +228,8 @@ describe('test routes', () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(
         {
           _id: admin.id,
-          ...admin
+          ...admin,
+          verified: true
         });
       const response = await request(app)
         .get('/api/user/current')
@@ -237,6 +242,7 @@ describe('test routes', () => {
       expect(response.body.user.blocked).toBe(admin.blocked);
       expect(response.body.user.id).toBe(admin.id);
       expect(response.body.user.id).toBeDefined();
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should return error invalid token', async () => {
@@ -373,6 +379,7 @@ describe('test routes', () => {
       expect(response.body.user.email).toBe(admin2.email);
       expect(response.body.user.blocked).toBe(admin2.blocked);
       expect(response.body.user.id).toBeDefined();
+      expect(response.body.user.verified).toBe(true);
       admin2.id = response.body.user.id;
       token2 = response.body.token;
     }); 
@@ -389,7 +396,10 @@ describe('test routes', () => {
     });
   
     it('should log admin just created', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...admin2,
+        verified: true
+      });
       const payload = {
         email: admin2.email,
         password: passUnique
@@ -403,10 +413,14 @@ describe('test routes', () => {
       expect(response.body.user.blocked).toBe(admin2.blocked);
       expect(response.body.user.id).toBe(admin2.id);
       expect(response.body.user.id).toBeDefined();
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should return admin just created', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...admin2,
+        verified: true
+      });
       const response = await request(app).get(`/api/user/${admin2.id}`)
         .set('x-token', token2);
       expect(response.headers['content-type']).toContain('json');
@@ -416,6 +430,7 @@ describe('test routes', () => {
       expect(response.body.user.blocked).toBe(admin2.blocked);
       expect(response.body.user.id).toBe(admin2.id);
       expect(response.body.user.role).toBe(admin2.role);
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should  admin not found', async () => {
@@ -475,11 +490,15 @@ describe('test routes', () => {
     });
 
     it('should update admin just created', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...admin2,
+        verified: true
+      });
       jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
         {
           _id: admin2.id,
-          ...admin2Updated
+          ...admin2Updated,
+          verified: true
         }      
       );
       const payload = {
@@ -497,14 +516,19 @@ describe('test routes', () => {
       expect(response.body.user.email).toBe(admin2Updated.email);
       expect(response.body.user.blocked).toBe(admin2Updated.blocked);
       expect(response.body.user.id).toBe(admin2.id);
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should update admin just created', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(admin2);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...admin2,
+        verified: true
+      });
       jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
         {
           _id: admin2.id,
-          ...admin2Updated
+          ...admin2Updated,
+          verified: true
         }      
       );
       const payload = {
@@ -521,6 +545,7 @@ describe('test routes', () => {
       expect(response.body.user.email).toBe(admin2Updated.email);
       expect(response.body.user.blocked).toBe(admin2Updated.blocked);
       expect(response.body.user.id).toBe(admin2.id);
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should fail on update admin just created because user not found', async () => {
@@ -610,13 +635,15 @@ describe('test routes', () => {
           id: admin.id,
           email: admin.email,
           role: admin.role,
-          blocked: admin.blocked
+          blocked: admin.blocked,
+          verified: true
         }, 
         {
           id: admin2Updated.id,
           email: admin2Updated.email,
           role: admin2Updated.role,
-          blocked: admin2Updated.blocked
+          blocked: admin2Updated.blocked,
+          verified: true
         }];
       jest.spyOn(User, 'find').mockReturnValueOnce(users);
       const response = await request(app)
@@ -662,16 +689,21 @@ describe('test routes', () => {
       expect(response.body.user.email).toBe(client.email);
       expect(response.body.user.blocked).toBe(client.blocked);
       expect(response.body.user.id).toBeDefined();
+      expect(response.body.user.verified).toBe(false);
       client.id = response.body.user.id;
       token_client = response.body.token;    
     }); 
 
     it('should block client', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...client,
+        verified: true
+      });
       client.blocked = true;
-      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
-        client
-      );
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce({
+        ...client,
+        verified: true
+      });
       const payload = {
         blocked: true
       };
@@ -684,14 +716,19 @@ describe('test routes', () => {
       expect(response.body.user.role).toBe(client.role);
       expect(response.body.user.email).toBe(client.email);
       expect(response.body.user.blocked).toBe(true);
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should unblock client', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...client,
+        verified: true
+      });
       client.blocked = false;
-      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce(
-        client
-      );
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce({
+        ...client,
+        verified: true
+      });
       const payload = {
         blocked: true
       };
@@ -704,6 +741,7 @@ describe('test routes', () => {
       expect(response.body.user.role).toBe(ROLES.CLIENT);
       expect(response.body.user.email).toBe(client.email);
       expect(response.body.user.blocked).toBe(false);
+      expect(response.body.user.verified).toBe(true);
     });
 
     it('should fail o create new client', async () => {
@@ -771,7 +809,10 @@ describe('test routes', () => {
     }); 
 
     it('should fail on create admin because is client', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...client,
+        verified: true
+      });
       const payload = {
         email: admin.email,
         password: passUnique,
@@ -814,7 +855,10 @@ describe('test routes', () => {
     });
 
     it('should fail on create new client', async () => {
-      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        ...client,
+        verified: true
+      });
       const payload = {
         email: client.email,
         password: passUnique,
@@ -829,7 +873,7 @@ describe('test routes', () => {
       expect(response.body.msg).toBe(MSG_USER_EXISTS);
       expect(response.body.ok).toBe(false);
     }); 
-
+    
   });
 
   describe('test role', () => {
