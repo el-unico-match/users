@@ -44,6 +44,32 @@ components:
                 role: administrador
                 blocked: false
                 verified: true
+        UserCreateData:
+            type: object
+            properties:
+                uid:
+                    type: string
+                    description: unique user id 
+                email:
+                    type: string
+                    description: unique user email              
+                role:
+                    type: string
+                    description: cliente or administrador
+                    enum: [administrador, cliente]
+                blocked:
+                    type: boolean
+                    description: unique. Disables the service for the user.
+            required: 
+                - email
+                - password
+                - role
+                - blocked
+            example:
+                email: carlos@mail.com
+                password: cli123te1*
+                role: cliente
+                blocked: false
         UserUpdateData:
             type: object
             properties:

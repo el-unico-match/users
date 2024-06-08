@@ -6,7 +6,7 @@ const {
 } = require('../../messages/auth');
 const {
     LENGTH_MIN_PASSWORD,
-    REGEXP_NUMBERS_SYMBOLS_PASSWORD} = require('../../models/requirements');
+    REGEXP_NUMBERS_SYMBOLS_PASSWORD} = require('../../models/requirements/users');
 
 /**
 * @returns {object} Un arreglo de middlewares que checkean la presencia de

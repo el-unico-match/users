@@ -3,12 +3,14 @@ const jwt = require('jsonwebtoken');
 const {jwtDecode} = require('jwt-decode');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
 const {MSG_NO_TOKEN, MSG_INVALID_TOKEN} = require('../messages/auth');
+const {MSG_WRONG_PIN} = require('../messages/auth');
+const ERROR_PIN = "Pin error";
 
 /**
  * Valida un token que viene por el header como "x-token" 
  */
 const validateJWT = (req, res = response, next) => {
-    genericValidateJWT(req, res, doValidateJWT, next);
+    genericValidateJWT(req, res, doValidateJWT, MSG_INVALID_TOKEN, next);
 }
 
 /**
@@ -35,7 +37,7 @@ const validateLazyJWT = (req, res = response, next) => {
  * Valida un token con Pin que viene por el header como "x-token" 
  */
 const validatePinJWT = (req, res = response, next) => {
-    genericValidateJWT(req, res, doValidatePinJWT, next);
+    genericValidateJWT(req, res, doValidatePinJWT, MSG_WRONG_PIN, next);
 }
 
 /**
@@ -64,9 +66,12 @@ const doValidatePinJWT = (req, token) =>  {
         process.env.SECRET_JWT_SEED
     );
     req.tokenExtractedData = {
-        pin,
         email
     };
+    const pinParam = req.params.pin;
+    if (pin !== pinParam) {
+        throw new Error(ERROR_PIN);
+    }
 }
 
 /**
@@ -107,7 +112,7 @@ const doDecodeJWT = (req, token) =>  {
 /**
  * Valida un token que viene por el header como "x-token" mediante la función parámetro 
  */
-const genericValidateJWT = (req, res = response, doValidate, next) => {
+const genericValidateJWT = (req, res = response, doValidate, msg_invalid, next) => {
     const token = req.header('x-token');
     if (!token) {
         return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
@@ -120,7 +125,7 @@ const genericValidateJWT = (req, res = response, doValidate, next) => {
     } catch (error) {
         return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
             ok: false,
-            msg: MSG_INVALID_TOKEN
+            msg: msg_invalid
         })
     }
     next();

@@ -39,7 +39,7 @@ const router = Router();
  *              application/json:
  *                  schema:
  *                      type: object
- *                      $ref: '#/components/schemas/User'
+ *                      $ref: '#/components/schemas/UserCreateData'
  *      responses:
  *          201: 
  *              description: return user data and token!
