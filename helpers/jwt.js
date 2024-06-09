@@ -22,11 +22,12 @@ const generateJWT = (uid, role, blocked) => {
     });
 }
 
-const generatePinJWT = (email, pin) => {
+const generatePinJWT = (id, email, pin) => {
     return new Promise((resolve, reject) => {
         const payload = {
-            pin,
-            email
+            id,
+            email,
+            pin
         }
         jwt.sign(payload, process.env.SECRET_JWT_SEED, {
             expiresIn: PIN_EXPIRE_IN

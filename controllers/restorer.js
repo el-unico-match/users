@@ -18,6 +18,7 @@ const sendRestorePin = async (req, res = response) => {
  * @description  Retorna los datos del usuario actualizado junto a un token regular.
  */
 const verifyPinAndUpdatePassword = async (req, res = response) => {
+    req.params.id = req.tokenExtractedData.id;
     updateUser(req, res);
 }
 

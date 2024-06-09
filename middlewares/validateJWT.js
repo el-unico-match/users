@@ -61,11 +61,12 @@ const doValidateJWT = (req, token) =>  {
  * Válida el token del request.
  */
 const doValidatePinJWT = (req, token) =>  {
-    const {pin, email} = jwt.verify(
+    const {id, email, pin} = jwt.verify(
         token,
         process.env.SECRET_JWT_SEED
     );
     req.tokenExtractedData = {
+        id,
         email
     };
     const pinParam = req.params.pin;

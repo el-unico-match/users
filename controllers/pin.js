@@ -3,14 +3,12 @@ const User = require('../models/Users');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const {
-    HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
 const {sendPinMail} = require('../helpers/email');
 const {generatePin} = require('../helpers/pin');
-const {
-    generateJWT, 
-    generatePinJWT} = require('../helpers/jwt');
+const {generatePinJWT} = require('../helpers/jwt');
+const {updateUser} = require('./user');
 const TEXT_VERIFY = "Your verification PIN is: ";
 
 /**
@@ -28,7 +26,7 @@ const sendPin = async (req, res = response, text) => {
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await dispatchPinMessage(res, email, text)      
+            await dispatchPinMessage(res, user._id, email, text)      
         } else {
             res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
@@ -47,9 +45,9 @@ const sendPin = async (req, res = response, text) => {
 /**
  * @description Envía efectivamente el mensaje
  */
-const dispatchPinMessage = async (res = response, email, text) => {
+const dispatchPinMessage = async (res = response, id, email, text) => {
     const pin = generatePin();
-    const token = await generatePinJWT(email, pin);
+    const token = await generatePinJWT(id, email, pin);
     const message = `${text}${pin}`;
     try {        
         await sendPinMail(res, email, message, token);        
@@ -95,19 +93,10 @@ const verifyPin = async (req, res = response) => {
  * 
  * @description Hace la verificación efectiva de pin.
  */
-const doVerifyPin = async (res = response, user) => {
-    // Generar el JWT (Java Web Token)
-    const token = await generateJWT(user.id, user.role, user.blocked);
-    res.status(HTTP_SUCCESS_2XX.CREATED).json({
-        ok: true,
-        user: {
-            id: user._id,
-            email: user.email,
-            role: user.role,
-            blocked: user.blocked
-        },
-        token: token,
-    });        
+const doVerifyPin = async (req, res = response, user) => {
+    req.params.id = req.tokenExtractedData.id;
+    req.body.verified = true;
+    updateUser(req, res);
 }
 
 module.exports = {
