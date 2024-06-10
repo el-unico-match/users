@@ -5,6 +5,9 @@ const {
     newUser, 
     saveUser} = require('../helpers/user');
 const {generateJWT} = require('../helpers/jwt');
+const {
+    logWarning, 
+    logInfo} = require('../helpers/log/log');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
     MSG_USER_EXISTS,
@@ -121,7 +124,8 @@ const updateUser = async (req, res = response) => {
             token: token,
         });
     } catch (error) {
-        console.log(error);
+        logWarning(`On update user: ${error}`);
+        logInfo(`On get update response: ${MSG_ERROR_500}`);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
@@ -145,7 +149,8 @@ const getUser = async (req, res = response) => {
             });
         }      
     } catch (error) {
-        console.log(error);
+        logWarning(`On get user: ${error}`);
+        logInfo(`On get user response: ${MSG_ERROR_500}`);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500

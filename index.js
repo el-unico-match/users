@@ -1,9 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const {dbConnection} = require('./database/config');
+const {initLog} = require('./helpers/log/log');
 
 // Importar y configurar variables de entorno
 require('dotenv').config();
+
+// Inicializar log
+initLog();
 
 // Paths
 const path = require("path");

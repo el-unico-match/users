@@ -66,6 +66,8 @@ PORT_EMAIL_APP = 465
 ULTRA_MSG_ID = *****************
 ULTRA_MSG_TOKEN =  *************
 ULTRA_MSG_API_URL = https://api.ultramsg.com/instance87184/
+LOG_FILENAME = "log.txt"
+LOGGING_LEVEL = 10
 HOST=0.0.0.0
 
 ```
@@ -100,6 +102,8 @@ PORT_EMAIL_APP = 465
 ULTRA_MSG_ID = *****************
 ULTRA_MSG_TOKEN =  *************
 ULTRA_MSG_API_URL = https://api.ultramsg.com/instance87184/
+LOG_FILENAME = "log.txt"
+LOGGING_LEVEL = 10
 HOST=0.0.0.0
 ```
 
