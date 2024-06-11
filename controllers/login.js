@@ -30,16 +30,22 @@ const loginUser = async (req, res = response) => {
         const {email, password} = req.body;
         const user = await User.findOne({email: email});
         if (!user){
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });
+            };
+            logDebug(`On login user, user not found: ${email}; ${password}`);
+            logInfo(`On login user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
         } else {
             if (user.blocked) {
-                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+                const dataToResponse = {
                     ok: false,
                     msg: MSG_USER_BLOCKED
-                }); 
+                };
+                logDebug(`On login user, user was blocked: ${JSON.stringify(user)}`);
+                logInfo(`On login user response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`);
+                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse); 
             }
         }
         // Confirmar contraseña
@@ -49,7 +55,8 @@ const loginUser = async (req, res = response) => {
                 ok: false,
                 msg: MSG_PASSWORD_INCORRECT
             };
-            logInfo(`On login user response: ${JSON.stringify(dataToResponse)}`)
+            logDebug(`On login user invalidad password: ${password} ${user.password}`);
+            logInfo(`On login user response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`)
             return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);    
         }
         // Generar el JWT (Java Web Token)
@@ -66,7 +73,7 @@ const loginUser = async (req, res = response) => {
             },
             token
         };
-        logInfo(`On login user response: ${JSON.stringify(dataToResponse)}`);
+        logInfo(`On login user response: ${HTTP_SUCCESS_2XX.ACCEPTED}; ${JSON.stringify(dataToResponse)}`);
         res.status(HTTP_SUCCESS_2XX.ACCEPTED).json(dataToResponse);    
     } catch (error) {
         logWarning(`On login user: ${error}`);
@@ -74,7 +81,7 @@ const loginUser = async (req, res = response) => {
             ok: false,
             msg: MSG_ERROR_500
         };
-        logInfo(`On login user response: ${JSON.stringify(dataToResponse)}`);
+        logInfo(`On login user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse)
     }
 }

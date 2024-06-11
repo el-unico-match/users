@@ -1,6 +1,7 @@
 const {response} = require('express');
 const User = require('../models/Users');
 const {
+    logDebug,
     logWarning, 
     logInfo} = require('../helpers/log/log');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
@@ -17,12 +18,12 @@ const getDataUser = async (req, res = response) => {
         const userId = req.tokenExtractedData.uid;
         const user = await User.findOne({_id: userId}, {_id: 1, email: 1, role:1, blocked:1, verified:1});
         if (!user) {
-            logWarning(`On current user the user was not found: ${JSON.stringify(req.tokenExtractedData)}`);
+            logDebug(`On current user the user was not found: ${JSON.stringify(req.tokenExtractedData)}`);
             const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             }
-            logInfo(`On current response: ${JSON.stringify(dataToResponse)}`);
+            logInfo(`On current response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
             return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
         }
         const dataToResponse = {
@@ -35,7 +36,8 @@ const getDataUser = async (req, res = response) => {
                 verified: user.verified
             }
         }
-        logInfo(`On current response: ${JSON.stringify(dataToResponse)}`);
+        logDebug(`On current user: ${JSON.stringify(req.tokenExtractedData)}`);
+        logInfo(`On current response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`);
         res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
     } catch (error) {
         logWarning(`On get data user: ${error}`);
@@ -43,7 +45,7 @@ const getDataUser = async (req, res = response) => {
             ok: false,
             msg: MSG_ERROR_500
         }
-        logInfo(`On get data user response: ${JSON.stringify(dataToResponse)}`);
+        logInfo(`On get data user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
     }
 }

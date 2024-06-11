@@ -5,6 +5,9 @@ const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
 const {MSG_NO_TOKEN, MSG_INVALID_TOKEN} = require('../messages/auth');
 const {MSG_WRONG_PIN} = require('../messages/auth');
 const ERROR_PIN = "Pin error";
+const {
+    logInfo,
+    logDebug} = require('../helpers/log/log');
 
 /**
  * Valida un token que viene por el header como "x-token" 
@@ -21,13 +24,17 @@ const validateLazyJWT = (req, res = response, next) => {
     const token = req.header('x-token');
     if (token) {
         try {
+            logDebug(`On validate lazy JWT token: ${token}`);
             doValidateJWT(req, token);
             req.token = token;
         } catch (error) {
-            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_INVALID_TOKEN
-            })
+            };
+            logDebug(`On validad lazy JWT error: ${error}`);
+            logInfo(`On validata lazy JWT response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`);
+            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
         }
     }    
     next();
@@ -54,6 +61,7 @@ const doValidateJWT = (req, token) =>  {
         role,
         blocked
     };
+    logDebug(`On validate token, token extracted data: ${JSON.stringify(req.tokenExtractedData)}`);
 }
 
 /**
@@ -70,9 +78,12 @@ const doValidatePinJWT = (req, token) =>  {
         email
     };
     const pinParam = req.params.pin;
+    logDebug(`On validate pin : ${pin} ?== ${pinParam}`);
+    logDebug(`On validate pin JWT, token extracted data: ${JSON.stringify(req.tokenExtractedData)}`);
     if (pin !== pinParam) {
+        logDebug(`On validate pin JWT: ${pin} !== ${pinParam}`);
         throw new Error(ERROR_PIN);
-    }
+    }    
 }
 
 /**
@@ -81,18 +92,24 @@ const doValidatePinJWT = (req, token) =>  {
 const decodeJWT = (req, res = response, next) => {
     const token = req.header('x-token');
     if (!token) {
-        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_NO_TOKEN
-        });
+        };
+        logDebug(`On decode JWT token null`);
+        logInfo(`On decode JWT response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`)
+        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);
     }
     try {
         doDecodeJWT(req, token);
     } catch (error) {
-        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_INVALID_TOKEN
-        })
+        };
+        logDebug(`On decode JWT error: ${error}`);
+        logInfo(`On decode JWT response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`)
+        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse)
     }
     next();
 }
@@ -116,18 +133,24 @@ const doDecodeJWT = (req, token) =>  {
 const genericValidateJWT = (req, res = response, doValidate, msg_invalid, next) => {
     const token = req.header('x-token');
     if (!token) {
-        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_NO_TOKEN
-        });
+        };
+        logDebug(`On validate JWT token null`);
+        logInfo(`On validate JWT response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`)
+        return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);
     } 
     try {
         doValidate(req, token);
     } catch (error) {
-        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+        const dataToResponse = {
             ok: false,
             msg: msg_invalid
-        })
+        };
+        logDebug(`On validate JWT error: ${error}`);
+        logInfo(`On validate JWT response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`)
+        return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse)
     }
     next();
 }

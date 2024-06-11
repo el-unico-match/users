@@ -7,6 +7,10 @@ const {
     MSG_USER_BLOCKED,
     MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const User = require('../models/Users');
+const {
+    logDebug,
+    logInfo
+} = require('../helpers/log/log');
 
 /**
  * 
@@ -19,25 +23,34 @@ const refreshToken = async (req, res = response) => {
     const blocked = req.tokenExtractedData.blocked
     // Tarda a lo sumo dos tiempos de validez del token en ser efectivo un bloqueo
     if (blocked) {
-        res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_USER_BLOCKED
-        }); 
+        };
+        logDebug(`On refresh token user blocked: ${JSON.stringify(req.tokenExtractedData)}`);
+        logInfo(`On refresh token response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`);
+        res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse); 
     } else {
         // Refrescar datos de usuario
         const user = await User.findOne({_id: uid});
         if (user){
+            logDebug(`On refresh token user: ${JSON.stringify(user)}`);
             // Generar el JWT (Java Web Token)
             const token = await generateJWT(uid, user.role, user.blocked);
-            res.status(HTTP_SUCCESS_2XX.CREATED).json({
+            const dataToResponse = {
                 ok: true,
                 token
-            });
+            };
+            logInfo(`On refresh token response: ${HTTP_SUCCESS_2XX.CREATED}; ${JSON.stringify(dataToResponse)}`);
+            res.status(HTTP_SUCCESS_2XX.CREATED).json(dataToResponse);
         } else {
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            logDebug(`On refresh token user not found: ${JSON.stringify(req.tokenExtractedData)}`);
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });            
+            };
+            logInfo(`On refresh token response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
+            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);            
         }        
     }
 }

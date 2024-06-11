@@ -6,7 +6,8 @@ const {
     saveUser} = require('../helpers/user');
 const {generateJWT} = require('../helpers/jwt');
 const {
-    logWarning, 
+    logWarning,
+    logDebug, 
     logInfo} = require('../helpers/log/log');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
@@ -45,10 +46,13 @@ const createUser = async (req, res = response) => {
         const {email, password, role, blocked} = req.body;
         let user = await User.findOne({email: email});
         if (user){
-            return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_EXISTS
-            });
+            };
+            logDebug(`On create user, user exists: ${JSON.stringify(user)}`);
+            logInfo(`On create user response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`);
+            return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);
         };        
         const verified = checkMustBeSetVerified(role);
         // Crear un nuevo usuario en base al body
@@ -59,11 +63,13 @@ const createUser = async (req, res = response) => {
         // Encriptar contraseña
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
+        logDebug(`On create user password encripted: ${user.password}`);
         // Guardar en DB
         await saveUser(user);    
         // Generar el JWT (Java Web Token)
         const token = await generateJWT(user.id, user. role, user.blocked);
-        res.status(HTTP_SUCCESS_2XX.CREATED).json({
+        logDebug(`On create user token generated: ${token}`);
+        const dataToResponse = {
             ok: true,
             user: {
                 id: user.id,
@@ -73,13 +79,17 @@ const createUser = async (req, res = response) => {
                 verified        
             },            
             token            
-        });    
+        };
+        logInfo(`On create user response: ${HTTP_SUCCESS_2XX.CREATED}; ${JSON.stringify(dataToResponse)}`);
+        res.status(HTTP_SUCCESS_2XX.CREATED).json(dataToResponse);    
     } catch (error) {
-        console.log(error);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        })
+        };
+        logWarning(`On create user error: ${error}`);
+        logInfo(`On create user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
     }
 }
 
@@ -88,10 +98,13 @@ const updateUser = async (req, res = response) => {
     try {
         const user = await User.findOne({_id: userId});
         if (!user) {
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });        
+            };
+            logDebug(`On update user, user not found: ${userId}`);
+            logInfo(`On update user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);        
         }
         const newUser = {
             ...req.body,
@@ -112,7 +125,7 @@ const updateUser = async (req, res = response) => {
         const userUpdated = await User.findByIdAndUpdate(userId, newUser, {new: true});
         // Generar el JWT (Java Web Token)
         const token = await generateJWT(userUpdated.id, userUpdated.role, userUpdated.blocked);
-        res.status(HTTP_SUCCESS_2XX.OK).json({
+        const dataToResponse = {
             ok: true,
             user: {
                 id: userUpdated._id,
@@ -122,14 +135,17 @@ const updateUser = async (req, res = response) => {
                 verified: userUpdated.verified
             },
             token: token,
-        });
+        };
+        logInfo(`On update user response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`);
+        res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
     } catch (error) {
-        logWarning(`On update user: ${error}`);
-        logInfo(`On get update response: ${MSG_ERROR_500}`);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        });
+        }
+        logWarning(`On update user: ${error}`);
+        logInfo(`On update user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
     }   
 }
 
@@ -138,15 +154,20 @@ const getUser = async (req, res = response) => {
     try {
         const user = await User.findOne({_id: userId}, {_id:1, email: 1, role:1, blocked:1});
         if (!user) {
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });
+            };
+            logDebug(`On get user user not found: ${userId}`);
+            logInfo(`On get user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);    
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
         } else {
-            res.status(HTTP_SUCCESS_2XX.OK).json({
+            const dataToResponse = {
                 ok: true,
                 user: user
-            });
+            };
+            logInfo(`On get user response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`);    
+            res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
         }      
     } catch (error) {
         logWarning(`On get user: ${error}`);
@@ -162,21 +183,30 @@ const deleteUser = async (req, res = response) => {
     const userId = req.params.id;
     try {
         const user = await User.findOne({_id: userId});
+        logDebug(`On delete user: ${userId}`);
         if (!user) {
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            })
+            };
+            logDebug(`On delete user not found: ${userId}`);
+            logInfo(`On delete user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`)
+            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse)
         }
         await User.findByIdAndDelete(userId);
-        res.status(HTTP_SUCCESS_2XX.OK).json({
+        const dataToResponse = {
             ok: true
-        });
+        };
+        logInfo(`On delete user response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`)
+        res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
     } catch (error) {
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        });
+        };
+        logWarning(`On delete user: ${error}`);
+        logInfo(`On delete user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`)
+        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
     }
 }
 

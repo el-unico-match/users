@@ -1,6 +1,8 @@
 const {response} = require('express');
 const User = require('../models/Users');
-const {HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes')
+const {
+    HTTP_SUCCESS_2XX,
+    HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes')
 const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
 const { 
     logWarning,
@@ -16,8 +18,7 @@ const {
 const getStatus = async (req, res = response) => {
     try {
         let users = await User.find();
-        logInfo(`On get status response database working on port ${process.env.PORT}`);
-        res.json({
+        const dataToReponse = {
             ok: true,
             status: {
                 database: {
@@ -27,11 +28,12 @@ const getStatus = async (req, res = response) => {
                     port: process.env.PORT
                 } 
             }            
-        })
+        };
+        logInfo(`On get status response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToReponse)}`);
+        res.status(HTTP_SUCCESS_2XX.OK).json(dataToReponse)
     } catch(error) {
         logWarning(`On get status: ${error}`);
-        logInfo(`On get status response: ${MSG_DATABASE_ERROR}`);
-        res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json({
+        const dataToReponse = {
             ok: false,
             status: {
                 database: {
@@ -42,7 +44,9 @@ const getStatus = async (req, res = response) => {
                 } 
             },
             msg: MSG_DATABASE_ERROR
-        })
+        };
+        logInfo(`On get status response: ${HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE}; ${JSON.stringify(dataToReponse)}`);
+        res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json(dataToReponse)
     }
 }
 

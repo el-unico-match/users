@@ -2,6 +2,10 @@ const {response} = require('express');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
 const MSG_ACCESS_DENIED = 'You do not have the necessary access level';
 const MSG_ROLE_NOT_FOUND = 'User without role';
+const {
+    logDebug,
+    logInfo,
+    logWarning} = require('../helpers/log/log');
 
 /**
  * 
@@ -12,16 +16,22 @@ const createAccessRoleBased = (superRole) => {
     return async (req, res = response, next) => {        
         const role = req.tokenExtractedData.role;
         if (!role){
-            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_ROLE_NOT_FOUND
-            });
+            };
+            logDebug(`On check role, role null`);
+            logInfo(`On check role response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`)
+            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
         }        
         if (role !== superRole) {
-            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_ACCESS_DENIED
-            });
+            };
+            logDebug(`On check role: ${role}; ${superRole}`);
+            logInfo(`On check role response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`)
+            return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
         }
         next();
     }
