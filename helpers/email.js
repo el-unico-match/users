@@ -67,8 +67,8 @@ const doSendPinMail = async (res, to, subject, text, token) => {
                 msg: MSG_COULD_NOT_BE_SENT_PIN
             }
             logDebug(`On send pin mail: ${error}`);
-            logInfo(`On send pin mail response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
+            logInfo(`On send pin mail response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`);
+            res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);
         } else {            
             const dataToResponse = {
                 ok: true,
