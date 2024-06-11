@@ -8,28 +8,34 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_SERVER_ERROR_5XX,
     HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
+const {
+    logDebug,
+    logInfo,
+    logWarning} = require('../helpers/log/log');
 
-let mailServiceConfigError = null;
+let mailServInitError = null;
 
-const transporter = nodemailer.createTransport(
-    {
-        service: process.env.SERVICE_EMAIL_APP,
-        host: process.env.HOST_EMAIL_APP,
-        port: process.env.PORT_EMAIL_APP,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_APP,
-            pass: process.env.PASS_EMAIL_APP
-        }
+const mailServCfg = {
+    service: process.env.SERVICE_EMAIL_APP,
+    host: process.env.HOST_EMAIL_APP,
+    port: process.env.PORT_EMAIL_APP,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_APP,
+        pass: process.env.PASS_EMAIL_APP
     }
-)
+};
+
+const transporter = nodemailer.createTransport(mailServCfg);
 
 // Verificar conexión
 transporter.verify( (error) => {
+    logDebug(`Mail service config: ${JSON.stringify(mailServCfg)}`);
     if (error) {
-      mailServiceConfigError = `Mail Service Configuration Fail: ${error}`;
+        mailServInitError = `Mail Service Configuration Fail: ${error}`;
+        logWarning(`${mailServInitError}`);
     } else {
-      console.log("Mail service is ready.");
+        logInfo(`Mail service is ready: ${mailServCfg.auth.user}`);
     }
 });
 
@@ -43,28 +49,36 @@ const createMailOptions = (to, subject, text) => {
 }
 
 const doSendPinMail = async (res, to, subject, text, token) => {
-    if (mailServiceConfigError) {
-        return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json({
+    if (mailServInitError) {
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500,
-            detail: mailServiceConfigError
-        });
+            detail: mailServInitError
+        };
+        logDebug(`On send pin mail wrong configuration: ${error}`);
+        logInfo(`On send pin mail response: ${HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE}; ${JSON.stringify(dataToResponse)}`);
+        return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json(dataToResponse);
     }
     const options = createMailOptions(to, subject, text);
     await transporter.sendMail(options, (error, info) => {
         if (error) {
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_COULD_NOT_BE_SENT_PIN
-            });
+            }
+            logDebug(`On send pin mail: ${error}`);
+            logInfo(`On send pin mail response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
+            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
         } else {            
-            res.status(HTTP_SUCCESS_2XX.CREATED).json({
+            const dataToResponse = {
                 ok: true,
                 user: {
                     email: to
                 },            
                 token: token            
-            });   
+            };
+            logInfo(`On send pin mail response: ${HTTP_SUCCESS_2XX.CREATED}; ${JSON.stringify(dataToResponse)}`);
+            res.status(HTTP_SUCCESS_2XX.CREATED).json(dataToResponse);   
         }        
     });
 }

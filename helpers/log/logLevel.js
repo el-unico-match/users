@@ -20,6 +20,25 @@ const LOG_LEVELS = Object.freeze({
     }
 });
 
+/**
+ * 
+ * @param {*} numberLevel Ejemplo: 0, 10, 14, 20, 30, 40, 100
+ * @returns El nivel de log comprendido en ese rango
+ */
+const getLogLevel = (numberLevel) => {
+    if (numberLevel <= LOG_LEVELS.DEBUG.level) {
+        return LOG_LEVELS.DEBUG;
+    }
+    if (numberLevel <= LOG_LEVELS.INFO.level) {
+        return LOG_LEVELS.INFO;
+    }
+    if (numberLevel <= LOG_LEVELS.WARNING.level) {
+        return LOG_LEVELS.WARNING;
+    }
+    return LOG_LEVELS.DEBUG;
+}
+
 module.exports = {
-    LOG_LEVELS
+    LOG_LEVELS,
+    getLogLevel
 }

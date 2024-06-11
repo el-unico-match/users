@@ -30,9 +30,9 @@ jobs:
         echo "PORT_EMAIL_APP=${{ vars.PORT_EMAIL_APP }}" >> .env
         echo "PASS_EMAIL_APP='${{ secrets.PASS_EMAIL_APP }}'" >> .env
         
-        echo "ULTRA_MSG_ID=${{ vars.ULTRA_MSG_ID }}" >> .env
-        echo "ULTRA_MSG_TOKEN=${{ secrets.ULTRA_MSG_TOKEN }}" >> .env
-
+        echo "LOG_FILENAME=${{ vars.LOG_FILENAME }}" >> .env
+        echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
+        
     - name: Install dependencies
       run: |
         npm install --force

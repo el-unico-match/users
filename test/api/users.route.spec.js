@@ -27,6 +27,7 @@ const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = requi
 const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
 const {isRole, ROLES} = require('../../types/role');
 const {generateJWT} = require('../../helpers/jwt');
+const {initLog} = require('../../helpers/log/log');
 
 process.env.LOG_FILENAME ||= "log.txt"
 
@@ -37,7 +38,7 @@ describe('test routes', () => {
   beforeAll(async () => {
     process.env.SECRET_JWT_SEED ||= "SECRET121212121edefadfsadfds";
     process.env.PORT ||= "0.0.0.0";  
-    
+    initLog();
     app = express();
     // Lectura y parseo del body
     app.use(express.json());

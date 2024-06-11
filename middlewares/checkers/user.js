@@ -18,6 +18,9 @@ const {
     REGEXP_NUMBERS_SYMBOLS_PASSWORD
 } = require('../../models/requirements/users');
 const {HTTP_CLIENT_ERROR_4XX} = require('../../helpers/httpCodes')
+const {
+    logDebug,
+    logInfo} = require('../../helpers/log/log');
 
 /**
  * @returns Un middleware que checkea los siguiente invariante según el request:
@@ -31,19 +34,25 @@ const checkPermissionOnCreateUser = () => {
             let {role} = await User.findOne({_id: req.tokenExtractedData.uid});
             // un cliente no puede crear otro usuario
             if (role === ROLES.CLIENT) {
-                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+                const dataToResponse = {
                     ok: false,
                     msg: MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER
-                });
+                };
+                logDebug(`On check permission to create user. User ${ROLES.CLIENT} tries to create other user`);
+                logInfo(`On check permission to create user response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`);
+                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
             }            
         } else {
             const roleNewUser = req.body.role;
             // un usuario sin token no puede crear un administrador
             if (roleNewUser === ROLES.ADMINISTRATOR) {
-                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json({
+                const dataToResponse = {
                     ok: false,
                     msg: MSG_WITHOUT_AUTH_TO_CREATE_ADMIN
-                })
+                };
+                logDebug(`On check permission to create user. User ${ROLES.CLIENT} token tries to create ${ROLES.ADMINISTRATOR}`);    
+                logInfo(`On check permission to create user response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`);
+                return res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
             }
         }     
         next();

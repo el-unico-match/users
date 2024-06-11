@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const {dbConnection} = require('./database/config');
-const {initLog} = require('./helpers/log/log');
+const {initLog,
+    logInfo
+} = require('./helpers/log/log');
 
 // Importar y configurar variables de entorno
 require('dotenv').config();
@@ -36,7 +38,7 @@ const swaggerSpec = {
         `${path.join(__dirname, "./routes/*.*")}`,
         `${path.join(__dirname, "./models/*.*")}`
     ]
-}
+};
 
 // Crear servidor express
 const app = express();
@@ -54,7 +56,8 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // Ruta Swagger
-app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)))
+app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)));
+logInfo(`Swagger running: ${JSON.stringify(swaggerSpec)}`);
 // Rutas Usuario
 app.use('/api/user', require('./routes/user'));
 app.use('/api/users', require('./routes/users'));
@@ -66,6 +69,6 @@ app.use('/api/pin', require('./routes/pin'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, process.env.HOST, () => {
-    console.log(`Api REST USUARIOS corriendo en ${process.env.HOST}:${process.env.PORT}`);
+    logInfo(`Api REST USERS running on ${process.env.HOST}:${process.env.PORT}`);
 });
 
