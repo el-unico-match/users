@@ -24,11 +24,7 @@ const mailServCfg = {
     auth: {
         user: process.env.EMAIL_APP,
         pass: process.env.PASS_EMAIL_APP
-    },
-    /*
-    tls:{
-        rejectUnAuthorized:true
-    }*/
+    }
 };
 
 const transporter = nodemailer.createTransport(mailServCfg);
