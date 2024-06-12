@@ -1,14 +1,14 @@
 const {response} = require('express');
-const User = require('../models/Users');
+const {statusDb} = require('../database/config');
 const {
     HTTP_SUCCESS_2XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes')
-const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
 const { 
     logWarning,
     logInfo
  } = require('../helpers/log/log');
-
+ const {statusMailService} = require('../helpers/email');
+ 
 /**
  * 
  * @return una función que retorna como true (y el estado del servicio) si
@@ -16,38 +16,27 @@ const {
  * con mensaje de error.
  */
 const getStatus = async (req, res = response) => {
-    try {
-        let users = await User.find();
-        const dataToReponse = {
-            ok: true,
-            status: {
-                database: {
-                    online: users.length > 0 
-                },
-                service: {
-                    port: process.env.PORT
-                } 
-            }            
-        };
-        logInfo(`On get status response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToReponse)}`);
-        res.status(HTTP_SUCCESS_2XX.OK).json(dataToReponse)
-    } catch(error) {
-        logWarning(`On get status: ${error}`);
-        const dataToReponse = {
-            ok: false,
-            status: {
-                database: {
-                    online: false 
-                },
-                service: {
-                    port: process.env.PORT
-                } 
+    const stDb = await statusDb();
+    const stMs = await statusMailService();
+    const dataToReponse = {
+        ok: true,
+        status: {
+            service: {
+                port: process.env.PORT
             },
-            msg: MSG_DATABASE_ERROR
-        };
-        logInfo(`On get status response: ${HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE}; ${JSON.stringify(dataToReponse)}`);
-        res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json(dataToReponse)
+            database: stDb,                
+            mailService: stMs
+        }            
+    };
+    let statusToResponse;
+    if (stDb.online && stMs.online) {   
+        statusToResponse = HTTP_SUCCESS_2XX.OK;
+    } else {
+        statusToResponse = HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE;
+        logWarning(`On get status, incomplete functionality`);
     }
+    logInfo(`On get status response: ${statusToResponse}; ${JSON.stringify(dataToReponse)}`);
+    res.status(statusToResponse).json(dataToReponse);
 }
 
 module.exports = {

@@ -7,6 +7,8 @@ const {
     logDebug,
     logInfo,
     logWarning} = require('../helpers/log/log');
+const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
+const User = require('../models/Users');
 
 const doDbConnection = async () => {
     let db_cnn = process.env.DB_CNN;
@@ -27,6 +29,22 @@ const dbConnection = async () => {
     }
 }
 
+const statusDb = async () => {
+    let users = null;
+    try {
+        users = await User.find();
+        return {
+            online: users.length > 0
+        }
+    } catch (error) {
+        return {
+            online: false,
+            detail: MSG_DATABASE_ERROR
+        }
+    }        
+}
+
 module.exports = {
-    dbConnection
+    dbConnection,
+    statusDb
 }

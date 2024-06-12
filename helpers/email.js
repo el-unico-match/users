@@ -55,7 +55,7 @@ const doSendPinMail = async (res, to, subject, text, token) => {
             msg: MSG_ERROR_500,
             detail: mailServInitError
         };
-        logDebug(`On send pin mail wrong configuration: ${error}`);
+        logDebug(`On send pin mail wrong configuration: ${mailServInitError}`);
         logInfo(`On send pin mail response: ${HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE}; ${JSON.stringify(dataToResponse)}`);
         return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json(dataToResponse);
     }
@@ -87,6 +87,35 @@ const sendPinMail = async (res, email, text, token) => {
     await doSendPinMail(res, email, SUBJECT_PIN_MESSAGE, text, token);
 }
 
+const checkMail = async () => {
+    const options = createMailOptions(mailServCfg.auth.user, "test", "test");
+    let result = true;
+    await transporter.sendMail(options, (error, info) => {
+        if (error) {
+            result = false;   
+        }        
+    });
+    return result;
+}
+
+const statusMailService = async () => {
+    let result;
+    if (mailServInitError) {
+        result = {
+            online: false,
+            detail: mailServInitError
+        };
+        logWarning(`On check mail service error: ${mailServInitError}`);    
+    } else {
+        result = {
+            online: await checkMail()
+        };
+    };   
+    logInfo(`On check mail service status: ${JSON.stringify(result)}`);
+    return result;
+}
+
 module.exports = {
-    sendPinMail
+    sendPinMail,
+    statusMailService
 }
