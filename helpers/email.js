@@ -16,18 +16,19 @@ const {
 let mailServInitError = null;
 
 const mailServCfg = {
-    service: process.env.SERVICE_EMAIL_APP,
+    //service: process.env.SERVICE_EMAIL_APP,
     host: process.env.HOST_EMAIL_APP,
     port: process.env.PORT_EMAIL_APP,
-    secure: true,
-    secureConnection: false,
+    secure: false,
+    //secureConnection: false,
     auth: {
         user: process.env.EMAIL_APP,
         pass: process.env.PASS_EMAIL_APP
     },
+    /*
     tls:{
         rejectUnAuthorized:true
-    }
+    }*/
 };
 
 const transporter = nodemailer.createTransport(mailServCfg);
