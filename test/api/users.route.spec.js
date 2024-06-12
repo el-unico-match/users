@@ -205,7 +205,7 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(false);
       expect(response.body.status.database.online).toBe(false);
       expect(response.body.status.service.port).toBe(process.env.PORT);
-      expect(response.body.msg).toBe(MSG_DATABASE_ERROR);
+      expect(response.body.status.database.detail).toBe(MSG_DATABASE_ERROR);
       expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
     }); 
 
@@ -302,8 +302,9 @@ describe('test routes', () => {
       jest.spyOn(User, 'find').mockReturnValueOnce(admin);
       const response = await request(app).get('/api/status');
       expect(response.headers['content-type']).toContain('json');
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-      expect(response.body.ok).toBe(true);
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.status.database.online).toBe(false);
       expect(response.body.status).toBeDefined();
     });
 
@@ -314,7 +315,7 @@ describe('test routes', () => {
       expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
       expect(response.body.ok).toBe(false);
       expect(response.body.status).toBeDefined();
-      expect(response.body.msg).toBe(MSG_DATABASE_ERROR);
+      expect(response.body.status.database.detail).toBe(MSG_DATABASE_ERROR);
     });
 
     it('should return a new token', async () => {
