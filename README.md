@@ -58,11 +58,13 @@ const UserSchema = Schema({
 PORT = 4000
 DB_CNN=********
 SECRET_JWT_SEED=************************
+
 EMAIL_APP = matchunico@gmail.com
 PASS_EMAIL_APP = '************************'
 SERVICE_EMAIL_APP = Gmail
 HOST_EMAIL_APP = smtp.gmail.com
 PORT_EMAIL_APP = 465
+
 LOG_FILENAME = "log.txt"
 LOGGING_LEVEL = 10
 HOST=0.0.0.0
@@ -91,14 +93,18 @@ el cual permite configurar las variables de entorno.
 PORT = 4000
 DB_CNN=mongodb://users_mongo:27017/match_dev
 SECRET_JWT_SEED=************************
-EMAIL_APP = matchunico@gmail.com
-PASS_EMAIL_APP = '************************'
-SERVICE_EMAIL_APP = Gmail
-HOST_EMAIL_APP = smtp.gmail.com
-PORT_EMAIL_APP = 465
+
+EMAIL_CHECK_APP = rputaro@fi.uba.ar
+USER_APP_EMAIL = **************************
+PASS_EMAIL_APP = **************************
+SERVICE_EMAIL_APP = Mailgun
+HOST_EMAIL_APP = smtp.mailgun.org
+PORT_EMAIL_APP = 587
+
 LOG_FILENAME = "log.txt"
 LOGGING_LEVEL = 10
 HOST=0.0.0.0
+
 ```
 
 
