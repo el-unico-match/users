@@ -17,4 +17,6 @@ RUN npm install
 
 EXPOSE 4000
 
+EXPOSE 587
+
 ENTRYPOINT [ "node", "index.js"]
