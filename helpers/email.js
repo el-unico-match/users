@@ -19,10 +19,14 @@ const mailServCfg = {
     service: process.env.SERVICE_EMAIL_APP,
     host: process.env.HOST_EMAIL_APP,
     port: process.env.PORT_EMAIL_APP,
-    secure: false,
+    secure: true,
+    secureConnection: false,
     auth: {
         user: process.env.USER_APP_EMAIL,
         pass: process.env.PASS_EMAIL_APP
+    },
+    tls:{
+        rejectUnAuthorized:true
     }
 };
 
