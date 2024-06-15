@@ -24,11 +24,11 @@ jobs:
           echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
           echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
           
-          echo "EMAIL_CHECK_APP=${{ vars.EMAIL_APP }}" >> .env
+          echo "EMAIL_CHECK_APP=${{ vars.EMAIL_CHECK_APP }}" >> .env
           echo "SERVICE_EMAIL_APP=${{ vars.SERVICE_EMAIL_APP }}" >> .env
           echo "HOST_EMAIL_APP=${{ vars.HOST_EMAIL_APP }}" >> .env
           echo "PORT_EMAIL_APP=${{ vars.PORT_EMAIL_APP }}" >> .env
-          echo "USER_APP_EMAIL=${{ vars.PORT_EMAIL_APP }}" >> .env
+          echo "USER_APP_EMAIL=${{ vars.USER_APP_EMAIL }}" >> .env
           echo "PASS_EMAIL_APP=${{ secrets.PASS_EMAIL_APP }}" >> .env
           
           echo "LOG_FILENAME=${{ vars.LOG_FILENAME }}" >> .env
