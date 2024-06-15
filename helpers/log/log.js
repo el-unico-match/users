@@ -6,16 +6,16 @@ const {MSG_LOG_FILE_NOT_EXISTS} = require('../../messages/uncategorized');
 
 const DEFAULT_FILE = "log.txt";
 const LOG_FILENAME = process.env.LOG_FILENAME ? process.env.LOG_FILENAME : DEFAULT_FILE;
-const LOGGING_LEVEL = process.env.LOGGING_LEVEL ? process.env.LOGGING_LEVEL : LOG_LEVELS.DEBUG.level;
+const LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : LOG_LEVELS.DEBUG.level;
 
 let fileStream = null;
 
 const initLog = () => {
     try {
         fileStream = fs.createWriteStream(LOG_FILENAME);
-        logInfo(`Log init in file ${LOG_FILENAME} with level ${getLogLevel(LOGGING_LEVEL).tag}`);
+        logInfo(`Log init in file ${LOG_FILENAME} with level ${getLogLevel(LOG_LEVEL).tag}`);
     } catch (error) {
-        logWarning(`Error on init log in file ${LOG_FILENAME} with level ${LOGGING_LEVEL}: ${error}`);
+        logWarning(`Error on init log in file ${LOG_FILENAME} with level ${LOG_LEVEL}: ${error}`);
     }
 }
 
@@ -77,7 +77,7 @@ const writeLog = (logLevel, message) => {
  * caso contrario
  */
 const checkLevel = (logLevel) => {
-    return logLevel.level >= LOGGING_LEVEL
+    return logLevel.level >= LOG_LEVEL
 }
 
 module.exports = {

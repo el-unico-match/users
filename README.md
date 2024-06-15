@@ -66,7 +66,7 @@ HOST_EMAIL_APP = smtp.gmail.com
 PORT_EMAIL_APP = 465
 
 LOG_FILENAME = "log.txt"
-LOGGING_LEVEL = 10
+LOG_LEVEL = 10
 HOST=0.0.0.0
 
 ```
@@ -102,7 +102,7 @@ HOST_EMAIL_APP = smtp.mailgun.org
 PORT_EMAIL_APP = 587
 
 LOG_FILENAME = "log.txt"
-LOGGING_LEVEL = 10
+LOG_LEVEL = 10
 HOST=0.0.0.0
 
 ```
