@@ -29,7 +29,7 @@ jobs:
           echo "HOST_EMAIL_APP=${{ vars.HOST_EMAIL_APP }}" >> .env
           echo "PORT_EMAIL_APP=${{ vars.PORT_EMAIL_APP }}" >> .env
           echo "USER_APP_EMAIL=${{ vars.USER_APP_EMAIL }}" >> .env
-          echo "PASS_EMAIL_APP=${{ 'secrets.PASS_EMAIL_APP' }}" >> .env
+          echo "PASS_EMAIL_APP='${{ secrets.PASS_EMAIL_APP }}'" >> .env
           
           echo "LOG_FILENAME=${{ vars.LOG_FILENAME }}" >> .env
           echo "LOG_LEVEL=${{ vars.LOG_LEVEL }}" >> .env
