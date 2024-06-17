@@ -7,7 +7,7 @@ const {
     logWarning,
     logInfo
  } = require('../helpers/log/log');
- const {statusMailService} = require('../helpers/email');
+ const {statusMailService} = require('../helpers/email/email');
  
 /**
  * 

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const moment = require('moment');
 const {
     LOG_LEVELS,
     getLogLevel} = require('./logLevel');
@@ -56,7 +57,8 @@ const logError = (message) => {
 
 const writeLog = (logLevel, message) => {
     if (checkLevel(logLevel)) {
-        const messageToLog = `[USERS] ${logLevel.tag}: ${message}`;
+        const date = moment();
+        const messageToLog = `${date} [USERS] ${logLevel.tag}: ${message}`;
             console.log(messageToLog);
         try {
             fileStream.write(`${messageToLog}\n`);

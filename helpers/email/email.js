@@ -2,31 +2,28 @@ const nodemailer = require('nodemailer');
 
 const NO_REPLY_EMAIL = "info-noreply@math.com";
 const SUBJECT_PIN_MESSAGE = "Match App - PIN";
-const {MSG_ERROR_500} = require('../messages/uncategorized');
-const {MSG_COULD_NOT_BE_SENT_PIN} = require('../messages/auth');
+const {MSG_ERROR_500} = require('../../messages/uncategorized');
+const {MSG_COULD_NOT_BE_SENT_PIN} = require('../../messages/auth');
 const {
     HTTP_SUCCESS_2XX,
     HTTP_SERVER_ERROR_5XX,
-    HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
+    HTTP_CLIENT_ERROR_4XX} = require('../httpCodes');
 const {
     logDebug,
     logInfo,
-    logWarning} = require('../helpers/log/log');
+    logWarning} = require('../log/log');
+const PATH_LOGO = __dirname+'/logo.png';
 
 let mailServInitError = null;
 
 const mailServCfg = {
-    //service: process.env.SERVICE_EMAIL_APP,
     host: process.env.HOST_EMAIL_APP,
     port: process.env.PORT_EMAIL_APP,
     secure: true,
     auth: {
         user: process.env.USER_APP_EMAIL,
         pass: process.env.PASS_EMAIL_APP
-    },
-    //ignoreTLS: true,
-    //logger: true,
-    //debug: true,
+    }
 };
 
 const transporter = nodemailer.createTransport(mailServCfg);
@@ -47,7 +44,15 @@ const createMailOptions = (to, subject, text) => {
         from: NO_REPLY_EMAIL,
         to,
         subject,
-        text
+        text,
+        attachments: [
+            {
+                filename: 'logo.png',
+                path: PATH_LOGO,
+                cid: 'logo'
+            }
+        ],
+        html: `<p>${text}</p><br><img src="cid:logo"/>`
     }
 }
 

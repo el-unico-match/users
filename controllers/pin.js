@@ -5,7 +5,7 @@ const {MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const {
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
-const {sendPinMail} = require('../helpers/email');
+const {sendPinMail} = require('../helpers/email/email');
 const {generatePin} = require('../helpers/pin');
 const {generatePinJWT} = require('../helpers/jwt');
 const {updateUser} = require('./user');
