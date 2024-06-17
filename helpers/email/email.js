@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-
 const NO_REPLY_EMAIL = "info-noreply@math.com";
 const SUBJECT_PIN_MESSAGE = "Match App - PIN";
 const {MSG_ERROR_500} = require('../../messages/uncategorized');

@@ -1,6 +1,34 @@
 const {ObjectId} =  require('mongodb');
+const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
 jest.mock('../../models/Users');
 jest.mock('../../helpers/user');
+let mockStMlSrSet = true;
+const mockStatusMailService = () => {
+  if (mockStMlSrSet) {
+    return Promise.resolve({online: true});
+  } else {
+    return Promise.resolve({online: false});
+  }
+};
+
+let mockSnPnMlSet = HTTP_SUCCESS_2XX.CREATED;
+const mockSendPinMail = (res) => {
+  switch (mockSnPnMlSet) {
+    case HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE:
+      return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json({});
+    case HTTP_CLIENT_ERROR_4XX.BAD_REQUEST:
+      return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({});
+    default:
+      res.status(HTTP_SUCCESS_2XX.CREATED).json({})
+      break;
+  }
+};
+jest.mock('../../helpers/email/email', () => ({
+  statusMailService: mockStatusMailService,
+  sendPinMail: mockSendPinMail,  
+}));
+
+
 const {
   newUser,
   saveUser} = require('../../helpers/user');
@@ -23,7 +51,6 @@ const {
   MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
   MSG_USER_EXISTS
   } = require('../../messages/auth');
-const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
 const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
 const {isRole, ROLES} = require('../../types/role');
 const {generateJWT} = require('../../helpers/jwt');
@@ -890,6 +917,94 @@ describe('test routes', () => {
 
     it('should return false on check other string', async () => {
       expect(isRole("jefe")).toBe(false);
+    });
+
+  });
+
+  describe('test mail service', () => {
+  
+    it('should return status mail service online"', async () => {
+      mockSnPnMlSet = true;
+      const response = await request(app).get('/api/status');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.status.mailService.online).toBe(true);
+    });
+
+    it('should return status mail service offline"', async () => {
+      mockStMlSrSet = false;
+      const response = await request(app).get('/api/status');
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.status.mailService.online).toBe(false);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+  });
+
+  describe('test verified user pin', () => {
+    
+    beforeAll( async () => {
+      client = {
+        id: undefined,
+        email: "cliente@gmail.com",
+        password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
+        role: "cliente",
+        blocked: false
+      };
+    })
+
+    it('should init verification pin"', async () => {
+      mockSnPnMlSet = HTTP_SUCCESS_2XX.CREATED;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      const response = await request(app).post('/api/pin').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+    });
+
+    it('should fail init verification because fail on send mail ', async () => {
+      mockSnPnMlSet = HTTP_CLIENT_ERROR_4XX.BAD_REQUEST;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      const response = await request(app).post('/api/pin').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+    });
+
+    it('should fail on init verification pin because mail service not available', async () => {
+      mockSnPnMlSet = HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      const response = await request(app).post('/api/pin').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    });
+
+    it('should fail on init verification pin because user not exists', async () => {
+      mockSnPnMlSet = HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const response = await request(app).post('/api/pin').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
     });
 
   });
