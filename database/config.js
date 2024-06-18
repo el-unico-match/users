@@ -10,6 +10,9 @@ const {
 const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
 const User = require('../models/Users');
 
+/**
+ * @description inicia efectivamente la conexión a la base de datos
+ */
 const doDbConnection = async () => {
     let db_cnn = process.env.DB_CNN;
     logDebug(`On init database conection: ${db_cnn}`);
@@ -17,6 +20,9 @@ const doDbConnection = async () => {
     logInfo(`${MSG_DB_ONLINE}`);    
 }
 
+/**
+ * @description inicia la conexión a la base de datos
+ */
 const dbConnection = async () => {
     while (true) {
         try {
@@ -29,6 +35,10 @@ const dbConnection = async () => {
     }
 }
 
+/**
+ * 
+ * @description retorna el estado de la conexión con la base de datos 
+ */
 const statusDb = async () => {
     let users = null;
     try {

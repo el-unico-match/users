@@ -107,7 +107,6 @@ HOST=0.0.0.0
 
 ```
 
-
 2) Ejecutar el siguiente comando:
 
 ```

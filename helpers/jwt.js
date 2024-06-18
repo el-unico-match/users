@@ -1,8 +1,13 @@
 const jwt = require('jsonwebtoken');
+const {logWarning} = require('./log/log');
 const EXPIRE_IN = '5m';
 const PIN_EXPIRE_IN = '20m';
 const MSG_TOKEN_COULD_NOT_BE_GENERATED = "Token could not be generated";
 
+/**
+ * 
+ * @description Genera el JWT según los parámetros
+ */
 const generateJWT = (uid, role, blocked) => {
     return new Promise((resolve, reject) => {
         const payload = {
@@ -14,7 +19,7 @@ const generateJWT = (uid, role, blocked) => {
             expiresIn: EXPIRE_IN
         }, (error, token) => {
             if (error) {
-                console.log(error);
+                logWarning(`On generate JWT: ${error}`);
                 reject(MSG_TOKEN_COULD_NOT_BE_GENERATED)
             }
             resolve(token)
@@ -22,6 +27,10 @@ const generateJWT = (uid, role, blocked) => {
     });
 }
 
+/**
+ * 
+ * @description Genera el JWT según los parámetros
+ */
 const generatePinJWT = (id, email, pin) => {
     return new Promise((resolve, reject) => {
         const payload = {
@@ -33,7 +42,7 @@ const generatePinJWT = (id, email, pin) => {
             expiresIn: PIN_EXPIRE_IN
         }, (error, token) => {
             if (error) {
-                console.log(error);
+                logWarning(`On generate Pin JWT: ${error}`);
                 reject(MSG_TOKEN_COULD_NOT_BE_GENERATED)
             }
             resolve(token)

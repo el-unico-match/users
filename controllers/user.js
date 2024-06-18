@@ -29,6 +29,9 @@ const prepareBlocked = (req) => {
     }
 }   
 
+/**
+ * @description retorna verdadero si el rol debe ser verificado
+ */
 const checkMustBeSetVerified = (role) => {
     switch (role) {
         case ROLES.ADMINISTRATOR:
@@ -38,6 +41,10 @@ const checkMustBeSetVerified = (role) => {
     }
 }
 
+/**
+ * 
+ * @description crea un nuevo usuario según el request
+ */
 const createUser = async (req, res = response) => {
     try {
         // Normalizar el parámetro del body
@@ -93,6 +100,9 @@ const createUser = async (req, res = response) => {
     }
 }
 
+/**
+ * @description actualiza un usuario según el request
+ */
 const updateUser = async (req, res = response) => {
     const userId = req.params.id;
     try {
@@ -149,6 +159,10 @@ const updateUser = async (req, res = response) => {
     }   
 }
 
+/**
+ * 
+ * @description retorna los datos del usuario del request
+ */
 const getUser = async (req, res = response) => {
     const userId = req.params.id;
     try {
@@ -179,6 +193,10 @@ const getUser = async (req, res = response) => {
     }    
 }
 
+/**
+ * 
+ * @description borrar el usuario del request
+ */
 const deleteUser = async (req, res = response) => {
     const userId = req.params.id;
     try {

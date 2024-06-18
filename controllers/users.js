@@ -6,6 +6,9 @@ const {
     logWarning,
     logInfo} = require('../helpers/log/log');
 
+/**
+ * @description retorna los datos de todos los usuarios
+ */
 const getUsers = async (req, res = response) => {
     try {
         const users = await User.find({}, {_id:1, email: 1, role:1, blocked:1, verified:1});

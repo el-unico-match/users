@@ -1,7 +1,29 @@
 const {ObjectId} =  require('mongodb');
-const { HTTP_SUCCESS_2XX, HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
+const {generatePin} = require('../../helpers/pin');
+const { 
+  HTTP_SUCCESS_2XX,
+  HTTP_CLIENT_ERROR_4XX, 
+  HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
+const {MSG_ACCESS_DENIED} = require('../../middlewares/validateAccess');
+const { 
+  MSG_PASSWORD_INCORRECT, 
+  MSG_USER_BLOCKED, 
+  MSG_USER_NOT_EXISTS, 
+  MSG_NO_TOKEN, 
+  MSG_INVALID_TOKEN,
+  MSG_EMAIL_IS_REQUIRED,
+  MSG_PASSWORD_ERROR_LENGTH,
+  MSG_ROLE_ERROR_TYPE,
+  MSG_INVALID_LOCK_STATE,
+  MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
+  MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
+  MSG_USER_EXISTS,
+  MSG_WRONG_PIN,
+  MSG_PASSWORD_NOT_ENTERED} = require('../../messages/auth');
+const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
 jest.mock('../../models/Users');
 jest.mock('../../helpers/user');
+
 let mockStMlSrSet = true;
 const mockStatusMailService = () => {
   if (mockStMlSrSet) {
@@ -23,11 +45,11 @@ const mockSendPinMail = (res) => {
       break;
   }
 };
+
 jest.mock('../../helpers/email/email', () => ({
   statusMailService: mockStatusMailService,
   sendPinMail: mockSendPinMail,  
 }));
-
 
 const {
   newUser,
@@ -36,24 +58,11 @@ const User = require('../../models/Users');
 const request = require('supertest');
 const express = require('express');
 require('dotenv').config();
-const {MSG_ACCESS_DENIED} = require('../../middlewares/validateAccess');
-const { 
-  MSG_PASSWORD_INCORRECT, 
-  MSG_USER_BLOCKED, 
-  MSG_USER_NOT_EXISTS, 
-  MSG_NO_TOKEN, 
-  MSG_INVALID_TOKEN,
-  MSG_EMAIL_IS_REQUIRED,
-  MSG_PASSWORD_ERROR_LENGTH,
-  MSG_ROLE_ERROR_TYPE,
-  MSG_INVALID_LOCK_STATE,
-  MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
-  MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
-  MSG_USER_EXISTS
-  } = require('../../messages/auth');
-const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
+
 const {isRole, ROLES} = require('../../types/role');
-const {generateJWT} = require('../../helpers/jwt');
+const {
+  generateJWT,
+  generatePinJWT} = require('../../helpers/jwt');
 const {initLog} = require('../../helpers/log/log');
 
 process.env.LOG_FILENAME ||= "log.txt"
@@ -955,11 +964,12 @@ describe('test routes', () => {
         email: "cliente@gmail.com",
         password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
         role: "cliente",
-        blocked: false
+        blocked: false,
+        verified: false
       };
     })
 
-    it('should init verification pin"', async () => {
+    it('should init verification pin', async () => {
       mockSnPnMlSet = HTTP_SUCCESS_2XX.CREATED;   
       const payload ={
         "email": client.email
@@ -1001,6 +1011,214 @@ describe('test routes', () => {
       const response = await request(app).post('/api/pin').send(payload);
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+    });
+
+    it('should verify pin', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const token = await generatePinJWT(client.id, client.email, pin);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        _id: client.id,
+        ...client
+      });      
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce({
+          _id: client.id,
+          id: client.id,
+          email: client.email,
+          role: client.role,
+          blocked: client.blocked,
+          verified: true
+      });
+      const response = await request(app).post(`/api/pin/${pin}`).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.id).toBe(client.id);
+      expect(response.body.user.email).toBe(client.email);
+      expect(response.body.user.role).toBe(client.role);
+      expect(response.body.user.blocked).toBe(client.blocked);
+      expect(response.body.user.verified).toBe(true);
+      expect(response.body.token).toBeDefined();
+    });
+
+    it('should fail on verify pin because wrong pin', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const fakePin = 'P?00';
+      const token = await generatePinJWT(client.id, client.email, pin);
+      const response = await request(app).post(`/api/pin/${fakePin}`).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.msg).toBe(MSG_WRONG_PIN);
+    });
+
+    it('should fail on verify pin because bad token', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const token = await generatePinJWT(client.id, client.email, pin)+'?';
+      const response = await request(app).post(`/api/pin/${pin}`).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_WRONG_PIN);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+  });
+
+  describe('test restore pass', () => {
+    
+    beforeAll( async () => {
+      client = {
+        id: undefined,
+        email: "cliente@gmail.com",
+        password: "$2a$10$p8EHaUfyGeqwqy8nE6POyOV2Cx0aYSsYG.8Qbbx42TzG9BvGL2Nx.",
+        role: "cliente",
+        blocked: false,
+        verified: false
+      };
+    })
+
+    it('should init restore pass', async () => {
+      mockSnPnMlSet = HTTP_SUCCESS_2XX.CREATED;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      const response = await request(app).post('/api/restorer').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+    });
+
+    it('should fail init restore pass because fail on send mail ', async () => {
+      mockSnPnMlSet = HTTP_CLIENT_ERROR_4XX.BAD_REQUEST;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      const response = await request(app).post('/api/restorer').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+    });
+
+    it('should fail on init restore pass because mail service not available', async () => {
+      mockSnPnMlSet = HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      const response = await request(app).post('/api/restorer').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    });
+
+    it('should fail on init restore pass pin because user not exists', async () => {
+      mockSnPnMlSet = HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE;   
+      const payload ={
+        "email": client.email
+      }
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(null);
+      const response = await request(app).post('/api/restorer').send(payload);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.NOT_FOUND);
+    });
+
+    it('should restore pass', async () => {
+      client.id = new ObjectId().toString();
+      client.password = "pasP122**A"
+      const pin = generatePin();
+      const token = await generatePinJWT(client.id, client.email, pin);
+      jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
+      jest.spyOn(User, 'findOne').mockReturnValueOnce({
+        _id: client.id,
+        ...client
+      });      
+      const clientNewPass = `${client.password}New`
+      jest.spyOn(User, 'findByIdAndUpdate').mockReturnValueOnce({
+          _id: client.id,
+          id: client.id,
+          email: client.email,
+          role: client.role,
+          blocked: client.blocked,
+          verified: true
+      });
+      const payload = {
+        password: `${clientNewPass}`
+      };
+      const response = await request(app).post(`/api/restorer/${pin}`).send(payload).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+      expect(response.body.ok).toBe(true);
+      expect(response.body.user.id).toBe(client.id);
+      expect(response.body.user.email).toBe(client.email);
+      expect(response.body.user.role).toBe(client.role);
+      expect(response.body.user.blocked).toBe(client.blocked);
+      expect(response.body.user.verified).toBe(true);
+      expect(response.body.token).toBeDefined();
+    });
+
+    it('should fail on restore pass because wrong pin', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const fakePin = 'P?00';
+      const clientNewPass = `${client.pass}New`
+      const payload = {
+        password: `${clientNewPass}`
+      };
+      const token = await generatePinJWT(client.id, client.email, pin);
+      const response = await request(app).post(`/api/restorer/${fakePin}`).send(payload).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.msg).toBe(MSG_WRONG_PIN);
+    });
+
+    it('should fail on restore pass because bad token', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const clientNewPass = `${client.pass}New`
+      const payload = {
+        password: `${clientNewPass}`
+      };
+      const token = await generatePinJWT(client.id, client.email, pin)+'?';
+      const response = await request(app).post(`/api/restorer/${pin}`).send(payload).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBe(MSG_WRONG_PIN);
+    });
+
+    it('should fail on restore pass because no password in body', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const clientNewPass = `${client.pass}New`
+      const payload = {
+        noPassword: `${clientNewPass}`
+      };
+      const token = await generatePinJWT(client.id, client.email, pin);
+      const response = await request(app).post(`/api/restorer/${pin}`).send(payload).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBeDefined();
+    });
+
+    it('should fail on restore pass because bad password in body', async () => {
+      client.id = new ObjectId().toString();
+      const pin = generatePin();
+      const clientNewPass = `New`
+      const payload = {
+        noPassword: `${clientNewPass}`
+      };
+      const token = await generatePinJWT(client.id, client.email, pin);
+      const response = await request(app).post(`/api/restorer/${pin}`).send(payload).set('x-token', token);
+      expect(response.headers['content-type']).toContain('json');
+      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+      expect(response.body.ok).toBe(false);
+      expect(response.body.msg).toBeDefined();
     });
 
     afterEach(() => {

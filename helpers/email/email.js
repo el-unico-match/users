@@ -11,6 +11,7 @@ const {
     logDebug,
     logInfo,
     logWarning} = require('../log/log');
+
 const PATH_LOGO = __dirname+'/logo.png';
 
 let mailServInitError = null;
@@ -38,6 +39,7 @@ transporter.verify( (error) => {
     }
 });
 
+// Opciones de mail
 const createMailOptions = (to, subject, text) => {
     return {
         from: NO_REPLY_EMAIL,
@@ -55,6 +57,7 @@ const createMailOptions = (to, subject, text) => {
     }
 }
 
+// Envía efectivamente el email
 const doSendPinMail = async (res, to, subject, text, token) => {
     if (mailServInitError) {
         const dataToResponse = {
@@ -90,10 +93,17 @@ const doSendPinMail = async (res, to, subject, text, token) => {
     });
 }
 
+/**
+ * 
+ * @description Envía el email con el texto y el token correspondiente
+ */
 const sendPinMail = async (res, email, text, token) => {
     await doSendPinMail(res, email, SUBJECT_PIN_MESSAGE, text, token);
 }
 
+/**
+ * @description Chequea efectivamente el estado del servicio de email
+ */
 const checkMail = async () => {
     const options = createMailOptions(process.env.EMAIL_CHECK_APP, "test", "test");
     let result = true;
@@ -105,6 +115,9 @@ const checkMail = async () => {
     return result;
 }
 
+/**
+ * @description Retorna el estado del servicio de email
+ */
 const statusMailService = async () => {
     let result;
     if (mailServInitError) {

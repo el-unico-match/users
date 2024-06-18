@@ -16,7 +16,7 @@ const router = Router();
  * @swagger
  * /api/pin/:
  *  post:
- *      summary: init password restore
+ *      summary: init user's verification
  *      tags: [User Verification]
  *      requestBody:
  *          required: true
@@ -30,7 +30,7 @@ const router = Router();
  *                              example: rputaro@fi.uba.ar
  *      responses:
  *          201: 
- *              description: return applicant credentials and token for restoration!
+ *              description: returns applicant credentials and token for verification. Also send the verification email!
  *              content:
  *                  application/json:
  *                      schema:
@@ -93,7 +93,7 @@ router.post('/', checkSendPin, sendVerificationPin);
  * @swagger
  * /api/pin/{pin}:
  *  post:
- *      summary: check pin
+ *      summary: check pin a verificate the user
  *      tags: [User Verification]
  *      parameters:
  *          - in: header
@@ -109,7 +109,7 @@ router.post('/', checkSendPin, sendVerificationPin);
  *              type: string
  *      responses:
  *          200: 
- *              description: xreturn user data and token for update password!
+ *              description: return user data and regular token!
  *              content:
  *                  application/json:
  *                      schema:
@@ -138,7 +138,7 @@ router.post('/', checkSendPin, sendVerificationPin);
  *                                  type: object
  *                                  example: Pin is required
  *          401:
- *              description: return error "Invalid token" or "User without role" or "You do not have the necessary access level"
+ *              description: return error "Invalid token"
  *              content:
  *                  application/json:
  *                      schema:

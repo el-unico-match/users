@@ -5,6 +5,10 @@ const {
     logInfo,
     logDebug} = require('../helpers/log/log');
 
+/**
+ * 
+ * @description Evalúa si alguno de los middleware previos ha detectado algún error.
+ */
 const validateFields = (req, res = response, next) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){

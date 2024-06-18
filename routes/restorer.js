@@ -9,6 +9,7 @@ const {
     sendRestorePin,
     verifyPinAndUpdatePassword} = require('../controllers/restorer');
 const {checkSendPin} = require('../middlewares/checkers/pin');
+const {checkUpdatePassword} = require('../middlewares/checkers/restorer')
 
 const router = Router();
 
@@ -93,7 +94,7 @@ router.post('/', checkSendPin, sendRestorePin);
  * @swagger
  * /api/restorer/{pin}:
  *  post:
- *      summary: check pin
+ *      summary: checks pin and restore password
  *      tags: [Restorer]
  *      parameters:
  *          - in: header
@@ -119,7 +120,7 @@ router.post('/', checkSendPin, sendRestorePin);
  *                              example: cli123te1**
  *      responses:
  *          200: 
- *              description: xreturn user data and token for update password!
+ *              description: return user data and regular token!
  *              content:
  *                  application/json:
  *                      schema:
@@ -135,7 +136,7 @@ router.post('/', checkSendPin, sendRestorePin);
  *                                  type: string
  *                                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjJkMGMxMzRmMjA5MTk5ZDJmMjc0YTMiLCJuYW1lIjoicmFmYWVsIiwiaWF0IjoxNzE0MjUxMjUxLCJleHAiOjE3MTQyNTg0NTF9.ky8davH_RhQrscgs4k3dnLXJPB5mrdD6RVmWtv5dqUA
  *          400:
- *              description: return error "pin is required"
+ *              description: return error "pin is required" or "password is required"
  *              content:
  *                  application/json:
  *                      schema:
@@ -148,7 +149,7 @@ router.post('/', checkSendPin, sendRestorePin);
  *                                  type: object
  *                                  example: Pin is required
  *          401:
- *              description: return error "Invalid token" or "User without role" or "You do not have the necessary access level"
+ *              description: return error "Invalid token"
  *              content:
  *                  application/json:
  *                      schema:
@@ -187,8 +188,6 @@ router.post('/', checkSendPin, sendRestorePin);
  *                                  type: string
  *                                  example: Please talk to the administrator
 */
-router.post('/:pin', validatePinJWT, verifyPinAndUpdatePassword);
-
-//TODO el updata password
+router.post('/:pin', validatePinJWT, checkUpdatePassword, verifyPinAndUpdatePassword);
 
 module.exports = router;

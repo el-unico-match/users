@@ -132,6 +132,7 @@ const doDecodeJWT = (req, token) =>  {
  */
 const genericValidateJWT = (req, res = response, doValidate, msg_invalid, next) => {
     const token = req.header('x-token');
+    logDebug(`On validate JWT : ${token}`);
     if (!token) {
         const dataToResponse = {
             ok: false,
