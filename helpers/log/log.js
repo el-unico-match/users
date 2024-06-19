@@ -66,7 +66,7 @@ const writeLog = (logLevel, message) => {
             if (fileStream) {
                 console.log(`[USERS] WARNING: ${error}`);
             } else {
-                console.log(`[USERS] WARNING: ${MSG_LOG_FILE_NOT_EXISTS} - ${logFilePath}`);
+                console.log(`[USERS] WARNING: ${MSG_LOG_FILE_NOT_EXISTS} - ${LOG_FILENAME}`);
             }            
         }        
     }
