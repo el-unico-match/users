@@ -5,11 +5,22 @@ const {MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const {
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
+const {MSG_PIN_USED} = require('../messages/pin');
 const {sendPinMail} = require('../helpers/email/email');
 const {generatePin} = require('../helpers/pin');
 const {generatePinJWT} = require('../helpers/jwt');
 const {updateUser} = require('./user');
 const TEXT_VERIFY = "Your verification PIN is: ";
+
+const {
+    logWarning,
+    logInfo,
+    logDebug
+} = require('../helpers/log/log');
+
+const generateMessageVerificationPin = (pin, _token) => {
+    return `${TEXT_VERIFY}${pin}`;
+}
 
 /**
  * 
@@ -17,16 +28,20 @@ const TEXT_VERIFY = "Your verification PIN is: ";
  * @description un Pin de verificación de contraseña al mail. Retorna un token de verificación.
  */
 const sendVerificationPin = async (req, res = response) => {
-    await sendPin(req, res, TEXT_VERIFY);
+    await sendPin(req, res, generateMessageVerificationPin);
 }
 
-const sendPin = async (req, res = response, text) => {
+/**
+ * 
+ * @param {*} generateMessage (pin, token) => string
+ */
+const sendPin = async (req, res = response, generateMessage) => {
     try {
         const {email} = req.body;
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await dispatchPinMessage(res, user._id, email, text)      
+            await dispatchPinMessage(res, user._id, email, generateMessage)      
         } else {
             res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
                 ok: false,
@@ -34,7 +49,7 @@ const sendPin = async (req, res = response, text) => {
             });
         }        
     } catch (error) {
-        console.log(error);
+        logWarning(error);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
@@ -45,14 +60,14 @@ const sendPin = async (req, res = response, text) => {
 /**
  * @description Envía efectivamente el mensaje
  */
-const dispatchPinMessage = async (res = response, id, email, text) => {
+const dispatchPinMessage = async (res = response, id, email, generateMessage) => {
     const pin = generatePin();
     const token = await generatePinJWT(id, email, pin);
-    const message = `${text}${pin}`;
+    const message = generateMessage(pin, token);
     try {        
         await sendPinMail(res, email, message, token);        
     } catch (error) {
-        console.log(error);
+        logWarning(error);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500,
@@ -71,7 +86,7 @@ const verifyPin = async (req, res = response) => {
     try {
         const {email} = req.tokenExtractedData;
         // Check en DB si existe el usuario
-        let user = await User.findOne({email});
+        const user = await User.findOne({email});
         if (user){    
             await doVerifyPin(req, res, user);
         } else {
@@ -81,7 +96,7 @@ const verifyPin = async (req, res = response) => {
             });
         }        
     } catch (error) {
-        console.log(error);
+        logWarning(error);
         res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
             ok: false,
             msg: MSG_ERROR_500
@@ -94,9 +109,22 @@ const verifyPin = async (req, res = response) => {
  * @description Hace la verificación efectiva de pin.
  */
 const doVerifyPin = async (req, res = response, user) => {
-    req.params.id = req.tokenExtractedData.id;
-    req.body.verified = true;
-    updateUser(req, res);
+    const last_pin = user.last_pin;
+    const req_pin = req.params.pin;
+    logDebug(`On verify pin: ${last_pin} (last used) ?== ${req_pin} (to check)`);
+    if (last_pin === req_pin) {
+        const dataToResponse = {
+            ok: false,
+            msg: MSG_PIN_USED
+        }
+        logInfo(`On verify pin response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED} ${JSON.stringify(dataToResponse)}`);
+        res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
+    } else {
+        req.params.id = req.tokenExtractedData.id;
+        req.body.verified = true;
+        req.body.last_pin = req_pin
+        await updateUser(req, res);
+    }    
 }
 
 module.exports = {

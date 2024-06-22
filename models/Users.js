@@ -58,6 +58,10 @@ const UserSchema = Schema({
     verified: {
         type: Boolean,
         required: true
+    },
+    last_pin: {
+        type: String,
+        required: false
     } 
 });
 

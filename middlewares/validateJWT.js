@@ -3,8 +3,11 @@ const jwt = require('jsonwebtoken');
 const {jwtDecode} = require('jwt-decode');
 const {HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes')
 const {MSG_NO_TOKEN, MSG_INVALID_TOKEN} = require('../messages/auth');
-const {MSG_WRONG_PIN} = require('../messages/auth');
-const ERROR_PIN = "Pin error";
+const {
+    MSG_WRONG_PIN,
+    ERROR_PIN
+} = require('../messages/pin');
+
 const {
     logInfo,
     logDebug} = require('../helpers/log/log');

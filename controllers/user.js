@@ -166,7 +166,7 @@ const updateUser = async (req, res = response) => {
 const getUser = async (req, res = response) => {
     const userId = req.params.id;
     try {
-        const user = await User.findOne({_id: userId}, {_id:1, email: 1, role:1, blocked:1});
+        const user = await User.findOne({_id: userId}, {_id:1, email: 1, role:1, blocked:1, verified:1});
         if (!user) {
             const dataToResponse = {
                 ok: false,

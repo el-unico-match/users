@@ -5,6 +5,7 @@ const {
   HTTP_CLIENT_ERROR_4XX, 
   HTTP_SERVER_ERROR_5XX } = require('../../helpers/httpCodes');
 const {MSG_ACCESS_DENIED} = require('../../middlewares/validateAccess');
+const {MSG_WRONG_PIN} = require('../../messages/pin');
 const { 
   MSG_PASSWORD_INCORRECT, 
   MSG_USER_BLOCKED, 
@@ -17,9 +18,7 @@ const {
   MSG_INVALID_LOCK_STATE,
   MSG_WITHOUT_AUTH_TO_CREATE_EXTRA_USER,
   MSG_WITHOUT_AUTH_TO_CREATE_ADMIN,
-  MSG_USER_EXISTS,
-  MSG_WRONG_PIN,
-  MSG_PASSWORD_NOT_ENTERED} = require('../../messages/auth');
+  MSG_USER_EXISTS} = require('../../messages/auth');
 const { MSG_ERROR_500, MSG_DATABASE_ERROR } = require("../../messages/uncategorized");
 jest.mock('../../models/Users');
 jest.mock('../../helpers/user');
