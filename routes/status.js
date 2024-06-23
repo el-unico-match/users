@@ -5,8 +5,11 @@
 
 const {Router} = require('express');
 const {getStatus} = require('../controllers/status');
+const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
+
+router.use(validateApikeys);
 
 /**
  * @swagger

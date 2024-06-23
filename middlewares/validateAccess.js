@@ -4,8 +4,7 @@ const MSG_ACCESS_DENIED = 'You do not have the necessary access level';
 const MSG_ROLE_NOT_FOUND = 'User without role';
 const {
     logDebug,
-    logInfo,
-    logWarning} = require('../helpers/log/log');
+    logInfo} = require('../helpers/log/log');
 
 /**
  * 

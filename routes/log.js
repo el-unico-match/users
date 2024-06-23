@@ -1,0 +1,1 @@
+const {validateApikeys} = require('../middlewares/validateApikeys');

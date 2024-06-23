@@ -9,8 +9,11 @@ const {checkSendPin} = require('../middlewares/checkers/pin');
 const {
     sendVerificationPin,
     verifyPin} = require('../controllers/pin');
+const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
+
+router.use(validateApikeys);
 
 /**
  * @swagger

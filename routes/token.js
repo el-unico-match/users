@@ -6,8 +6,11 @@
 const {Router} = require('express');
 const {decodeJWT} = require('../middlewares/validateJWT');
 const {refreshToken} = require('../controllers/token');
+const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
+
+router.use(validateApikeys);
 
 /**
  * @swagger

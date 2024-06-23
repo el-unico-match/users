@@ -87,3 +87,27 @@ components:
                 email: carlos@mail.com
                 password: cli123te1*
                 blocked: false
+        Apikeys:
+            type: object
+            properties:
+                gateway:
+                    type: string
+                    description: microservice apikey              
+                users:
+                    type: string
+                    description: microservice apikey
+                profile:
+                    type: string
+                    description: microservice apikey
+                match:
+                    type: string
+                    description: microservice apikey                
+                messages:
+                    type: string
+                    description: microservice apikey
+                services:
+                    type: string
+                    description: service apikey                    
+            required: 
+                - gateway
+                - users

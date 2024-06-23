@@ -10,8 +10,11 @@ const {
     verifyPinAndUpdatePassword} = require('../controllers/restorer');
 const {checkSendPin} = require('../middlewares/checkers/pin');
 const {checkUpdatePassword} = require('../middlewares/checkers/restorer')
+const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
+
+router.use(validateApikeys);
 
 /**
  * @swagger

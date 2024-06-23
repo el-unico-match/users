@@ -1,33 +1,37 @@
 /*
-    Rutas de Usuarios /users
-    host + /api/users
+    Rutas de Estado /apikeys
+    host + /api/apikeys
 */
 
 const {Router} = require('express');
+const {setApikeys} = require('../controllers/apikeys');
 const {validateJWT} = require('../middlewares/validateJWT');
-const {getUsers} = require('../controllers/users');
-const {validateApikeys} = require('../middlewares/validateApikeys');
+const {checkSetApikeys} = require('../middlewares/checkers/apikeys');
 
 const router = Router();
 
-router.use(validateApikeys);
-
 /**
  * @swagger
- * /api/users:
- *  get:
- *      summary: get all the users
- *      tags: [User]
+ * /api/apikeys:
+ *  post:
+ *      summary: set o renew apikeys 
+ *      tags: [apikeys]
  *      parameters:
  *          - in: header
  *            name: x-token
  *            schema:
  *              type: string
- *              required: true
- *              description: user token
+ *              description: admin user token
+ *      requestBody:
+ *          required: true
+ *          content: 
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/Apikeys'
  *      responses:
  *          200: 
- *              description: return all the users!
+ *              description: apikeys has been seted or reneweb!
  *              content:
  *                  application/json:
  *                      schema:
@@ -36,26 +40,11 @@ router.use(validateApikeys);
  *                              ok:
  *                                  type: boolean
  *                                  example: true
- *                              users:
- *                                  type: array
- *                                  items:
- *                                      type: object
- *                                      $ref: '#/components/schemas/UserSharedData'
- *          400:
- *              description: return error "There is no token in the request"
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              ok:
- *                                  type: boolean
- *                                  example: false
- *                              msg:
+ *                              status:
  *                                  type: object
- *                                  example: There is no token in the request
+ *                                  $ref: '#/components/schemas/Apikeys'
  *          401:
- *              description: return error "Invalid token"!
+ *              description: return error "Invalid token" or "You do not have permission to set apikeys"!
  *              content:
  *                  application/json:
  *                      schema:
@@ -66,7 +55,7 @@ router.use(validateApikeys);
  *                                  example: false
  *                              msg:
  *                                  type: string
- *                                  example: Invalid token
+ *                                  example: "The user does not have permission to create a new administrator"
  *          500:
  *              description: return internal error!
  *              content:
@@ -81,6 +70,6 @@ router.use(validateApikeys);
  *                                  type: string
  *                                  example: Please talk to the administrator
 */
-router.get('/', validateJWT, getUsers);
+router.post('/', validateJWT, checkSetApikeys, setApikeys);
 
 module.exports = router;

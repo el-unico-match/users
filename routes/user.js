@@ -18,8 +18,11 @@ const {
     checkUpdateUser,
     checkDeleteUser,    
     } = require('../middlewares/checkers/user');
+const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
+
+router.use(validateApikeys);
 
 /**
  * @swagger

@@ -66,6 +66,8 @@ app.use('/api/token', require('./routes/token'));
 app.use('/api/status', require('./routes/status'));
 app.use('/api/restorer', require('./routes/restorer'));
 app.use('/api/pin', require('./routes/pin'));
+app.use('/api/apikeys', require('./routes/apikeys'));
+//app.use('/api/log', require('./routes/log'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, process.env.HOST, () => {

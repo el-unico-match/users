@@ -7,7 +7,6 @@ const {
     MSG_WRONG_PIN,
     ERROR_PIN
 } = require('../messages/pin');
-
 const {
     logInfo,
     logDebug} = require('../helpers/log/log');
