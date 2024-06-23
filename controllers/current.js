@@ -7,6 +7,7 @@ const {
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const {HTTP_SUCCESS_2XX, HTTP_SERVER_ERROR_5XX, HTTP_CLIENT_ERROR_4XX} = require('../helpers/httpCodes');
+const {responseWithApikey} = require('../helpers/response');
 
 /**
  * 
@@ -23,8 +24,8 @@ const getDataUser = async (req, res = response) => {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             }
-            logInfo(`On current response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
+            return responseWithApikey(req, res, "On current response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
+
         }
         const dataToResponse = {
             ok: true,
@@ -37,16 +38,14 @@ const getDataUser = async (req, res = response) => {
             }
         }
         logDebug(`On current user: ${JSON.stringify(req.tokenExtractedData)}`);
-        logInfo(`On current response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
+        return responseWithApikey(req, res, "On current response", HTTP_SUCCESS_2XX.OK, dataToResponse);        
     } catch (error) {
         logWarning(`On get data user: ${error}`);
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
         }
-        logInfo(`On get data user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
+        return responseWithApikey(req, res, "On get data user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }
 }
 

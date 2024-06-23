@@ -3,10 +3,8 @@ const {statusDb} = require('../database/config');
 const {
     HTTP_SUCCESS_2XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes')
-const { 
-    logWarning,
-    logInfo
- } = require('../helpers/log/log');
+const {logWarning} = require('../helpers/log/log');
+ const {responseWithApikey} = require('../helpers/response');
  const {statusMailService} = require('../helpers/email/email');
  
 /**
@@ -36,8 +34,7 @@ const getStatus = async (req, res = response) => {
             mailService: stMs
         }            
     };
-    logInfo(`On get status response: ${statusToResponse}; ${JSON.stringify(dataToReponse)}`);
-    res.status(statusToResponse).json(dataToReponse);
+    responseWithApikey(req, res, "On get status response", statusToResponse, dataToReponse);
 }
 
 module.exports = {

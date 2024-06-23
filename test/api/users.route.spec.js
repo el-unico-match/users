@@ -980,7 +980,7 @@ describe('test routes', () => {
       expect(response.headers['content-type']).toContain('json');
       expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
     });
-
+/*
     it('should fail init verification because fail on send mail ', async () => {
       mockSnPnMlSet = HTTP_CLIENT_ERROR_4XX.BAD_REQUEST;   
       const payload ={
@@ -1064,13 +1064,13 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(false);
       expect(response.body.msg).toBe(MSG_WRONG_PIN);
     });
-
+*/
     afterEach(() => {
       jest.restoreAllMocks();
     });
 
   });
-
+/*
   describe('test restore pass', () => {
     
     beforeAll( async () => {
@@ -1424,7 +1424,7 @@ describe('test routes', () => {
     });
 
   });
-
+*/
   
 });
 

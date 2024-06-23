@@ -7,10 +7,8 @@ const {
     MSG_USER_BLOCKED,
     MSG_USER_NOT_EXISTS} = require('../messages/auth');
 const User = require('../models/Users');
-const {
-    logDebug,
-    logInfo
-} = require('../helpers/log/log');
+const {responseWithApikey} = require('../helpers/response');
+const {logDebug} = require('../helpers/log/log');
 
 /**
  * 
@@ -28,8 +26,7 @@ const refreshToken = async (req, res = response) => {
             msg: MSG_USER_BLOCKED
         };
         logDebug(`On refresh token user blocked: ${JSON.stringify(req.tokenExtractedData)}`);
-        logInfo(`On refresh token response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse); 
+        responseWithApikey(req, res, "On refresh token response", HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED, dataToResponse);
     } else {
         // Refrescar datos de usuario
         const user = await User.findOne({_id: uid});
@@ -41,16 +38,14 @@ const refreshToken = async (req, res = response) => {
                 ok: true,
                 token
             };
-            logInfo(`On refresh token response: ${HTTP_SUCCESS_2XX.CREATED}; ${JSON.stringify(dataToResponse)}`);
-            res.status(HTTP_SUCCESS_2XX.CREATED).json(dataToResponse);
+            responseWithApikey(req, res, "On refresh token response", HTTP_SUCCESS_2XX.CREATED, dataToResponse);
         } else {
             logDebug(`On refresh token user not found: ${JSON.stringify(req.tokenExtractedData)}`);
             const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
             };
-            logInfo(`On refresh token response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);            
+            responseWithApikey(req, res, "On refresh token response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }        
     }
 }

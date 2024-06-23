@@ -11,10 +11,9 @@ const {generatePin} = require('../helpers/pin');
 const {generatePinJWT} = require('../helpers/jwt');
 const {updateUser} = require('./user');
 const TEXT_VERIFY = "Your verification PIN is: ";
-
+const {responseWithApikey} = require('../helpers/response');
 const {
     logWarning,
-    logInfo,
     logDebug
 } = require('../helpers/log/log');
 
@@ -41,38 +40,41 @@ const sendPin = async (req, res = response, generateMessage) => {
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await dispatchPinMessage(res, user._id, email, generateMessage)      
+            await dispatchPinMessage(req, res, user._id, email, generateMessage)      
         } else {
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });
+            };
+            responseWithApikey(req, res, "On send Pin response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }        
     } catch (error) {
         logWarning(error);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        })
+        };
+        responseWithApikey(req, res, "On send Pin response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }
 }
 
 /**
  * @description Envía efectivamente el mensaje
  */
-const dispatchPinMessage = async (res = response, id, email, generateMessage) => {
+const dispatchPinMessage = async (req, res = response, id, email, generateMessage) => {
     const pin = generatePin();
     const token = await generatePinJWT(id, email, pin);
     const message = generateMessage(pin, token);
     try {        
-        await sendPinMail(res, email, message, token);        
+        await sendPinMail(req, res, email, message, token);        
     } catch (error) {
         logWarning(error);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500,
             detail: error.toString()
-        });    
+        };
+        responseWithApikey(req, res, "On dispatch Pin message response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }            
 }
 
@@ -90,17 +92,19 @@ const verifyPin = async (req, res = response) => {
         if (user){    
             await doVerifyPin(req, res, user);
         } else {
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });
+            };
+            responseWithApikey(req, res, "On verify Pin response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }        
     } catch (error) {
         logWarning(error);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        })
+        };
+        responseWithApikey(req, res, "On verify Pin response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }
 }
 
@@ -117,8 +121,7 @@ const doVerifyPin = async (req, res = response, user) => {
             ok: false,
             msg: MSG_PIN_USED
         }
-        logInfo(`On verify pin response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED} ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
+        responseWithApikey(req, res, "On verify pin response", HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED, dataToResponse);
     } else {
         req.params.id = req.tokenExtractedData.id;
         req.body.verified = true;

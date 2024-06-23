@@ -17,6 +17,7 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
+const {responseWithApikey} = require('../helpers/response');
 const { ROLES } = require('../types/role');
 
 /**
@@ -58,8 +59,7 @@ const createUser = async (req, res = response) => {
                 msg: MSG_USER_EXISTS
             };
             logDebug(`On create user, user exists: ${JSON.stringify(user)}`);
-            logInfo(`On create user response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`);
-            return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);
+            return responseWithApikey(req, res, "On create user response", HTTP_CLIENT_ERROR_4XX.BAD_REQUEST, dataToResponse);
         };        
         const verified = checkMustBeSetVerified(role);
         // Crear un nuevo usuario en base al body
@@ -87,16 +87,14 @@ const createUser = async (req, res = response) => {
             },            
             token            
         };
-        logInfo(`On create user response: ${HTTP_SUCCESS_2XX.CREATED}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_SUCCESS_2XX.CREATED).json(dataToResponse);    
+        responseWithApikey(req, res, "On create user response", HTTP_SUCCESS_2XX.CREATED, dataToResponse);
     } catch (error) {
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
         };
         logWarning(`On create user error: ${error}`);
-        logInfo(`On create user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
+        responseWithApikey(req, res, "On create user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }
 }
 
@@ -113,8 +111,7 @@ const updateUser = async (req, res = response) => {
                 msg: MSG_USER_NOT_EXISTS
             };
             logDebug(`On update user, user not found: ${userId}`);
-            logInfo(`On update user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);        
+            return responseWithApikey(req, res, "On update user response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }
         const newUser = {
             ...req.body,
@@ -146,16 +143,14 @@ const updateUser = async (req, res = response) => {
             },
             token: token,
         };
-        logInfo(`On update user response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
+        responseWithApikey(req, res, "On update user response", HTTP_SUCCESS_2XX.OK, dataToResponse);
     } catch (error) {
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
         }
         logWarning(`On update user: ${error}`);
-        logInfo(`On update user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
+        responseWithApikey(req, res, "On update user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }   
 }
 
@@ -173,23 +168,21 @@ const getUser = async (req, res = response) => {
                 msg: MSG_USER_NOT_EXISTS
             };
             logDebug(`On get user user not found: ${userId}`);
-            logInfo(`On get user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`);    
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse);
+            return responseWithApikey(req, res, "On get user response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);            
         } else {
             const dataToResponse = {
                 ok: true,
                 user: user
             };
-            logInfo(`On get user response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`);    
-            res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
+            responseWithApikey(req, res, "On get user response", HTTP_SUCCESS_2XX.OK, dataToResponse);
         }      
     } catch (error) {
         logWarning(`On get user: ${error}`);
-        logInfo(`On get user response: ${MSG_ERROR_500}`);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        }); 
+        };
+        responseWithApikey(req, res, "On get user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }    
 }
 
@@ -208,23 +201,20 @@ const deleteUser = async (req, res = response) => {
                 msg: MSG_USER_NOT_EXISTS
             };
             logDebug(`On delete user not found: ${userId}`);
-            logInfo(`On delete user response: ${HTTP_CLIENT_ERROR_4XX.NOT_FOUND}; ${JSON.stringify(dataToResponse)}`)
-            return res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json(dataToResponse)
+            return responseWithApikey(req, res, "On delete user response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }
         await User.findByIdAndDelete(userId);
         const dataToResponse = {
             ok: true
         };
-        logInfo(`On delete user response: ${HTTP_SUCCESS_2XX.OK}; ${JSON.stringify(dataToResponse)}`)
-        res.status(HTTP_SUCCESS_2XX.OK).json(dataToResponse);
+        responseWithApikey(req, res, "On delete user response", HTTP_SUCCESS_2XX.OK, dataToResponse);
     } catch (error) {
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
         };
         logWarning(`On delete user: ${error}`);
-        logInfo(`On delete user response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR}; ${JSON.stringify(dataToResponse)}`)
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json(dataToResponse);
+            responseWithApikey(req, res, "On delete user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }
 }
 

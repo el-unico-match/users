@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const {response} = require('express');
 const NO_REPLY_EMAIL = "info-noreply@math.com";
 const SUBJECT_PIN_MESSAGE = "Match App - PIN";
 const {MSG_ERROR_500} = require('../../messages/uncategorized');
@@ -7,6 +8,7 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_SERVER_ERROR_5XX,
     HTTP_CLIENT_ERROR_4XX} = require('../httpCodes');
+const {responseWithApikey} = require('../response');
 const {
     logDebug,
     logInfo,
@@ -58,7 +60,7 @@ const createMailOptions = (to, subject, text) => {
 }
 
 // Envía efectivamente el email
-const doSendPinMail = async (res, to, subject, text, token) => {
+const doSendPinMail = async (req, res = response, to, subject, text, token) => {
     if (mailServInitError) {
         const dataToResponse = {
             ok: false,
@@ -66,8 +68,7 @@ const doSendPinMail = async (res, to, subject, text, token) => {
             detail: mailServInitError
         };
         logDebug(`On send pin mail wrong configuration: ${mailServInitError}`);
-        logInfo(`On send pin mail response: ${HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE}; ${JSON.stringify(dataToResponse)}`);
-        return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json(dataToResponse);
+        return responseWithApikey(req, res, "On send pin mail response", HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE, dataToResponse);        
     }
     const options = createMailOptions(to, subject, text);
     await transporter.sendMail(options, (error, info) => {
@@ -77,8 +78,7 @@ const doSendPinMail = async (res, to, subject, text, token) => {
                 msg: MSG_COULD_NOT_BE_SENT_PIN
             }
             logDebug(`On send pin mail: ${error}`);
-            logInfo(`On send pin mail response: ${HTTP_CLIENT_ERROR_4XX.BAD_REQUEST}; ${JSON.stringify(dataToResponse)}`);
-            res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json(dataToResponse);
+            return responseWithApikey(req, res, "On send pin mail response", HTTP_CLIENT_ERROR_4XX.BAD_REQUEST, dataToResponse);
         } else {            
             const dataToResponse = {
                 ok: true,
@@ -88,7 +88,7 @@ const doSendPinMail = async (res, to, subject, text, token) => {
                 token: token            
             };
             logInfo(`On send pin mail response: ${HTTP_SUCCESS_2XX.CREATED}; ${JSON.stringify(dataToResponse)}`);
-            res.status(HTTP_SUCCESS_2XX.CREATED).json(dataToResponse);   
+            return responseWithApikey(req, res, "On send pin mail response", HTTP_SUCCESS_2XX.CREATED, dataToResponse);
         }        
     });
 }
@@ -97,8 +97,8 @@ const doSendPinMail = async (res, to, subject, text, token) => {
  * 
  * @description Envía el email con el texto y el token correspondiente
  */
-const sendPinMail = async (res, email, text, token) => {
-    await doSendPinMail(res, email, SUBJECT_PIN_MESSAGE, text, token);
+const sendPinMail = async (req, res = response, email, text, token) => {
+    await doSendPinMail(req, res, email, SUBJECT_PIN_MESSAGE, text, token);
 }
 
 /**

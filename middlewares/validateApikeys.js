@@ -82,8 +82,15 @@ const doValidateApikeys = (req) =>  {
     }
 }
 
+const validateApikeysOnResponse = (req) => {
+    const gatewayApikey = req.header('x-apikey');
+    if (gatewayApikey) {
+        doValidateApikeys(req);
+    }
+}
+
 module.exports = {
     validateApikeys,
-    doValidateApikeys
+    validateApikeysOnResponse
 }
 

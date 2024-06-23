@@ -8,11 +8,11 @@ const {
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
 const {MSG_PIN_USED} = require('../messages/pin');
+const {responseWithApikey} = require('../helpers/response');
 const {
     logDebug,
-    logInfo,
     logWarning} = require('../helpers/log/log');
-
+    
 const TEXT_RESTORE = "Your restore LINK is: ";
 const URL_RESTORE = "https://el-unico-match.github.io/"
 
@@ -41,17 +41,19 @@ const verifyPinAndUpdatePassword = async (req, res = response) => {
         if (user){    
             await doVerifyPinAndUpdatePassword(req, res, user);
         } else {
-            res.status(HTTP_CLIENT_ERROR_4XX.NOT_FOUND).json({
+            const dataToResponse = {
                 ok: false,
                 msg: MSG_USER_NOT_EXISTS
-            });
+            };
+            responseWithApikey(req, res, "On verify Pin and update password response" , HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }        
     } catch (error) {
-        logWarning(`On verify pin to restore password response: ${HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR} ${error}`);
-        res.status(HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR).json({
+        const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
-        })
+        };
+        logWarning(`On verify pin to restore password: ${error}`);
+        responseWithApikey(req, res, "On verify pin to restore password response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR, dataToResponse);
     }    
 }
 
@@ -66,9 +68,8 @@ const doVerifyPinAndUpdatePassword = async (req, res = response, user) => {
         const dataToResponse = {
             ok: false,
             msg: MSG_PIN_USED
-        }
-        logInfo(`On verify pin to restore password response: ${HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED} ${JSON.stringify(dataToResponse)}`);
-        res.status(HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED).json(dataToResponse);
+        };
+        responseWithApikey(req, res, "On verify pin to restore password response", HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED, dataToResponse);
     } else {
         req.params.id = req.tokenExtractedData.id;
         req.body.last_pin = req_pin;        
