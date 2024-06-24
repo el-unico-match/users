@@ -44,7 +44,7 @@ const router = Router();
  *                                  type: object
  *                                  $ref: '#/components/schemas/Apikeys'
  *          401:
- *              description: return error "Invalid token" or "You do not have permission to set apikeys"!
+ *              description: return error "Invalid token" or "You do not have the necessary access level"!
  *              content:
  *                  application/json:
  *                      schema:
@@ -55,7 +55,7 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: string
- *                                  example: "The user does not have permission to create a new administrator"
+ *                                  example: "You do not have the necessary access level"
  *          500:
  *              description: return internal error!
  *              content:

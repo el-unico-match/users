@@ -45,8 +45,8 @@ router.use(validateApikeys);
  *                                  example: true
  *                              status:
  *                                  type: object
- *          503:
- *              description: return bad status!
+ *          401:
+ *              description: return error "Invalid token" 
  *              content:
  *                  application/json:
  *                      schema:
@@ -55,11 +55,22 @@ router.use(validateApikeys);
  *                              ok:
  *                                  type: boolean
  *                                  example: false
- *                              status:
- *                                  type: object
  *                              msg:
  *                                  type: string
- *                                  example: "The database is not available"
+ *                                  example: "Invalid token"
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.get('/', validateJWT, checkGetLog, getLog);
 

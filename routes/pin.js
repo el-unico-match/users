@@ -96,6 +96,19 @@ router.use(validateApikeys);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.post('/', checkSendPin, sendVerificationPin);
 
@@ -107,17 +120,17 @@ router.post('/', checkSendPin, sendVerificationPin);
  *      tags: [User Verification]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              required: false
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: true
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: user token
  *          - in: path
  *            name: pin
  *            required: true
@@ -192,6 +205,19 @@ router.post('/', checkSendPin, sendVerificationPin);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.post('/:pin', validatePinJWT, verifyPin);
 

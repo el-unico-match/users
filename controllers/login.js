@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/Users');
 const {
     logWarning, 
-    logInfo,
     logDebug} = require('../helpers/log/log');
 const {generateJWT} = require('../helpers/jwt')
 const {MSG_ERROR_500} = require('../messages/uncategorized');
@@ -16,7 +15,7 @@ const {
     HTTP_SUCCESS_2XX,
     HTTP_CLIENT_ERROR_4XX,
     HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
-const {responseWithApikey} = require('../helpers/response');
+const {responseAndLog} = require('../helpers/response');
 
 /**
  * 
@@ -36,7 +35,7 @@ const loginUser = async (req, res = response) => {
                 msg: MSG_USER_NOT_EXISTS
             };
             logDebug(`On login user, user not found: ${email}; ${password}`);
-            return responseWithApikey(req, res, "On login user response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
+            return responseAndLog(req, res, "On login user response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         } else {
             if (user.blocked) {
                 const dataToResponse = {
@@ -44,7 +43,7 @@ const loginUser = async (req, res = response) => {
                     msg: MSG_USER_BLOCKED
                 };
                 logDebug(`On login user, user was blocked: ${JSON.stringify(user)}`);
-                return responseWithApikey(req, res, "On login user response", HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED, dataToResponse);
+                return responseAndLog(req, res, "On login user response", HTTP_CLIENT_ERROR_4XX.UNAUTHORIZED, dataToResponse);
             }
         }
         // Confirmar contraseña
@@ -55,7 +54,7 @@ const loginUser = async (req, res = response) => {
                 msg: MSG_PASSWORD_INCORRECT
             };
             logDebug(`On login user invalidad password: ${password} ${user.password}`);
-            return responseWithApikey(req, res, "On login user response", HTTP_CLIENT_ERROR_4XX.BAD_REQUEST,dataToResponse);
+            return responseAndLog(req, res, "On login user response", HTTP_CLIENT_ERROR_4XX.BAD_REQUEST,dataToResponse);
         }
         // Generar el JWT (Java Web Token)
         const token = await generateJWT(user.id, user.role, user.blocked);
@@ -71,14 +70,14 @@ const loginUser = async (req, res = response) => {
             },
             token
         };
-        responseWithApikey(req, res, "On login user response", HTTP_SUCCESS_2XX.ACCEPTED, dataToResponse);
+        responseAndLog(req, res, "On login user response", HTTP_SUCCESS_2XX.ACCEPTED, dataToResponse);
     } catch (error) {
         logWarning(`On login user: ${error}`);
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
         };
-        responseWithApikey(req, res, "On login user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR,dataToResponse);
+        responseAndLog(req, res, "On login user response", HTTP_SERVER_ERROR_5XX.INTERNAL_SERVER_ERROR,dataToResponse);
     }
 }
 

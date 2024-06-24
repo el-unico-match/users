@@ -6,11 +6,8 @@
 const {Router} = require('express');
 const {loginUser} = require('../controllers/login');
 const {checkLoginUser} = require('../middlewares/checkers/login');
-const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
-
-router.use(validateApikeys);
 
 /**
  * @swagger
@@ -18,13 +15,6 @@ router.use(validateApikeys);
  *  post:
  *      summary: login user 
  *      tags: [User]
- *      parameters:
- *          - in: header
- *            name: x-apikey
- *            schema:
- *              type: string
- *              required: false
- *              description: gateway apikey
  *      requestBody:
  *          required: true
  *          content: 

@@ -32,16 +32,16 @@ router.use(validateApikeys);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: false
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              description: user token
  *      requestBody:
  *          required: true
  *          content: 
@@ -105,6 +105,19 @@ router.use(validateApikeys);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.post('/',validateLazyJWT, checkCreateUser, createUser);
 
@@ -116,17 +129,17 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              required: true
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: false
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: user token
  *      responses:
  *          200: 
  *              description: return user data!
@@ -193,6 +206,19 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.get('/current', validateJWT, getDataUser);
 
@@ -204,17 +230,17 @@ router.get('/current', validateJWT, getDataUser);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              required: true
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: false
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: user token
  *          - in: path
  *            name: id
  *            required: true
@@ -286,6 +312,19 @@ router.get('/current', validateJWT, getDataUser);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.get('/:id', validateJWT, getUser);
 
@@ -297,17 +336,17 @@ router.get('/:id', validateJWT, getUser);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              required: true
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: false
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: user token
  *          - in: path
  *            name: id
  *            required: true
@@ -389,6 +428,19 @@ router.get('/:id', validateJWT, getUser);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.put('/:id', validateJWT, checkUpdateUser, updateUser);
 
@@ -400,17 +452,17 @@ router.put('/:id', validateJWT, checkUpdateUser, updateUser);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              required: true
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: false
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: user token
  *          - in: path
  *            name: id
  *            required: true
@@ -479,6 +531,19 @@ router.put('/:id', validateJWT, checkUpdateUser, updateUser);
  *                              msg:
  *                                  type: string
  *                                  example: Please talk to the administrator
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.delete('/:id', validateJWT, checkDeleteUser, deleteUser);
 

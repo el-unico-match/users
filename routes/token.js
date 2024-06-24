@@ -20,17 +20,17 @@ router.use(validateApikeys);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-token
- *            schema:
- *              type: string
- *              required: true
- *              description: user token
- *          - in: header
  *            name: x-apikey
  *            schema:
  *              type: string
  *              required: false
  *              description: gateway apikey
+ *          - in: header
+ *            name: x-token
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: user token
  *      responses:
  *          201: 
  *              description: return user token!
@@ -84,6 +84,19 @@ router.use(validateApikeys);
  *                              msg:
  *                                  type: string
  *                                  example: The user does not exist
+ *          503:
+ *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              ok:
+ *                                  type: boolean
+ *                                  example: false
+ *                              msg:
+ *                                  type: string
+ *                                  example: "Invalidad Apikey"
 */
 router.post('/', decodeJWT, refreshToken);
 
