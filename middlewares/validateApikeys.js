@@ -71,7 +71,7 @@ const doValidateApikeys = (req) =>  {
             );
             logDebug(`On validate apikey self data: ${JSON.stringify(selfApikeyData)}`);
         } else {
-            logDebug('On validadte apikey gateway: there is no whitelist');
+            logDebug('On validadte apikeys: there is no whitelist');
         }        
     } else {
         if (localGatewayApikey) {

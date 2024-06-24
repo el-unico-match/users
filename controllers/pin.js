@@ -40,7 +40,7 @@ const sendPin = async (req, res = response, generateMessage) => {
         // Check en DB si existe el usuario
         let user = await User.findOne({email});
         if (user){    
-            await dispatchPinMessage(req, res, user._id, email, generateMessage)      
+            await dispatchPinMessage(req, res, user._id, email, generateMessage);   
         } else {
             dataToResponse = {
                 ok: false,
@@ -49,7 +49,7 @@ const sendPin = async (req, res = response, generateMessage) => {
             responseWithApikey(req, res, "On send Pin response", HTTP_CLIENT_ERROR_4XX.NOT_FOUND, dataToResponse);
         }        
     } catch (error) {
-        logWarning(error);
+        logWarning(`On send pin: ${error}`);
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500
@@ -65,10 +65,10 @@ const dispatchPinMessage = async (req, res = response, id, email, generateMessag
     const pin = generatePin();
     const token = await generatePinJWT(id, email, pin);
     const message = generateMessage(pin, token);
-    try {        
+    try {
         await sendPinMail(req, res, email, message, token);        
     } catch (error) {
-        logWarning(error);
+        logWarning(`On dispatch pin message: ${error}`);
         const dataToResponse = {
             ok: false,
             msg: MSG_ERROR_500,

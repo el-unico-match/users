@@ -72,6 +72,18 @@ const writeLog = (logLevel, message) => {
     }
 }
 
+const readLog = () => {
+    fileStream = fs.readFile(LOG_FILENAME, (error, data) => {
+        if (error) {
+            logWarning(`Error on read log file ${LOG_FILENAME}: ${error}`);
+            return "";
+        } else {
+            logInfo(`Read log file ${LOG_FILENAME}`);        
+            return data;
+        }
+    });
+}
+
 /**
  * 
  * @param {*} logLevel Ejemplo LOG_LEVELS.WARNING
@@ -87,5 +99,6 @@ module.exports = {
     logInfo,
     logError,
     logWarning,
-    initLog
+    initLog,
+    readLog
 }

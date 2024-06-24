@@ -21,6 +21,13 @@ router.use(validateApikeys);
  *  post:
  *      summary: init user's verification
  *      tags: [User Verification]
+ *      parameters:
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      requestBody:
  *          required: true
  *          content: 
@@ -103,8 +110,14 @@ router.post('/', checkSendPin, sendVerificationPin);
  *            name: x-token
  *            schema:
  *              type: string
- *              required: true
+ *              required: false
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: true
+ *              description: gateway apikey
  *          - in: path
  *            name: pin
  *            required: true

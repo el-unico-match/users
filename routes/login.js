@@ -18,6 +18,13 @@ router.use(validateApikeys);
  *  post:
  *      summary: login user 
  *      tags: [User]
+ *      parameters:
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      requestBody:
  *          required: true
  *          content: 

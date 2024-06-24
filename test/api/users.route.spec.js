@@ -1,5 +1,6 @@
 const {ObjectId} =  require('mongodb');
 const {generatePin} = require('../../helpers/pin');
+const {responseWithApikey} = require('../../helpers/response');
 const { 
   HTTP_SUCCESS_2XX,
   HTTP_CLIENT_ERROR_4XX, 
@@ -33,14 +34,14 @@ const mockStatusMailService = () => {
 };
 
 let mockSnPnMlSet = HTTP_SUCCESS_2XX.CREATED;
-const mockSendPinMail = (res) => {
+const mockSendPinMail = (req, res) => {
   switch (mockSnPnMlSet) {
     case HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE:
-      return res.status(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE).json({});
+      return responseWithApikey(req, res, "On mocked response", HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE, {});
     case HTTP_CLIENT_ERROR_4XX.BAD_REQUEST:
-      return res.status(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST).json({});
+      return responseWithApikey(req, res, "On mocked response", HTTP_CLIENT_ERROR_4XX.BAD_REQUEST, {});
     default:
-      res.status(HTTP_SUCCESS_2XX.CREATED).json({})
+      responseWithApikey(req, res, "On mocked response", HTTP_SUCCESS_2XX.CREATED, {});
       break;
   }
 };
@@ -978,9 +979,9 @@ describe('test routes', () => {
       jest.spyOn(User, 'findOne').mockReturnValueOnce(client);      
       const response = await request(app).post('/api/pin').send(payload);
       expect(response.headers['content-type']).toContain('json');
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED);
+      expect(response.status).toBe(HTTP_SUCCESS_2XX.CREATED); 
     });
-/*
+
     it('should fail init verification because fail on send mail ', async () => {
       mockSnPnMlSet = HTTP_CLIENT_ERROR_4XX.BAD_REQUEST;   
       const payload ={
@@ -1064,13 +1065,13 @@ describe('test routes', () => {
       expect(response.body.ok).toBe(false);
       expect(response.body.msg).toBe(MSG_WRONG_PIN);
     });
-*/
+
     afterEach(() => {
       jest.restoreAllMocks();
     });
 
   });
-/*
+
   describe('test restore pass', () => {
     
     beforeAll( async () => {
@@ -1424,7 +1425,7 @@ describe('test routes', () => {
     });
 
   });
-*/
+
   
 });
 

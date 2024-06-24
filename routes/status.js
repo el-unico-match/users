@@ -16,6 +16,13 @@ router.use(validateApikeys);
  * /api/status:
  *  get:
  *      summary: user service status 
+ *      parameters:
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      tags: [User]
  *      responses:
  *          200: 

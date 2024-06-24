@@ -20,8 +20,8 @@ const responseWithApikey = async (req, res = response, letterheadToLog, status, 
             msg: MSG_INVALID_APIKEY
         };
         const statusToResponse = HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE;
-        logDebug(`On error: ${error}`);
-        logInfo(`On  response: ${statusToResponse}; ${JSON.stringify(dataToResponse)}`)
+        logDebug(`On response with apykey error: ${error}`);
+        logInfo(`On response with apykey, response: ${statusToResponse}; ${JSON.stringify(dataToResponse)}`)
         return res.status(statusToResponse).json(dataToResponse)
     }    
 }

@@ -22,6 +22,13 @@ router.use(validateApikeys);
  *  post:
  *      summary: init password restore
  *      tags: [Restorer]
+ *      parameters:
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      requestBody:
  *          required: true
  *          content: 
@@ -106,6 +113,12 @@ router.post('/', checkSendPin, sendRestorePin);
  *              type: string
  *              required: true
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *          - in: path
  *            name: pin
  *            required: true

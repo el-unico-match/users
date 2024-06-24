@@ -25,6 +25,12 @@ router.use(validateApikeys);
  *              type: string
  *              required: true
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      responses:
  *          201: 
  *              description: return user token!

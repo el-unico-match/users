@@ -36,6 +36,12 @@ router.use(validateApikeys);
  *            schema:
  *              type: string
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      requestBody:
  *          required: true
  *          content: 
@@ -115,6 +121,12 @@ router.post('/',validateLazyJWT, checkCreateUser, createUser);
  *              type: string
  *              required: true
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *      responses:
  *          200: 
  *              description: return user data!
@@ -197,6 +209,12 @@ router.get('/current', validateJWT, getDataUser);
  *              type: string
  *              required: true
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *          - in: path
  *            name: id
  *            required: true
@@ -284,6 +302,12 @@ router.get('/:id', validateJWT, getUser);
  *              type: string
  *              required: true
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *          - in: path
  *            name: id
  *            required: true
@@ -381,6 +405,12 @@ router.put('/:id', validateJWT, checkUpdateUser, updateUser);
  *              type: string
  *              required: true
  *              description: user token
+ *          - in: header
+ *            name: x-apikey
+ *            schema:
+ *              type: string
+ *              required: false
+ *              description: gateway apikey
  *          - in: path
  *            name: id
  *            required: true
