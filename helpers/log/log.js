@@ -8,8 +8,12 @@ const {MSG_LOG_FILE_NOT_EXISTS} = require('../../messages/uncategorized');
 const DEFAULT_FILE = "log.txt";
 const LOG_FILENAME = process.env.LOG_FILENAME ? process.env.LOG_FILENAME : DEFAULT_FILE;
 const LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : LOG_LEVELS.DEBUG.level;
+const BUFFER_MAX_LINES = 5000;
 
 let fileStream = null;
+
+let buffer = [];
+let linesBuffer = 0;
 
 const initLog = () => {
     try {
@@ -61,27 +65,20 @@ const writeLog = (logLevel, message) => {
         const messageToLog = `${date} [USERS] ${logLevel.tag}: ${message}`;
             console.log(messageToLog);
         try {
+            writeBuffer(messageToLog);
             fileStream.write(`${messageToLog}\n`);
         } catch (error) {
             if (fileStream) {
-                console.log(`[USERS] WARNING: ${error}`);
+                console.log(`${date} [USERS] WARNING: ${error}`);
             } else {
-                console.log(`[USERS] WARNING: ${MSG_LOG_FILE_NOT_EXISTS} - ${LOG_FILENAME}`);
+                console.log(`${date} [USERS] WARNING: ${MSG_LOG_FILE_NOT_EXISTS} - ${LOG_FILENAME}`);
             }            
         }        
     }
 }
 
 const readLog = () => {
-    fileStream = fs.readFile(LOG_FILENAME, (error, data) => {
-        if (error) {
-            logWarning(`Error on read log file ${LOG_FILENAME}: ${error}`);
-            return "";
-        } else {
-            logInfo(`Read log file ${LOG_FILENAME}`);        
-            return data;
-        }
-    });
+    return buffer;
 }
 
 /**
@@ -92,6 +89,15 @@ const readLog = () => {
  */
 const checkLevel = (logLevel) => {
     return logLevel.level >= LOG_LEVEL
+}
+
+const writeBuffer = (line) => {
+    if (line > BUFFER_MAX_LINES) {
+        linesBuffer = 0;
+        buffer = []
+    }
+    buffer.push(line);
+    linesBuffer++;
 }
 
 module.exports = {
