@@ -15,7 +15,7 @@ const router = Router();
  * /api/apikeys:
  *  post:
  *      summary: set o renew apikeys 
- *      tags: [apikeys]
+ *      tags: [Apikeys]
  *      parameters:
  *          - in: header
  *            name: x-token
