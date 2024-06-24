@@ -12,8 +12,7 @@ const getLog = async (req, res = response) => {
         ok: true,
         log: readLog()            
     };
-    // TODO arreglar para que no loguee el log:
-    responseWithApikey(req, res, "On get log response", HTTP_SUCCESS_2XX.OK, dataToReponse);
+    responseWithApikey(req, res, "On get log response", HTTP_SUCCESS_2XX.OK, dataToReponse, {Log: "all log"});
 }
 
 module.exports = {

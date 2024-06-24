@@ -5,11 +5,13 @@
 
 const {Router} = require('express');
 const {getLog} = require('../controllers/log');
+const {validateJWT} = require('../middlewares/validateJWT');
 const {validateApikeys} = require('../middlewares/validateApikeys');
+const {checkGetLog} = require('../middlewares/checkers/log');
 
 const router = Router();
 
-//router.use(validateApikeys);
+router.use(validateApikeys);
 
 /**
  * @swagger
@@ -59,6 +61,6 @@ const router = Router();
  *                                  type: string
  *                                  example: "The database is not available"
 */
-router.get('/', getLog);
+router.get('/', validateJWT, checkGetLog, getLog);
 
 module.exports = router;

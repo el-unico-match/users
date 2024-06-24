@@ -9,11 +9,12 @@ const {
 /**
  * @description Efectúa la respuesta pero antes checkea las apikeys.
  */
-const responseWithApikey = async (req, res = response, letterheadToLog, status, data) => {
+const responseWithApikey = async (req, res = response, letterheadToLog, status, dataToSend, dataToLog) => {
     try {
+        const toLog = dataToLog ? dataToLog : dataToSend;
         validateApikeysOnResponse(req);
-        logInfo(`${letterheadToLog}: ${status}; ${JSON.stringify(data)}`);
-        res.status(status).json(data);   
+        logInfo(`${letterheadToLog}: ${status}; ${JSON.stringify(toLog)}`);
+        res.status(status).json(dataToSend);   
     } catch (error) {
         const dataToResponse = {
             ok: false,
