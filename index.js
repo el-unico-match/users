@@ -68,7 +68,7 @@ app.use('/api/user', require('./routes/user'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/login', require('./routes/login'));
 app.use('/api/token', require('./routes/token'));
-app.use('/api/status', require('./routes/status'));
+app.use('/status', require('./routes/status'));
 app.use('/api/restorer', require('./routes/restorer'));
 app.use('/api/pin', require('./routes/pin'));
 app.use('/whitelist', require('./routes/apikeys'));
