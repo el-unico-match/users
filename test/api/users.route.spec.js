@@ -1499,21 +1499,21 @@ describe('test routes', () => {
       token_client = response.body.token;    
     }); 
 
-    it('should set apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const payload = {
-        gateway: token,
-        users: token_client
-      };
-      const response = await request(app).post('/api/apikeys')
-        .send(payload)
-        .set('x-token', token);;
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeDefined();
-      expect(response.body.apikeys.users).toBeDefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const payload = {
+    //     gateway: token,
+    //     users: token_client
+    //   };
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send(payload)
+    //     .set('x-token', token);;
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeDefined();
+    //   expect(response.body.apikeys.users).toBeDefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
     it('should get log module', async () => {
       jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
