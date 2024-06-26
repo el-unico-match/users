@@ -13,7 +13,7 @@ router.use(validateApikeys);
 
 /**
  * @swagger
- * /api/status:
+ * /status:
  *  get:
  *      summary: user service status 
  *      parameters:

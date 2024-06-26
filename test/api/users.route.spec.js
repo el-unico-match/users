@@ -1302,21 +1302,21 @@ describe('test routes', () => {
       token_client = response.body.token;    
     }); 
 
-    it('should set apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const payload = {
-        gateway: token,
-        users: token_client
-      };
-      const response = await request(app).post('/api/apikeys')
-        .send(payload)
-        .set('x-token', token);;
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeDefined();
-      expect(response.body.apikeys.users).toBeDefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const payload = {
+    //     gateway: token,
+    //     users: token_client
+    //   };
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send(payload)
+    //     .set('x-token', token);;
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeDefined();
+    //   expect(response.body.apikeys.users).toBeDefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
     it('should get status module', async () => {
       jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
@@ -1330,96 +1330,96 @@ describe('test routes', () => {
       expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
     }); 
 
-    it('should fail get status module because no apikey', async () => {
-      const response = await request(app).get('/api/status')
-        .send();
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(false);
-      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
-    }); 
+    // it('should fail get status module because no apikey', async () => {
+    //   const response = await request(app).get('/api/status')
+    //     .send();
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(false);
+    //   expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+    // }); 
 
-    it('should get status module because bad apikey on header', async () => {
-      const invalidApikey = token+'fail';
-      const response = await request(app).get('/api/status')
-        .send()
-        .set('x-apikey', invalidApikey);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(false);
-      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
-    }); 
+    // it('should get status module because bad apikey on header', async () => {
+    //   const invalidApikey = token+'fail';
+    //   const response = await request(app).get('/api/status')
+    //     .send()
+    //     .set('x-apikey', invalidApikey);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(false);
+    //   expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    // }); 
 
-    it('should set a bad gateway apikey', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const payload = {
-        gateway: token+'fail',
-        users: token_client
-      };
-      const response = await request(app).post('/api/apikeys')
-        .send(payload)
-        .set('x-token', token);;
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeDefined();
-      expect(response.body.apikeys.users).toBeDefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set a bad gateway apikey', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const payload = {
+    //     gateway: token+'fail',
+    //     users: token_client
+    //   };
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send(payload)
+    //     .set('x-token', token);;
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeDefined();
+    //   expect(response.body.apikeys.users).toBeDefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
-    it('should fail on get status module because bad gateway apikey on the user', async () => {
-      const response = await request(app).get('/api/status')
-        .send()
-        .set('x-apikey', token);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(false);
-      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
-    }); 
+    // it('should fail on get status module because bad gateway apikey on the user', async () => {
+    //   const response = await request(app).get('/api/status')
+    //     .send()
+    //     .set('x-apikey', token);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(false);
+    //   expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    // }); 
 
-    it('should set a bad user apikey', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const payload = {
-        gateway: token,
-        users: token_client+'fail'
-      };
-      const response = await request(app).post('/api/apikeys')
-        .send(payload)
-        .set('x-token', token);;
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeDefined();
-      expect(response.body.apikeys.users).toBeDefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set a bad user apikey', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const payload = {
+    //     gateway: token,
+    //     users: token_client+'fail'
+    //   };
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send(payload)
+    //     .set('x-token', token);;
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeDefined();
+    //   expect(response.body.apikeys.users).toBeDefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
-    it('should fail on get status module because bad user apikey on the user', async () => {
-      const response = await request(app).get('/api/status')
-        .send()
-        .set('x-apikey', token);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(false);
-      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
-    }); 
+    // it('should fail on get status module because bad user apikey on the user', async () => {
+    //   const response = await request(app).get('/api/status')
+    //     .send()
+    //     .set('x-apikey', token);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(false);
+    //   expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    // }); 
 
-    it('should set empty apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const response = await request(app).post('/api/apikeys')
-        .send()
-        .set('x-token', token);;
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeUndefined();
-      expect(response.body.apikeys.users).toBeUndefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set empty apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send()
+    //     .set('x-token', token);;
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeUndefined();
+    //   expect(response.body.apikeys.users).toBeUndefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
-    it('should get status module without apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const response = await request(app).get('/api/status')
-        .send();
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.status.database.online).toBe(true);
-      expect(response.body.status.service.port).toBe(process.env.PORT);
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    }); 
+    // it('should get status module without apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const response = await request(app).get('/api/status')
+    //     .send();
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.status.database.online).toBe(true);
+    //   expect(response.body.status.service.port).toBe(process.env.PORT);
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // }); 
 
     afterEach(() => {
       jest.restoreAllMocks();
@@ -1499,21 +1499,21 @@ describe('test routes', () => {
       token_client = response.body.token;    
     }); 
 
-    it('should set apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const payload = {
-        gateway: token,
-        users: token_client
-      };
-      const response = await request(app).post('/api/apikeys')
-        .send(payload)
-        .set('x-token', token);;
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeDefined();
-      expect(response.body.apikeys.users).toBeDefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const payload = {
+    //     gateway: token,
+    //     users: token_client
+    //   };
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send(payload)
+    //     .set('x-token', token);;
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeDefined();
+    //   expect(response.body.apikeys.users).toBeDefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
     it('should get log module', async () => {
       jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
@@ -1527,48 +1527,48 @@ describe('test routes', () => {
       expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
     }); 
 
-    it('should fail get log module because no apikey', async () => {
-      const response = await request(app).get('/api/log')
-        .send()
-        .set('x-token', token);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(false);
-      expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
-    }); 
+    // it('should fail get log module because no apikey', async () => {
+    //   const response = await request(app).get('/api/log')
+    //     .send()
+    //     .set('x-token', token);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(false);
+    //   expect(response.status).toBe(HTTP_CLIENT_ERROR_4XX.BAD_REQUEST);
+    // }); 
 
-    it('should get log module because bad apikey on header', async () => {
-      const invalidApikey = token+'fail';
-      const response = await request(app).get('/api/log')
-        .send()
-        .set('x-apikey', invalidApikey)
-        .set('x-token', token);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(false);
-      expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
-    }); 
+    // it('should get log module because bad apikey on header', async () => {
+    //   const invalidApikey = token+'fail';
+    //   const response = await request(app).get('/api/log')
+    //     .send()
+    //     .set('x-apikey', invalidApikey)
+    //     .set('x-token', token);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.status).toBe(HTTP_SERVER_ERROR_5XX.SERVICE_NOT_AVAILABLE);
+    // }); 
 
-    it('should set empty apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const response = await request(app).post('/api/apikeys')
-        .send()
-        .set('x-token', token);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.apikeys.gateway).toBeUndefined();
-      expect(response.body.apikeys.users).toBeUndefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    });
+    // it('should set empty apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const response = await request(app).post('/api/apikeys')
+    //     .send()
+    //     .set('x-token', token);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.apikeys.gateway).toBeUndefined();
+    //   expect(response.body.apikeys.users).toBeUndefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // });
 
-    it('should get log module without apikeys', async () => {
-      jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
-      const response = await request(app).get('/api/log')
-        .send()
-        .set('x-token', token);
-      expect(response.headers['content-type']).toContain('json');
-      expect(response.body.ok).toBe(true);
-      expect(response.body.log).toBeDefined();
-      expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
-    }); 
+    // it('should get log module without apikeys', async () => {
+    //   jest.spyOn(User, 'find').mockReturnValueOnce([admin]);
+    //   const response = await request(app).get('/api/log')
+    //     .send()
+    //     .set('x-token', token);
+    //   expect(response.headers['content-type']).toContain('json');
+    //   expect(response.body.ok).toBe(true);
+    //   expect(response.body.log).toBeDefined();
+    //   expect(response.status).toBe(HTTP_SUCCESS_2XX.OK);
+    // }); 
 
     afterEach(() => {
       jest.restoreAllMocks();

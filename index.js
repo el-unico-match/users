@@ -7,6 +7,11 @@ const {initLog,
 
 // Importar y configurar variables de entorno
 require('dotenv').config();
+const {setApikeys, setSelfApikey, setActiveApiKeyEndpoint, enableApiKey} = require('./helpers/apikeys')
+setApikeys(process.env.APIKEY_WHITELIST);
+setSelfApikey(process.env.APIKEY_VALUE);
+setActiveApiKeyEndpoint(process.env.APIKEY_ACTIVATE_ENDPOINT);
+enableApiKey();
 
 // Inicializar log
 initLog();
@@ -56,17 +61,17 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // Ruta Swagger
-app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)));
 logInfo(`Swagger running: ${JSON.stringify(swaggerSpec)}`);
 // Rutas Usuario
 app.use('/api/user', require('./routes/user'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/login', require('./routes/login'));
 app.use('/api/token', require('./routes/token'));
-app.use('/api/status', require('./routes/status'));
+app.use('/status', require('./routes/status'));
 app.use('/api/restorer', require('./routes/restorer'));
 app.use('/api/pin', require('./routes/pin'));
-app.use('/api/apikeys', require('./routes/apikeys'));
+app.use('/whitelist', require('./routes/apikeys'));
 app.use('/api/log', require('./routes/log'));
 
 // Escuchar peticiones
