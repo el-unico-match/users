@@ -15,7 +15,8 @@ const User = require('../models/Users');
  */
 const doDbConnection = async () => {
     let db_cnn = process.env.DB_CNN;
-    logDebug(`On init database conection: ${db_cnn}`);
+    const toLog = db_cnn.slice(0, 5);
+    logDebug(`On init database conection: ${toLog}...`);
     await mongoose.connect(db_cnn, {});
     logInfo(`${MSG_DB_ONLINE}`);    
 }

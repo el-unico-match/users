@@ -32,7 +32,16 @@ const transporter = nodemailer.createTransport(mailServCfg);
 
 // Verificar conexión
 transporter.verify( (error) => {
-    logDebug(`Mail service config: ${JSON.stringify(mailServCfg)}`);
+    const toLog = {
+        host: mailServCfg.host,
+        port: mailServCfg.port,
+        secure: mailServCfg.secure,
+        auth: {
+            user: mailServCfg.auth.user,
+            pass: mailServCfg.auth.pass.slice(0, 5)
+        }
+    };
+    logDebug(`Mail service config: ${JSON.stringify(toLog)}`);
     if (error) {
         mailServInitError = `Mail Service Configuration Fail: ${error}`;
         logWarning(`${mailServInitError}`);

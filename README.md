@@ -208,3 +208,17 @@ NOTA 2: Para correr el endpoint local debe asegurarse que el menú desplegable "
 
 
 4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: http://localhost:4000/api/status
+
+## Testing
+<center><image src="https://cdn-icons-png.flaticon.com/256/1581/1581882.png" alt="Local DB"></center>
+
+
+
+Ejecutar las siguientes instrucciones en consola:
+
+```
+npm install
+
+npm test
+
+```

@@ -43,8 +43,10 @@ router.use(validateApikeys);
  *                              ok:
  *                                  type: boolean
  *                                  example: true
- *                              status:
- *                                  type: object
+ *                              log:
+ *                                  type: array
+ *                                  items:
+ *                                      type: string
  *          401:
  *              description: return error "Invalid token" 
  *              content:
