@@ -7,8 +7,7 @@ const {
 const {generateJWT} = require('../helpers/jwt');
 const {
     logWarning,
-    logDebug, 
-    logInfo} = require('../helpers/log/log');
+    logDebug} = require('../helpers/log/log');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {
     MSG_USER_EXISTS,

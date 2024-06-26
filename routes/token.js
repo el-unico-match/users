@@ -20,12 +20,6 @@ router.use(validateApikeys);
  *      tags: [User]
  *      parameters:
  *          - in: header
- *            name: x-apikey
- *            schema:
- *              type: string
- *              required: false
- *              description: gateway apikey
- *          - in: header
  *            name: x-token
  *            schema:
  *              type: string

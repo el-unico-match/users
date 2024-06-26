@@ -3,9 +3,7 @@ const User = require('../models/Users');
 const {HTTP_SUCCESS_2XX, HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes');
 const {MSG_ERROR_500} = require('../messages/uncategorized');
 const {responseWithApikey} = require('../helpers/response');
-const {
-    logWarning,
-    logInfo} = require('../helpers/log/log');
+const {logWarning} = require('../helpers/log/log');
 
 /**
  * @description retorna los datos de todos los usuarios
