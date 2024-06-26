@@ -1,24 +1,39 @@
 # Usuarios
-* Usuario sin token de acceso:
-    Crear cliente.
-    Iniciar recuperación contraseña.
+* Usuario sin token de acceso puede:
+    * Crear cliente.
+    * Iniciar recuperación contraseña.
 * Usuario con token de recuperación:
-    Validar pin de recuperación.
+    * Validar pin de recuperación.
+    * Recuperar contraseña.
 * Usuario con token de acceso:
     * Rol cliente:
         * Eliminar su usuario.
         * Obtener usuarios.
         * Actualizar su usuario.
-        * Consultar datos de un usuario en base a un email en particular
+        * Consultar datos de un usuario en base a un email en particular.
     * Rol administrador:
         * Puede crear y eliminar cualquier tipo de usuario.
         * Obtener lista de usuarios.
         * Actualizar su usuario.
-        * Consultar datos de un usuario en base a un email en particular
+        * Consultar datos de un usuario en base a un email en particular.
+        * Bloquear y desbloquear usuarios.
+        * Leer el log.
+        * Establecer y renovar whitelist de apikeys.
 
 NOTA: Un usuario cliente no puede pasar a ser administrador y viceversa.
 
+# Apikeys
+
+En caso de encontrarse activado el chequeo por apikeys se podrán realizar únicamente las siguientes operaciones sin remitir las mismas al endpoint correspondiente:
+
+* Login de usuario.
+* Renovación de token.
+* Actualización de apikeys (con un suario administrador).
+
 # Base de datos:
+
+Se utiliza una base de datos de usuarios en Mongo con el siguiente esquema:
+
 ```
 const {Schema, model} = require('mongoose');
 
