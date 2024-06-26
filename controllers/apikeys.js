@@ -1,6 +1,5 @@
 const {response} = require('express');
-const {HTTP_SUCCESS_2XX} = require('../helpers/httpCodes')
-const {setApikeys: setAK} = require('../helpers/apikeys');
+const {setApikeys} = require('../helpers/apikeys');
 const {logInfo} = require('../helpers/log/log');
   
 /**
@@ -9,18 +8,18 @@ const {logInfo} = require('../helpers/log/log');
  * el servicio funciona correctamente, y en caso contrario false 
  * con mensaje de error.
  */
-const setApikeys = async (req, res = response) => {
-    const apikeys = req.body;
-    const statusToResponse = HTTP_SUCCESS_2XX.OK;
+const updateWhitelist = async (req, res = response) => {
+    const apikeys = req.body?.apiKeys
+    const statusToResponse = 200;
     const dataToReponse = {
         ok: true,
         apikeys: apikeys    
     };
-    setAK(apikeys);
+    setApikeys(apikeys);
     logInfo(`On get status response: ${statusToResponse}; ${JSON.stringify(dataToReponse)}`);
-    res.status(statusToResponse).json(dataToReponse);    
+    res.status(statusToResponse).json(dataToReponse);     
 }
 
 module.exports = {
-    setApikeys
+    updateWhitelist
 }

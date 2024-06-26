@@ -4,16 +4,17 @@
 */
 
 const {Router} = require('express');
-const {setApikeys} = require('../controllers/apikeys');
+const {updateWhitelist} = require('../controllers/apikeys');
 const {validateJWT} = require('../middlewares/validateJWT');
 const {checkSetApikeys} = require('../middlewares/checkers/apikeys');
+const {validateApikeys} = require('../middlewares/validateApikeys');
 
 const router = Router();
 
 /**
  * @swagger
- * /api/apikeys:
- *  post:
+ * /whitelist:
+ *  put:
  *      summary: set o renew apikeys 
  *      tags: [Apikeys]
  *      parameters:
@@ -70,6 +71,6 @@ const router = Router();
  *                                  type: string
  *                                  example: Please talk to the administrator
 */
-router.post('/', validateJWT, checkSetApikeys, setApikeys);
+router.put('*', updateWhitelist);
 
 module.exports = router;

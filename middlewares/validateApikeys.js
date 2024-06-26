@@ -1,9 +1,7 @@
 const {response} = require('express');
 const jwt = require('jsonwebtoken');
 const {HTTP_CLIENT_ERROR_4XX, HTTP_SERVER_ERROR_5XX} = require('../helpers/httpCodes')
-const {
-    getGatewayApikey,
-    getSelfApikey} = require('../helpers/apikeys');
+const {getApikeys,getSelfApikey} = require('../helpers/apikeys');
 const {MSG_NO_APIKEY, 
     MSG_INVALID_APIKEY,
     MSG_APIKEY_NO_MATCH} = require('../messages/apikey');
@@ -17,9 +15,9 @@ const {
  */
 const validateApikeys = (req, res = response, next) => {
     const gatewayApikey = req.header('x-apikey');
-    const gatewayApikeyLocal = getGatewayApikey();
-    logDebug(`On validate gateway apikey, gateway apikey: ${gatewayApikey}`);
-    if (gatewayApikeyLocal) {
+    const whiteListApiKeys = getApikeys();
+    logDebug(`On validate gateway apikey, gateway apikey: ${whiteListApiKeys}`);
+    if (whiteListApiKeys) {
         if (!gatewayApikey) {
             const dataToResponse = {
                 ok: false,
@@ -55,26 +53,20 @@ const validateApikeys = (req, res = response, next) => {
 const doValidateApikeys = (req) =>  {
     const gatewayApikey = req.header('x-apikey');
     logDebug(`On validate apikey gateway : ${gatewayApikey}`);
-    const gatewayApikeyData = jwt.verify(
-        gatewayApikey,
-        process.env.SECRET_JWT_SEED
-    );
+    const gatewayApikeyData = jwt.decode(gatewayApikey);
     logDebug(`On validate apikey gateway data: ${JSON.stringify(gatewayApikeyData)}`);
-    const localGatewayApikey = getGatewayApikey();
-    if (localGatewayApikey === gatewayApikey) {
+    const whiteListApiKeys = getApikeys();
+    if (Array.isArray(whiteListApiKeys) && whiteListApiKeys.some( x => x == gatewayApikey)) {
         const selfApikey = getSelfApikey();
         if (selfApikey) {
             logDebug(`On validate apikey self: ${selfApikey}`);
-            const selfApikeyData = jwt.verify(
-                selfApikey,
-                process.env.SECRET_JWT_SEED
-            );
+            const selfApikeyData = jwt.decode(selfApikey);
             logDebug(`On validate apikey self data: ${JSON.stringify(selfApikeyData)}`);
         } else {
             logDebug('On validadte apikeys: there is no whitelist');
         }        
     } else {
-        if (localGatewayApikey) {
+        if (whiteListApiKeys) {
             throw new Error(MSG_APIKEY_NO_MATCH);
         } else {
             logDebug('On validadte apikey gateway: there is no whitelist');

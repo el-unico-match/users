@@ -1,14 +1,19 @@
-const {logInfo} = require('./log/log');
+const {logInfo, logError} = require('./log/log');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
 
-let apikeys = undefined;
+let whitelist_apikeys = undefined;
+let self_apikey = undefined;
+let active_apikey_endpoint = undefined;
+let apiKeyState = undefined;
 
 /**
  * 
  * @description establece todas las apikeys
  */
-const setApikeys = (apikeysParam) => {
-    logInfo(`Set the apikeys: ${JSON.stringify(apikeysParam)}`);
-    apikeys = apikeysParam;
+const setApikeys = (apikeys) => {
+    logInfo(`Set the apikeys: ${JSON.stringify(apikeys)}`);
+    whitelist_apikeys = apikeys;
 }
 
 /**
@@ -16,7 +21,7 @@ const setApikeys = (apikeysParam) => {
  * @returns retorna todas las apikeys
  */
 const getApikeys = () => {
-    return apikeys;
+    return whitelist_apikeys;
 }
 
 /**
@@ -24,11 +29,25 @@ const getApikeys = () => {
  * @returns retorn la apikey de este microservicio
  */
 const getSelfApikey = () => {
-    if (apikeys) {
-        return apikeys.users;
-    } else {
-        return undefined;
-    }    
+    return self_apikey;
+}
+
+/**
+ * 
+ * @description establece todas la self apikey
+ */
+const setSelfApikey = (apikey) => {
+    logInfo(`Set the self apikey: ${JSON.stringify(apikey)}`);
+    self_apikey = apikey;
+}
+
+/**
+ * 
+ * @description establece el endpoint para activar la apikey propia
+ */
+const setActiveApiKeyEndpoint = (apikey_endpoint) => {
+    logInfo(`Set the self apikey: ${JSON.stringify(apikey_endpoint)}`);
+    active_apikey_endpoint = apikey_endpoint;
 }
 
 /**
@@ -36,16 +55,46 @@ const getSelfApikey = () => {
  * @returns retorn la apikey del microservicio gateway
  */
 const getGatewayApikey = () => {
-    if (apikeys) {
-        return apikeys.gateway;
-    } else {
-        return undefined
-    }    
+    return undefined
+}
+
+/**
+ * 
+ * @description Invoca al endpoint de service para activar la apikey
+ */
+const enableApiKey = async () => {
+    if ( self_apikey != null && self_apikey != '' && active_apikey_endpoint != null && active_apikey_endpoint != '') {
+
+        try {
+            const {id} = jwt.decode(self_apikey);
+
+            const axiosConfig = {
+                headers: {'x-apikey': self_apikey},
+                method: 'patch',
+                url: `${active_apikey_endpoint}${id}`,
+                data: {'availability': 'enabled'},
+                timeout: 10000,
+            }
+
+            const {data} = await axios(axiosConfig);
+            apiKeyState = data.availability;    
+        }
+
+        catch(exception) {
+            logError(`Falló la habilitación de la apikey: ${JSON.stringify(exception)}`)
+        }
+        
+
+    }
 }
 
 module.exports = {
     setApikeys,
+    getApikeys,
     getGatewayApikey,
-    getSelfApikey
+    getSelfApikey,
+    setSelfApikey,
+    setActiveApiKeyEndpoint,
+    enableApiKey,
 }
 
