@@ -1,7 +1,7 @@
 # Microservicio de Usuarios 
-<center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO7xgbQ4sbzFsJ3kVavbsrOykzl4IF4w0arg&s" alt="User"></center>
-
 [![Coverage Status](https://coveralls.io/repos/github/el-unico-match/users/badge.svg?branch=main)](https://coveralls.io/github/el-unico-match/users?branch=main)
+
+<center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO7xgbQ4sbzFsJ3kVavbsrOykzl4IF4w0arg&s" alt="User"></center>
 
 La responsabilidad de este microservicio esta dada por la autenticación de usuarios y las operaciones asociados a esto, como la verificación de usuario por PIN y tanto la actualización como el restablecimiento de contraseñas. Así mismo respalda el rol del usuario (cliente o administrador) y habilita la posibilidad de bloqueo o desbloqueo del mismo para el logueo en la plataforma.
 
@@ -122,9 +122,20 @@ Se utilizan apikeys en una whitelist encriptadas como JWT. En caso de encontrars
 
 * Deep-links: https://developer.android.com/training/app-links/deep-linking?hl=es-419
 
+## Documentación de los endpoints en Swagger:
+
+<center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_9WelGnPrPva68rnqGLSPDnb-wNIAgv7ziQ&s" alt="Swagger"></center>
+
+
+Enlace: https://users-uniquegroup-match-fiuba.azurewebsites.net/api-doc/
+
 # Instrucciones:
 
-# Ejecución con base de datos remota en Mongo:
+
+## Ejecución con base de datos remota en Mongo:
+
+<center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjl2QNIUw2URsMWFQ1PoiLOD-JhD7laaLRRA&s" alt="Mongo Atlas"></center>
+
 
 1) Se debe disponer de las siguientes variables de entorno para su ejecución:
 
@@ -153,12 +164,16 @@ raíz del proyecto para configurar dichas variables de entorno.
 docker compose up --build
 ```
 
-3) Acceder a documentación en el servidor de desarrollo: https://users-uniquegroup-match-fiuba.azurewebsites.net/api-doc/
+3) Acceder a documentación en el servidor de desarrollo: http://localhost:4000/api-doc/
 
-4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: https://users-uniquegroup-match-fiuba.azurewebsites.net/api/status
+**NOTA: Para correr el endpoint local debe asegurarse que el menú desplegable "Servers" se encuentre en local **
+
+4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: http://localhost:4000/api/status
 
 
-# Ejecución sobre base de datos de desarrollo (local):
+## Ejecución sobre base de datos de desarrollo (local):
+
+<center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTidRfs7wM4fzKregUCCPt7FxazCGGNnQwkqCb2pz-rGWwkBsZFS76mqWrpu2q8I9A_1H4&usqp=CAU" alt="Local DB"></center>
 
 1) Se debe disponer del archivo ".dev.env" (pasado por privado) en la raíz del proyecto
 el cual permite configurar las variables de entorno.
@@ -185,8 +200,11 @@ HOST=0.0.0.0
 ```
 docker compose -f dev.docker-compose.yml up --build
 ```
-3) Acceder a documentación en local: http://localhost:<PORT>/api-doc/
+3) Acceder a documentación en local: http://localhost:\<PORT\>/api-doc/
 
-Nota: PORT normalmente es 4000 o sea: http://localhost:4000/api-doc/
+Nota 1: PORT normalmente es 4000 o sea: http://localhost:4000/api-doc/
+
+NOTA 2: Para correr el endpoint local debe asegurarse que el menú desplegable "Servers" se encuentre en local
+
 
 4) Endpoint GET para testear rápidamente desde un browser si la app funciona correctamente: http://localhost:4000/api/status
