@@ -2,10 +2,27 @@ const {logInfo, logError} = require('./log/log');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
+let is_apikeys_checking_enabled = !process.env.IS_APIKEY_CHECKING_DISABLED;
 let whitelist_apikeys = undefined;
 let self_apikey = undefined;
 let active_apikey_endpoint = undefined;
 let apiKeyState = undefined;
+
+/**
+ * 
+ * @returns booleano que indica si debe o no realizarse el chequeo de la presencia del header 'x-apikey'
+ */
+const isApiKeyCheckingEnabled = () => {
+    return is_apikeys_checking_enabled;
+}
+
+/**
+ * 
+ *  @description define si se debe realizar la validación sobre el header 'x-apikey'
+ */
+const setIsApiKeyCheckingEnabled = (isEnabled) => {
+    is_apikeys_checking_enabled = isEnabled;
+}
 
 /**
  * 
@@ -96,5 +113,7 @@ module.exports = {
     setSelfApikey,
     setActiveApiKeyEndpoint,
     enableApiKey,
+    isApiKeyCheckingEnabled,
+    setIsApiKeyCheckingEnabled,
 }
 
