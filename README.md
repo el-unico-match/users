@@ -224,7 +224,7 @@ NOTA 2: Para correr el endpoint local debe asegurarse que el menú desplegable "
 
 
 
-Ejecutar las siguientes instrucciones en consola:
+Ejecutar las siguientes comandos en consola:
 
 ```
 npm install

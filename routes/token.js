@@ -75,8 +75,8 @@ const router = Router();
  *                              msg:
  *                                  type: string
  *                                  example: The user does not exist
- *          503:
- *              description: service not available! "Invalidad Apikey" or "The apikeys does not match"
+ *          500:
+ *              description: return internal error!
  *              content:
  *                  application/json:
  *                      schema:
@@ -87,7 +87,7 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: string
- *                                  example: "Invalidad Apikey"
+ *                                  example: Please talk to the administrator
 */
 router.post('/', decodeJWT, refreshToken);
 
