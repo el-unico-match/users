@@ -28,7 +28,6 @@ La responsabilidad de este microservicio esta dada por la autenticación de usua
         * Consultar datos de un usuario en base a un email en particular.
         * Bloquear y desbloquear usuarios.
         * Leer el log.
-        * Establecer y renovar whitelist de apikeys.
 
 **NOTA: Un usuario cliente no puede pasar a ser administrador y viceversa.**
 
@@ -99,7 +98,7 @@ Se utilizan apikeys en una whitelist encriptadas como JWT. En caso de encontrars
 
 * Login de usuario.
 * Renovación de token.
-* Actualización de apikeys (con un usuario administrador).
+* Actualización de apikeys.
 
 ## Liberías utilizadas:
 <center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSJscx615heuSsv1tw02aEq7gBPkLohEBuxw&s" alt="Nodejs"></center>
@@ -127,7 +126,7 @@ Se utilizan apikeys en una whitelist encriptadas como JWT. En caso de encontrars
 <center><image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_9WelGnPrPva68rnqGLSPDnb-wNIAgv7ziQ&s" alt="Swagger"></center>
 
 
-Enlace: https://users-uniquegroup-match-fiuba.azurewebsites.net/api-doc/
+Enlace: https://users-uniquegroup-match-fiuba.azurewebsites.net/api-docs/
 
 # Instrucciones:
 
@@ -154,9 +153,15 @@ LOG_FILENAME = "log.txt"
 LOG_LEVEL = 10
 HOST=0.0.0.0
 
+APIKEY_WHITELIST="<apikey0> <apykey1> <apikey2>"
+APIKEY_VALUE="<apikey local>
+APIKEY_ACTIVATE_ENDPOINT=<endpoint services>
+IS_APIKEY_CHECKING_DISABLED=true
 ```
 Opcionalmente se podrá utilizar el archivo .env (pasado por privado) en la 
 raíz del proyecto para configurar dichas variables de entorno.
+
+NOTA: IS_APIKEY_CHECKING_DISABLED permite no utilizar chequeo con apikey en pruebas locales.
 
 2) Ejecutar el siguiente comando:
 
@@ -164,7 +169,7 @@ raíz del proyecto para configurar dichas variables de entorno.
 docker compose up --build
 ```
 
-3) Acceder a documentación en el servidor de desarrollo: http://localhost:4000/api-doc/
+3) Acceder a documentación en el servidor de desarrollo: http://localhost:4000/api-docs/
 
 **NOTA: Para correr el endpoint local debe asegurarse que el menú desplegable "Servers" se encuentre en local **
 
@@ -193,7 +198,12 @@ LOG_FILENAME = "log.txt"
 LOG_LEVEL = 10
 HOST=0.0.0.0
 
+APIKEY_WHITELIST="<apikey0> <apykey1> <apikey2>"
+APIKEY_VALUE="<apikey local>
+APIKEY_ACTIVATE_ENDPOINT=<endpoint services>
+IS_APIKEY_CHECKING_DISABLED=true
 ```
+NOTA: IS_APIKEY_CHECKING_DISABLED permite no utilizar chequeo con apikey en pruebas locales.
 
 2) Ejecutar el siguiente comando:
 
