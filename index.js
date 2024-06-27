@@ -8,7 +8,7 @@ const {initLog,
 // Importar y configurar variables de entorno
 require('dotenv').config();
 const {setApikeys, setSelfApikey, setActiveApiKeyEndpoint, enableApiKey} = require('./helpers/apikeys')
-setApikeys(process.env.APIKEY_WHITELIST);
+setApikeys(process.env.APIKEY_WHITELIST.split(' '));
 setSelfApikey(process.env.APIKEY_VALUE);
 setActiveApiKeyEndpoint(process.env.APIKEY_ACTIVATE_ENDPOINT);
 enableApiKey();
