@@ -1,13 +1,10 @@
 /*
     Rutas de Estado /apikeys
-    host + /api/apikeys
+    host + /api/whitelist
 */
 
 const {Router} = require('express');
-const {updateWhitelist} = require('../controllers/apikeys');
-const {validateJWT} = require('../middlewares/validateJWT');
-const {checkSetApikeys} = require('../middlewares/checkers/apikeys');
-const {validateApikeys} = require('../middlewares/validateApikeys');
+const {updateWhitelist} = require('../controllers/whitelist');
 
 const router = Router();
 
@@ -19,33 +16,26 @@ const router = Router();
  *      tags: [Apikeys]
  *      parameters:
  *          - in: header
- *            name: x-token
+ *            name: x-apikey
  *            schema:
  *              type: string
  *              description: admin user token
+ *              required: true
  *      requestBody:
  *          required: true
  *          content: 
  *              application/json:
  *                  schema:
  *                      type: object
- *                      $ref: '#/components/schemas/Apikeys'
  *      responses:
- *          200: 
+ *          201: 
  *              description: apikeys has been seted or reneweb!
  *              content:
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          properties:
- *                              ok:
- *                                  type: boolean
- *                                  example: true
- *                              status:
- *                                  type: object
- *                                  $ref: '#/components/schemas/Apikeys'
- *          401:
- *              description: return error "Invalid token" or "You do not have the necessary access level"!
+ *          400:
+ *              description: bad request!
  *              content:
  *                  application/json:
  *                      schema:
@@ -56,9 +46,9 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: string
- *                                  example: "You do not have the necessary access level"
- *          500:
- *              description: return internal error!
+ *                                  example: "Empty apikey"
+ *          503:
+ *              description: unavailable service!
  *              content:
  *                  application/json:
  *                      schema:
@@ -69,7 +59,7 @@ const router = Router();
  *                                  example: false
  *                              msg:
  *                                  type: string
- *                                  example: Please talk to the administrator
+ *                                  example: unavailable service
 */
 router.put('*', updateWhitelist);
 

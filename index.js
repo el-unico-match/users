@@ -71,7 +71,7 @@ app.use('/api/token', require('./routes/token'));
 app.use('/status', require('./routes/status'));
 app.use('/api/restorer', require('./routes/restorer'));
 app.use('/api/pin', require('./routes/pin'));
-app.use('/whitelist', require('./routes/apikeys'));
+app.use('/whitelist', require('./routes/whitelist'));
 app.use('/api/log', require('./routes/log'));
 
 // Escuchar peticiones

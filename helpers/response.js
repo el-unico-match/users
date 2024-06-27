@@ -13,7 +13,7 @@ const {
 const responseWithApikey = async (req, res = response, letterheadToLog, status, dataToSend, dataToLog) => {
     try {
         const toLog = dataToLog ? dataToLog : dataToSend;
-        validateApikeysOnResponse(req);
+        validateApikeysOnResponse();
         logInfo(`${letterheadToLog}: ${status}; ${JSON.stringify(toLog)}`);
         res.status(status).json(dataToSend);   
     } catch (error) {

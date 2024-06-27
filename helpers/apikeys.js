@@ -12,7 +12,7 @@ let apiKeyState = undefined;
  * @description establece todas las apikeys
  */
 const setApikeys = (apikeys) => {
-    logInfo(`Set the apikeys: ${JSON.stringify(apikeys)}`);
+    logInfo(`Set the apikeys: ${apikeys}`);
     whitelist_apikeys = apikeys;
 }
 

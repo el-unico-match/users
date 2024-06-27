@@ -200,9 +200,9 @@ HOST=0.0.0.0
 ```
 docker compose -f dev.docker-compose.yml up --build
 ```
-3) Acceder a documentación en local: http://localhost:\<PORT\>/api-doc/
+3) Acceder a documentación en local: http://localhost:\<PORT\>/api-docs/
 
-Nota 1: PORT normalmente es 4000 o sea: http://localhost:4000/api-doc/
+Nota 1: PORT normalmente es 4000 o sea: http://localhost:4000/api-docs/
 
 NOTA 2: Para correr el endpoint local debe asegurarse que el menú desplegable "Servers" se encuentre en local
 
