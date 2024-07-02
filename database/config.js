@@ -7,7 +7,8 @@ const DELAY_RETRY = 200;
 const {
     logDebug,
     logInfo,
-    logWarning} = require('../helpers/log/log');
+    logWarning,
+    logError} = require('../helpers/log/log');
 const {MSG_DATABASE_ERROR} = require('../messages/uncategorized');
 const User = require('../models/Users');
 
@@ -35,7 +36,8 @@ const dbConnection = async () => {
             await doDbConnection();
             break;        
         } catch (error) {
-            logWarning(`${MSG_DATABASE_CONN_ERROR}: ${JSON.stringify(error)} [DB_URL: ${process.env.DB_CNN}] on attempt ${attempt}`)
+            logError(`${MSG_DATABASE_CONN_ERROR}: ${error?.message} [DB_URL: ${process.env.DB_CNN}] on attempt ${attempt}`)
+            logError(str(error))
         };
 
         waiting_time *= 2; 
