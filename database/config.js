@@ -37,7 +37,7 @@ const dbConnection = async () => {
             break;        
         } catch (error) {
             logError(`${MSG_DATABASE_CONN_ERROR}: ${error?.message} [DB_URL: ${process.env.DB_CNN}] on attempt ${attempt}`)
-            logError(str(error))
+            logError(`Returned error message: ${JSON.stringify(error?.errorResponse)}`)
         };
 
         waiting_time *= 2; 
