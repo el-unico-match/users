@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const {dbConnection} = require('./database/config');
-const {initLog,
-    logInfo
-} = require('./helpers/log/log');
+const {logInfo} = require('./helpers/log/log');
 
 // Importar y configurar variables de entorno
 require('dotenv').config();
@@ -12,9 +10,6 @@ setApikeys(process.env.APIKEY_WHITELIST.split(' '));
 setSelfApikey(process.env.APIKEY_VALUE);
 setActiveApiKeyEndpoint(process.env.APIKEY_ACTIVATE_ENDPOINT);
 enableApiKey();
-
-// Inicializar log
-initLog();
 
 // Paths
 const path = require("path");

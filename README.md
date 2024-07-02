@@ -149,13 +149,12 @@ SERVICE_EMAIL_APP = Gmail
 HOST_EMAIL_APP = smtp.gmail.com
 PORT_EMAIL_APP = 465
 
-LOG_FILENAME = "log.txt"
 LOG_LEVEL = 10
 HOST=0.0.0.0
 
 APIKEY_WHITELIST="<apikey0> <apykey1> <apikey2>"
-APIKEY_VALUE="<apikey local>
-APIKEY_ACTIVATE_ENDPOINT=<endpoint services>
+APIKEY_VALUE="<apikey local>"
+APIKEY_ACTIVATE_ENDPOINT="<endpoint services>"
 IS_APIKEY_CHECKING_DISABLED=true
 ```
 Opcionalmente se podrá utilizar el archivo .env (pasado por privado) en la 
@@ -194,16 +193,37 @@ SERVICE_EMAIL_APP = Gmail
 HOST_EMAIL_APP = smtp.gmail.com
 PORT_EMAIL_APP = 465
 
-LOG_FILENAME = "log.txt"
 LOG_LEVEL = 10
 HOST=0.0.0.0
 
 APIKEY_WHITELIST="<apikey0> <apykey1> <apikey2>"
-APIKEY_VALUE="<apikey local>
-APIKEY_ACTIVATE_ENDPOINT=<endpoint services>
+APIKEY_VALUE="<apikey local>"
+APIKEY_ACTIVATE_ENDPOINT="<endpoint services>"
+IS_APIKEY_CHECKING_DISABLED=<true or false>
+```
+NOTA: IS_APIKEY_CHECKING_DISABLED permite no utilizar chequeo con apikey.
+
+Ejemplo de archivo de entorno sin chequeo de apikeys:
+
+```
+PORT = 4000
+DB_CNN=mongodb://users_mongo:27017/match_dev
+SECRET_JWT_SEED=************************
+
+EMAIL_APP = matchunico@gmail.com
+PASS_EMAIL_APP = '************************'
+SERVICE_EMAIL_APP = Gmail
+HOST_EMAIL_APP = smtp.gmail.com
+PORT_EMAIL_APP = 465
+
+LOG_LEVEL = 10
+HOST=0.0.0.0
+
+APIKEY_WHITELIST=""
+APIKEY_VALUE=""
+APIKEY_ACTIVATE_ENDPOINT=""
 IS_APIKEY_CHECKING_DISABLED=true
 ```
-NOTA: IS_APIKEY_CHECKING_DISABLED permite no utilizar chequeo con apikey en pruebas locales.
 
 2) Ejecutar el siguiente comando:
 
