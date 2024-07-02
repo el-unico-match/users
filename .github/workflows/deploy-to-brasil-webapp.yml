@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "PORT=${{ vars.PORT }}" > .env    
           echo "HOST=${{ vars.HOST }}" >> .env
-          echo "DB_CNN=${{ secrets.DB_CNN }}" >> .env
+          echo "${{ secrets.DB_CNN }}" >> .env
           echo "SECRET_JWT_SEED=${{ secrets.SECRET_JWT_SEED }}" >> .env
           
           echo "EMAIL_CHECK_APP=${{ vars.EMAIL_CHECK_APP }}" >> .env
