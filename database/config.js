@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const {sleep} = require('../helpers/sleep');
 const MSG_DB_ONLINE = 'User database is ONLINE';
 const MSG_RETRY_CONN_DB = `Retry connecting user database`;
+const MSG_DATABASE_CONN_ERROR = 'Error raise while connecting to database';
 const DELAY_RETRY = 200;
 const {
     logDebug,
@@ -25,14 +26,22 @@ const doDbConnection = async () => {
  * @description inicia la conexión a la base de datos
  */
 const dbConnection = async () => {
+
+    let attempt = 0
+    let waiting_time = DELAY_RETRY
+
     while (true) {
         try {
             await doDbConnection();
             break;        
         } catch (error) {
-            logWarning(`${MSG_RETRY_CONN_DB}: ${process.env.DB_CNN}`)
+            logWarning(`${MSG_DATABASE_CONN_ERROR}: ${JSON.stringify(error)} [DB_URL: ${process.env.DB_CNN}] on attempt ${attempt}`)
         };
-        await sleep(DELAY_RETRY);
+
+        waiting_time *= 2; 
+        logInfo(`${MSG_RETRY_CONN_DB}: waiting for ${waiting_time}ms`)
+        await sleep(waiting_time);
+        attempt += 1
     }
 }
 
