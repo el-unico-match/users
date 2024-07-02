@@ -35,6 +35,9 @@ const swaggerSpec = {
                 url: `https://users-uniquegroup-match-fiuba.azurewebsites.net`
             },
             {
+                url: `https://br-users-uniquegroup-match-fiuba.azurewebsites.net`
+            },
+            {
                 url: `http://${process.env.HOST}:${process.env.PORT}`
             }
         ]
