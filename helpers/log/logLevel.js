@@ -35,7 +35,7 @@ const getLogLevel = (numberLevel) => {
     if (numberLevel <= LOG_LEVELS.WARNING.level) {
         return LOG_LEVELS.WARNING;
     }
-    return LOG_LEVELS.DEBUG;
+    return LOG_LEVELS.ERROR;
 }
 
 module.exports = {
